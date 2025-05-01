@@ -1,0 +1,17 @@
+# Add library target for dynamic_array
+add_library(dsa_dynamic_array STATIC
+    dynamic_array.c
+)
+
+# Set target properties
+target_include_directories(dsa_dynamic_array
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
+        $<INSTALL_INTERFACE:include>
+)
+
+# Add compile options if needed (can inherit from parent)
+# target_compile_options(dsa_dynamic_array PRIVATE ...)
+
+# Export the library for installation
+install(TARGETS dsa_dynamic_array EXPORT dsaTargets)

@@ -1,0 +1,28 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+*.dll
+*.exe
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Editor/OS specific files
+.DS_Store
+*.swp
+*~
+*.bak
+*.orig
+
+# VS Code specific
+.vscode/
+
+# Other temporary files
+*.log

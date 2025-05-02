@@ -170,6 +170,47 @@ bool dynamic_array_insert(DynamicArray* array, size_t index, void* element) {
     return true;
 }
 
+/**
+ * @brief 从动态数组的指定索引处移除一个元素
+ *
+ * 索引 `index` 必须在 `[0, size - 1]` 范围内。
+ * 后续元素将向前移动以填补空缺。
+ *
+ * @param array 指向DynamicArray的指针
+ * @param index 要移除元素的索引
+ * @return 指向被移除元素的指针，如果索引无效或数组为空则返回NULL
+ */
+void* dynamic_array_remove(DynamicArray* array, size_t index) {
+    // 使用现有的辅助函数检查索引是否越界
+    if (is_index_out_of_bounds(array, index)) {
+        return NULL; // 索引无效或数组为空
+    }
+
+    // 存储要移除的元素
+    void* removed_element = array->data[index];
+
+    // 如果移除的不是最后一个元素，则需要移动后续元素
+    if (index < array->size - 1) {
+        // 将从 index + 1 开始的元素向前移动一个位置
+        memmove(&array->data[index], &array->data[index + 1],
+                (array->size - 1 - index) * sizeof(void*));
+    }
+
+    // 减少数组大小
+    array->size--;
+
+    // 可选：将最后一个（现在未使用的）槽位置为 NULL
+    // array->data[array->size] = NULL;
+
+    // 可选：如果大小远小于容量，考虑缩小数组
+    // if (array->size > 0 && array->size <= array->capacity / 4 && array->capacity > DEFAULT_CAPACITY) {
+    //     dynamic_array_resize(array, array->capacity / 2);
+    //     // 忽略移除操作的调整大小失败，因为元素在逻辑上已经被移除
+    // }
+
+    return removed_element;
+}
+
 size_t dynamic_array_size(const DynamicArray* array) {
     return array ? array->size : 0;
 }
@@ -185,26 +226,13 @@ size_t dynamic_array_capacity(const DynamicArray* array) {
  * @return 指向被移除元素的指针，如果数组为空或无效则返回NULL
  */
 void* dynamic_array_pop_back(DynamicArray* array) {
-    if (!array || array->size == 0) {
-        return NULL; // 数组无效或为空
+    // 检查数组是否为空或无效
+    if (!array || dynamic_array_is_empty(array)) {
+        return NULL;
     }
-
-    // 获取最后一个元素
-    void* last_element = array->data[array->size - 1];
-
-    // 减少大小
-    array->size--;
-
-    // 可选：如果大小远小于容量，考虑缩小数组
-    // if (array->size > 0 && array->size <= array->capacity / 4 && array->capacity > DEFAULT_CAPACITY) {
-    //     dynamic_array_resize(array, array->capacity / 2);
-    //     // 忽略弹出操作的调整大小失败，因为元素在逻辑上已经被移除
-    // }
-
-    // 将指针槽位置为 NULL（可选，有助于捕获悬挂指针问题）
-    // array->data[array->size] = NULL;
-
-    return last_element;
+    // 调用 remove 函数移除最后一个元素
+    // 此时 size > 0，所以 size - 1 是有效索引
+    return dynamic_array_remove(array, dynamic_array_size(array) - 1);
 }
 bool dynamic_array_is_empty(const DynamicArray* array) {
     return array ? (array->size == 0) : true;

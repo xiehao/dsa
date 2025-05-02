@@ -194,6 +194,81 @@ static void test_dynamic_array_insert(void **state) {
     dynamic_array_destroy_with_free(arr);
 }
 
+// 移除元素测试用例
+static void test_dynamic_array_remove(void **state) {
+    (void) state; // 未使用
+    DynamicArray* arr = dynamic_array_create(5);
+    assert_non_null(arr);
+
+    // 准备数据
+    int* val1 = malloc(sizeof(int)); *val1 = 10;
+    int* val2 = malloc(sizeof(int)); *val2 = 20;
+    int* val3 = malloc(sizeof(int)); *val3 = 30;
+    int* val4 = malloc(sizeof(int)); *val4 = 40;
+    dynamic_array_push_back(arr, val1);
+    dynamic_array_push_back(arr, val2);
+    dynamic_array_push_back(arr, val3);
+    dynamic_array_push_back(arr, val4);
+    // 当前数组: [10, 20, 30, 40], size = 4
+
+    // 1. 从中间移除
+    void* removed = dynamic_array_remove(arr, 1); // 移除 20
+    assert_non_null(removed);
+    assert_int_equal(*(int*)removed, 20);
+    free(removed); // 释放被移除元素的数据
+    assert_int_equal(dynamic_array_size(arr), 3);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 30); // 30 移到索引 1
+    assert_int_equal(*(int*)dynamic_array_get(arr, 2), 40);
+    // 当前数组: [10, 30, 40], size = 3
+
+    // 2. 从末尾移除
+    removed = dynamic_array_remove(arr, 2); // 移除 40
+    assert_non_null(removed);
+    assert_int_equal(*(int*)removed, 40);
+    free(removed);
+    assert_int_equal(dynamic_array_size(arr), 2);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 30);
+    // 当前数组: [10, 30], size = 2
+
+    // 3. 从开头移除
+    removed = dynamic_array_remove(arr, 0); // 移除 10
+    assert_non_null(removed);
+    assert_int_equal(*(int*)removed, 10);
+    free(removed);
+    assert_int_equal(dynamic_array_size(arr), 1);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 30); // 30 移到索引 0
+    // 当前数组: [30], size = 1
+
+    // 4. 移除最后一个元素
+    removed = dynamic_array_remove(arr, 0); // 移除 30
+    assert_non_null(removed);
+    assert_int_equal(*(int*)removed, 30);
+    free(removed);
+    assert_int_equal(dynamic_array_size(arr), 0);
+    // 当前数组: [], size = 0
+
+    // 5. 从空数组移除
+    removed = dynamic_array_remove(arr, 0);
+    assert_null(removed);
+    assert_int_equal(dynamic_array_size(arr), 0);
+
+    // 6. 移除无效索引
+    // 先添加一个元素
+    int* val5 = malloc(sizeof(int)); *val5 = 50;
+    dynamic_array_push_back(arr, val5);
+    assert_int_equal(dynamic_array_size(arr), 1);
+    removed = dynamic_array_remove(arr, 1); // 索引 1 越界
+    assert_null(removed);
+    assert_int_equal(dynamic_array_size(arr), 1); // 大小不变
+    removed = dynamic_array_remove(arr, -1); // 负索引
+    assert_null(removed);
+    assert_int_equal(dynamic_array_size(arr), 1);
+
+    dynamic_array_destroy_with_free(arr); // 释放 val5
+}
+
 
 int main(void) {
     const struct CMUnitTest tests[] = {
@@ -205,6 +280,7 @@ int main(void) {
         cmocka_unit_test(test_dynamic_array_empty),
         cmocka_unit_test(test_dynamic_array_invalid_index),
         cmocka_unit_test(test_dynamic_array_insert),
+        cmocka_unit_test(test_dynamic_array_remove),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

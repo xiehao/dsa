@@ -75,6 +75,18 @@ void* dynamic_array_set(DynamicArray* array, size_t index, void* element);
 bool dynamic_array_insert(DynamicArray* array, size_t index, void* element);
 
 /**
+ * @brief 从动态数组的指定索引处移除一个元素
+ *
+ * 索引 `index` 必须在 `[0, size - 1]` 范围内。
+ * 后续元素将向前移动以填补空缺。
+ *
+ * @param array 指向DynamicArray的指针
+ * @param index 要移除元素的索引
+ * @return 指向被移除元素的指针，如果索引无效或数组为空则返回NULL
+ */
+void* dynamic_array_remove(DynamicArray* array, size_t index);
+
+/**
  * @brief 移除并返回动态数组的最后一个元素
  *
  * @param array 指向DynamicArray的指针

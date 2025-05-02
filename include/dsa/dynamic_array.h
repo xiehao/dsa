@@ -63,6 +63,18 @@ void* dynamic_array_get(const DynamicArray* array, size_t index);
 void* dynamic_array_set(DynamicArray* array, size_t index, void* element);
 
 /**
+ * @brief 在动态数组的指定索引处插入一个元素
+ *
+ * 如果需要，数组会自动调整大小。索引 `index` 必须在 `[0, size]` 范围内。
+ * 如果 `index == size`，则效果等同于 `dynamic_array_add`。
+ * @param array 指向DynamicArray的指针
+ * @param index 要插入元素的索引
+ * @param element 指向要插入的元素的指针
+ * @return 如果元素插入成功返回true，否则返回false（例如，索引无效、分配失败）
+ */
+bool dynamic_array_insert(DynamicArray* array, size_t index, void* element);
+
+/**
  * @brief 移除并返回动态数组的最后一个元素
  *
  * @param array 指向DynamicArray的指针

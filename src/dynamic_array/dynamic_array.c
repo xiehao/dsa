@@ -91,21 +91,8 @@ void dynamic_array_destroy_with_free(DynamicArray* array) {
 
 
 bool dynamic_array_add(DynamicArray* array, void* element) {
-    if (!array) {
-        return false;
-    }
-
-    // 检查是否需要调整大小
-    if (array->size >= array->capacity) {
-        size_t new_capacity = (array->capacity == 0) ? DEFAULT_CAPACITY : array->capacity * 2;
-        if (!dynamic_array_resize(array, new_capacity)) {
-            return false; // 调整大小失败
-        }
-    }
-
-    array->data[array->size] = element;
-    array->size++;
-    return true;
+    // 添加元素等同于在末尾插入
+    return dynamic_array_insert(array, dynamic_array_size(array), element);
 }
 
 void* dynamic_array_get(const DynamicArray* array, size_t index) {
@@ -133,6 +120,40 @@ void* dynamic_array_set(DynamicArray* array, size_t index, void* element) {
     array->data[index] = element;
     // 返回旧元素
     return old_element;
+}
+
+bool dynamic_array_insert(DynamicArray* array, size_t index, void* element) {
+    if (!array) {
+        return false;
+    }
+
+    // 索引必须在 [0, size] 范围内
+    if (index > array->size) {
+        fprintf(stderr, "错误：插入索引 %zu 超出动态数组大小 %zu 的范围 [0, %zu]。\n", index, array->size, array->size);
+        return false;
+    }
+
+    // 检查是否需要调整大小
+    if (array->size >= array->capacity) {
+        size_t new_capacity = (array->capacity == 0) ? DEFAULT_CAPACITY : array->capacity * 2;
+        if (!dynamic_array_resize(array, new_capacity)) {
+            return false; // 调整大小失败
+        }
+    }
+
+    // 如果插入位置不是末尾，则需要移动元素
+    if (index < array->size) {
+        // 将从 index 开始的元素向后移动一个位置
+        memmove(&array->data[index + 1], &array->data[index],
+                (array->size - index) * sizeof(void*));
+    }
+
+    // 在指定位置插入新元素
+    array->data[index] = element;
+    // 增加数组大小
+    array->size++;
+
+    return true;
 }
 
 size_t dynamic_array_size(const DynamicArray* array) {

@@ -146,6 +146,54 @@ static void test_dynamic_array_invalid_index(void **state) {
     dynamic_array_destroy_with_free(arr);
 }
 
+// 插入元素测试用例
+static void test_dynamic_array_insert(void **state) {
+    (void) state; // 未使用
+    DynamicArray* arr = dynamic_array_create(2);
+    assert_non_null(arr);
+
+    // 1. 在末尾插入 (等同于 add)
+    int* val1 = malloc(sizeof(int)); *val1 = 10;
+    assert_true(dynamic_array_insert(arr, 0, val1)); // 插入到空数组索引 0
+    assert_int_equal(dynamic_array_size(arr), 1);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
+
+    int* val2 = malloc(sizeof(int)); *val2 = 20;
+    assert_true(dynamic_array_insert(arr, 1, val2)); // 插入到末尾索引 1
+    assert_int_equal(dynamic_array_size(arr), 2);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 20);
+
+    // 2. 在开头插入
+    int* val0 = malloc(sizeof(int)); *val0 = 5;
+    assert_true(dynamic_array_insert(arr, 0, val0)); // 插入到开头索引 0
+    assert_int_equal(dynamic_array_size(arr), 3);
+    assert_true(dynamic_array_capacity(arr) >= 3); // 可能触发扩容
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 5);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 10);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 2), 20);
+
+    // 3. 在中间插入
+    int* val1_5 = malloc(sizeof(int)); *val1_5 = 15;
+    assert_true(dynamic_array_insert(arr, 2, val1_5)); // 插入到中间索引 2
+    assert_int_equal(dynamic_array_size(arr), 4);
+    assert_true(dynamic_array_capacity(arr) >= 4);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 5);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 10);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 2), 15);
+    assert_int_equal(*(int*)dynamic_array_get(arr, 3), 20);
+
+    // 4. 插入无效索引
+    int* val_invalid = malloc(sizeof(int)); *val_invalid = 100;
+    assert_false(dynamic_array_insert(arr, 5, val_invalid)); // 索引 5 越界 (size 是 4)
+    assert_int_equal(dynamic_array_size(arr), 4); // 大小不变
+    free(val_invalid); // 释放未插入的数据
+
+    // 5. 插入触发扩容 (已在上面测试过)
+
+    dynamic_array_destroy_with_free(arr);
+}
+
 
 int main(void) {
     const struct CMUnitTest tests[] = {
@@ -156,6 +204,7 @@ int main(void) {
         cmocka_unit_test(test_dynamic_array_size_capacity),
         cmocka_unit_test(test_dynamic_array_empty),
         cmocka_unit_test(test_dynamic_array_invalid_index),
+        cmocka_unit_test(test_dynamic_array_insert),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

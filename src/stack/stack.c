@@ -34,8 +34,8 @@ bool stack_push(Stack* stack, void* element) {
     if (!stack) {
         return false;
     }
-    // 使用 dynamic_array_add 来压入元素
-    return dynamic_array_add(stack->array, element);
+    // 使用 dynamic_array_push_back 来压入元素
+    return dynamic_array_push_back(stack->array, element);
 }
 
 void* stack_pop(Stack* stack) {

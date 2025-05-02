@@ -17,7 +17,7 @@ static void test_dynamic_array_creation(void **state) {
 }
 
 // 添加和获取元素测试用例
-static void test_dynamic_array_add_get(void **state) {
+static void test_dynamic_array_push_back_get(void **state) {
     (void) state; // 未使用
     DynamicArray* arr = dynamic_array_create(2);
     assert_non_null(arr);
@@ -25,8 +25,8 @@ static void test_dynamic_array_add_get(void **state) {
     int* val1 = malloc(sizeof(int)); *val1 = 10;
     int* val2 = malloc(sizeof(int)); *val2 = 20;
 
-    dynamic_array_add(arr, val1);
-    dynamic_array_add(arr, val2);
+    dynamic_array_push_back(arr, val1);
+    dynamic_array_push_back(arr, val2);
 
     assert_int_equal(dynamic_array_size(arr), 2);
     int* retrieved_val1 = (int*)dynamic_array_get(arr, 0);
@@ -42,24 +42,24 @@ static void test_dynamic_array_add_get(void **state) {
 }
 
 // 添加元素触发调整大小的测试用例
-static void test_dynamic_array_add_resize(void **state) {
+static void test_dynamic_array_push_back_resize(void **state) {
     (void) state; // 未使用
     DynamicArray* arr = dynamic_array_create(1); // 从小容量开始
     assert_non_null(arr);
     assert_int_equal(dynamic_array_capacity(arr), 1);
 
     int* val1 = malloc(sizeof(int)); *val1 = 1;
-    dynamic_array_add(arr, val1);
+    dynamic_array_push_back(arr, val1);
     assert_int_equal(dynamic_array_size(arr), 1);
     assert_int_equal(dynamic_array_capacity(arr), 1);
 
     int* val2 = malloc(sizeof(int)); *val2 = 2;
-    dynamic_array_add(arr, val2); // 这应该触发调整大小
+    dynamic_array_push_back(arr, val2); // 这应该触发调整大小
     assert_int_equal(dynamic_array_size(arr), 2);
     assert_true(dynamic_array_capacity(arr) > 1); // 容量应该增加了
 
     int* val3 = malloc(sizeof(int)); *val3 = 3;
-    dynamic_array_add(arr, val3); // 可能触发另一次调整大小
+    dynamic_array_push_back(arr, val3); // 可能触发另一次调整大小
     assert_int_equal(dynamic_array_size(arr), 3);
     assert_true(dynamic_array_capacity(arr) >= 3);
 
@@ -77,8 +77,8 @@ static void test_dynamic_array_set(void **state) {
     DynamicArray* arr = dynamic_array_create(5);
     int* val1 = malloc(sizeof(int)); *val1 = 1;
     int* val2 = malloc(sizeof(int)); *val2 = 2;
-    dynamic_array_add(arr, val1);
-    dynamic_array_add(arr, val2);
+    dynamic_array_push_back(arr, val1);
+    dynamic_array_push_back(arr, val2);
 
     int* new_val = malloc(sizeof(int)); *new_val = 99;
     void* old_val = dynamic_array_set(arr, 1, new_val);
@@ -102,19 +102,19 @@ static void test_dynamic_array_size_capacity(void **state) {
     assert_int_equal(dynamic_array_capacity(arr), 3);
 
     int* val1 = malloc(sizeof(int)); *val1 = 1;
-    dynamic_array_add(arr, val1);
+    dynamic_array_push_back(arr, val1);
     assert_int_equal(dynamic_array_size(arr), 1);
     assert_int_equal(dynamic_array_capacity(arr), 3);
 
     int* val2 = malloc(sizeof(int)); *val2 = 2;
-    dynamic_array_add(arr, val2);
+    dynamic_array_push_back(arr, val2);
     int* val3 = malloc(sizeof(int)); *val3 = 3;
-    dynamic_array_add(arr, val3);
+    dynamic_array_push_back(arr, val3);
     assert_int_equal(dynamic_array_size(arr), 3);
     assert_int_equal(dynamic_array_capacity(arr), 3);
 
     int* val4 = malloc(sizeof(int)); *val4 = 4;
-    dynamic_array_add(arr, val4); // 调整大小
+    dynamic_array_push_back(arr, val4); // 调整大小
     assert_int_equal(dynamic_array_size(arr), 4);
     assert_true(dynamic_array_capacity(arr) > 3);
 
@@ -136,7 +136,7 @@ static void test_dynamic_array_invalid_index(void **state) {
     (void) state; // 未使用
     DynamicArray* arr = dynamic_array_create(5);
     int* val1 = malloc(sizeof(int)); *val1 = 1;
-    dynamic_array_add(arr, val1);
+    dynamic_array_push_back(arr, val1);
 
     assert_null(dynamic_array_get(arr, 1)); // 索引越界（大小为 1）
     assert_null(dynamic_array_get(arr, -1)); // 负索引
@@ -198,8 +198,8 @@ static void test_dynamic_array_insert(void **state) {
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_dynamic_array_creation),
-        cmocka_unit_test(test_dynamic_array_add_get),
-        cmocka_unit_test(test_dynamic_array_add_resize),
+        cmocka_unit_test(test_dynamic_array_push_back_get),
+        cmocka_unit_test(test_dynamic_array_push_back_resize),
         cmocka_unit_test(test_dynamic_array_set),
         cmocka_unit_test(test_dynamic_array_size_capacity),
         cmocka_unit_test(test_dynamic_array_empty),

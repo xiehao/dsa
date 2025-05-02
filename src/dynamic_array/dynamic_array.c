@@ -90,7 +90,7 @@ void dynamic_array_destroy_with_free(DynamicArray* array) {
 }
 
 
-bool dynamic_array_add(DynamicArray* array, void* element) {
+bool dynamic_array_push_back(DynamicArray* array, void* element) {
     // 添加元素等同于在末尾插入
     return dynamic_array_insert(array, dynamic_array_size(array), element);
 }

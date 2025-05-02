@@ -14,7 +14,7 @@ int main() {
     for (int i = 0; i < 5; i++) {
         int* value = malloc(sizeof(int));
         *value = i;
-        dynamic_array_add(arr, value);
+        dynamic_array_push_back(arr, value);
     }
     printf("Array size: %zu\n", dynamic_array_size(arr));
     printf("Array elements: ");

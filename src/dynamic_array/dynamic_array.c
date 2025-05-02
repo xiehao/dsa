@@ -95,23 +95,42 @@ bool dynamic_array_push_back(DynamicArray* array, void* element) {
     return dynamic_array_insert(array, dynamic_array_size(array), element);
 }
 
+// 内部辅助函数，用于检查索引是否越界 (适用于 get/set 操作)
+static bool is_index_out_of_bounds(const DynamicArray* array, size_t index) {
+    if (!array) { // 检查数组指针是否有效
+        fprintf(stderr, "错误：动态数组指针无效。\n");
+        return true; // 无效指针视为越界
+    }
+    if (index >= array->size) {
+        fprintf(stderr, "错误：索引 %zu 超出动态数组大小 %zu 的范围 [0, %zu)。\n", index, array->size, array->size);
+        return true;
+    }
+    return false;
+}
+
+// 内部辅助函数，用于检查插入索引是否无效 (适用于 insert 操作)
+static bool is_insert_index_invalid(const DynamicArray* array, size_t index) {
+    if (!array) { // 检查数组指针是否有效
+        fprintf(stderr, "错误：动态数组指针无效。\n");
+        return true; // 无效指针视为无效索引
+    }
+    // 插入索引允许等于 size
+    if (index > array->size) {
+        fprintf(stderr, "错误：插入索引 %zu 超出动态数组大小 %zu 的允许范围 [0, %zu]。\n", index, array->size, array->size);
+        return true;
+    }
+    return false;
+}
+
 void* dynamic_array_get(const DynamicArray* array, size_t index) {
-    if (!array || index >= array->size) {
-        // 索引越界或数组为空
-        if (array) {
-             fprintf(stderr, "错误：索引 %zu 超出动态数组大小 %zu 的范围。\n", index, array->size);
-        }
+    if (is_index_out_of_bounds(array, index)) {
         return NULL;
     }
     return array->data[index];
 }
 
 void* dynamic_array_set(DynamicArray* array, size_t index, void* element) {
-    if (!array || index >= array->size) {
-        // 索引越界或数组为空
-        if (array) {
-             fprintf(stderr, "错误：索引 %zu 超出动态数组大小 %zu 的范围。\n", index, array->size);
-        }
+    if (is_index_out_of_bounds(array, index)) {
         return NULL; // 错误/越界时返回 NULL
     }
     // 存储旧元素
@@ -123,13 +142,8 @@ void* dynamic_array_set(DynamicArray* array, size_t index, void* element) {
 }
 
 bool dynamic_array_insert(DynamicArray* array, size_t index, void* element) {
-    if (!array) {
-        return false;
-    }
-
-    // 索引必须在 [0, size] 范围内
-    if (index > array->size) {
-        fprintf(stderr, "错误：插入索引 %zu 超出动态数组大小 %zu 的范围 [0, %zu]。\n", index, array->size, array->size);
+    // 使用新的辅助函数检查索引
+    if (is_insert_index_invalid(array, index)) {
         return false;
     }
 

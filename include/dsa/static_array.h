@@ -3,13 +3,14 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <dsa/common.h> // 包含通用定义
 
 // 定义静态数组结构
 // 使用 C99 的 VLA (Variable Length Array) 特性，在栈上分配
 // 注意：此结构体本身不直接包含数组，而是指向在栈上分配的数组
 // 实际使用时，通常结合 alloca 或直接在函数作用域内声明 VLA
 typedef struct {
-    void *data;         // 指向实际数据存储的指针 (通常是 VLA)
+    ElementPtr data;    // 指向实际数据存储的指针 (通常是 VLA)
     size_t size;        // 当前元素数量
     size_t capacity;    // 数组的总容量 (固定)
     size_t element_size; // 单个元素的大小（字节）
@@ -39,16 +40,16 @@ void static_array_destroy(StaticArray *arr);
  * @param index 要获取元素的索引。
  * @return 指向元素的指针，如果索引无效则返回 NULL。
  */
-void* static_array_get(const StaticArray *arr, size_t index);
+ElementPtr static_array_get(const StaticArray *arr, size_t index);
 
 /**
  * @brief 设置静态数组中指定索引处的值。
  * @param arr 指向 StaticArray 结构的指针。
  * @param index 要设置元素的索引。
- * @param value 指向要设置的值的指针。
+ * @param value 要设置的元素指针。
  * @return 如果成功则返回 true，否则返回 false（例如索引无效）。
  */
-bool static_array_set(StaticArray *arr, size_t index, const void *value);
+bool static_array_set(StaticArray *arr, size_t index, ElementPtr value);
 
 /**
  * @brief 获取静态数组的当前大小（元素数量）。
@@ -81,10 +82,10 @@ bool static_array_is_full(const StaticArray *arr);
 /**
  * @brief 在静态数组末尾添加一个元素。
  * @param arr 指向 StaticArray 结构的指针。
- * @param value 指向要添加的值的指针。
+ * @param value 要添加的元素指针。
  * @return 如果成功添加则返回 true，如果数组已满则返回 false。
  */
-bool static_array_push_back(StaticArray *arr, const void *value);
+bool static_array_push_back(StaticArray *arr, ElementPtr value);
 
 /**
  * @brief 从静态数组末尾移除一个元素。
@@ -97,10 +98,10 @@ bool static_array_pop_back(StaticArray *arr);
  * @brief 在静态数组的指定索引处插入一个元素。
  * @param arr 指向 StaticArray 结构的指针。
  * @param index 要插入位置的索引。
- * @param value 指向要插入的值的指针。
+ * @param value 要插入的元素指针。
  * @return 如果成功插入则返回 true，如果数组已满或索引无效则返回 false。
  */
-bool static_array_insert(StaticArray *arr, size_t index, const void *value);
+bool static_array_insert(StaticArray *arr, size_t index, ElementPtr value);
 
 /**
  * @brief 从静态数组的指定索引处删除一个元素。

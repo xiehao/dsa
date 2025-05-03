@@ -3,12 +3,13 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <dsa/common.h> // 包含通用定义
 
 // Opaque pointer type for the linked list
 typedef struct LinkedList LinkedList;
 
 // Type definition for a function pointer to free user-provided data
-typedef void (*FreeDataFunc)(void* data);
+typedef void (*FreeDataFunc)(ElementPtr data);
 
 /**
  * @brief Creates a new linked list.
@@ -35,7 +36,7 @@ void linked_list_destroy(LinkedList* list, FreeDataFunc free_data_func);
  * @param data A pointer to the data to add.
  * @return True if the element was added successfully, false otherwise (e.g., allocation failure).
  */
-bool linked_list_add_first(LinkedList* list, void* data);
+bool linked_list_add_first(LinkedList* list, ElementPtr data);
 
 /**
  * @brief Adds an element to the end of the linked list.
@@ -44,7 +45,7 @@ bool linked_list_add_first(LinkedList* list, void* data);
  * @param data A pointer to the data to add.
  * @return True if the element was added successfully, false otherwise (e.g., allocation failure).
  */
-bool linked_list_add_last(LinkedList* list, void* data);
+bool linked_list_add_last(LinkedList* list, ElementPtr data);
 
 /**
  * @brief Inserts an element at the specified index.
@@ -57,7 +58,7 @@ bool linked_list_add_last(LinkedList* list, void* data);
  * @param data A pointer to the data to insert.
  * @return True if the element was inserted successfully, false if the index is out of bounds or allocation fails.
  */
-bool linked_list_insert(LinkedList* list, size_t index, void* data);
+bool linked_list_insert(LinkedList* list, size_t index, ElementPtr data);
 
 /**
  * @brief Removes and returns the element from the beginning of the linked list.
@@ -66,7 +67,7 @@ bool linked_list_insert(LinkedList* list, size_t index, void* data);
  * @return A pointer to the data of the removed element, or NULL if the list is empty.
  *         The caller is responsible for freeing the returned data if necessary.
  */
-void* linked_list_remove_first(LinkedList* list);
+ElementPtr linked_list_remove_first(LinkedList* list);
 
 /**
  * @brief Removes and returns the element from the end of the linked list.
@@ -75,7 +76,7 @@ void* linked_list_remove_first(LinkedList* list);
  * @return A pointer to the data of the removed element, or NULL if the list is empty.
  *         The caller is responsible for freeing the returned data if necessary.
  */
-void* linked_list_remove_last(LinkedList* list);
+ElementPtr linked_list_remove_last(LinkedList* list);
 
 /**
  * @brief Removes and returns the element at the specified index.
@@ -87,7 +88,7 @@ void* linked_list_remove_last(LinkedList* list);
  * @return A pointer to the data of the removed element, or NULL if the index is out of bounds or the list is empty.
  *         The caller is responsible for freeing the returned data if necessary.
  */
-void* linked_list_remove(LinkedList* list, size_t index);
+ElementPtr linked_list_remove(LinkedList* list, size_t index);
 
 /**
  * @brief Gets the element at the specified index without removing it.
@@ -96,7 +97,7 @@ void* linked_list_remove(LinkedList* list, size_t index);
  * @param index The index of the element to retrieve.
  * @return A pointer to the data at the specified index, or NULL if the index is out of bounds.
  */
-void* linked_list_get(const LinkedList* list, size_t index);
+ElementPtr linked_list_get(const LinkedList* list, size_t index);
 
 /**
  * @brief Sets the data at the specified index.
@@ -106,7 +107,7 @@ void* linked_list_get(const LinkedList* list, size_t index);
  * @param data A pointer to the new data. The old data at this index is overwritten but not freed by this function.
  * @return True if the data was set successfully, false if the index is out of bounds.
  */
-bool linked_list_set(LinkedList* list, size_t index, void* data);
+bool linked_list_set(LinkedList* list, size_t index, ElementPtr data);
 
 /**
  * @brief Gets the current number of elements in the linked list.

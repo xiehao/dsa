@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "dsa/static_array.h"
+#include "dsa/common.h" // 包含通用定义
 
 // Test case for static_array_init and basic properties
 static void test_static_array_init(void **state) {
@@ -63,7 +64,7 @@ static void test_static_array_push_get_set(void **state) {
     for (int i = 0; i < capacity; ++i) {
         int *retrieved_value = (int*)static_array_get(&arr, i);
         assert_non_null(retrieved_value);
-        assert_int_equal(*retrieved_value, i * 10);
+        assert_int_equal(ELEMENT_VALUE(int, retrieved_value), i * 10);
     }
 
     // Test get out of bounds
@@ -80,7 +81,7 @@ static void test_static_array_push_get_set(void **state) {
     for (int i = 0; i < capacity; ++i) {
         int *retrieved_value = (int*)static_array_get(&arr, i);
         assert_non_null(retrieved_value);
-        assert_int_equal(*retrieved_value, i * 100);
+        assert_int_equal(ELEMENT_VALUE(int, retrieved_value), i * 100);
     }
 
     // Test set out of bounds
@@ -206,22 +207,22 @@ static void test_static_array_delete(void **state) {
     bool deleted = static_array_delete(&arr, 1); // Delete 20
     assert_true(deleted);
     assert_int_equal(static_array_size(&arr), 3);
-    assert_int_equal(*(int*)static_array_get(&arr, 0), 10);
-    assert_int_equal(*(int*)static_array_get(&arr, 1), 30);
-    assert_int_equal(*(int*)static_array_get(&arr, 2), 40);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 10);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 1)), 30);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 2)), 40);
 
     // Delete from the beginning
     deleted = static_array_delete(&arr, 0); // Delete 10
     assert_true(deleted);
     assert_int_equal(static_array_size(&arr), 2);
-    assert_int_equal(*(int*)static_array_get(&arr, 0), 30);
-    assert_int_equal(*(int*)static_array_get(&arr, 1), 40);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 30);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 1)), 40);
 
     // Delete from the end
     deleted = static_array_delete(&arr, 1); // Delete 40
     assert_true(deleted);
     assert_int_equal(static_array_size(&arr), 1);
-    assert_int_equal(*(int*)static_array_get(&arr, 0), 30);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 30);
 
     // Delete the last element
     deleted = static_array_delete(&arr, 0); // Delete 30

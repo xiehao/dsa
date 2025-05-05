@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 // 定义双端队列的底层结构（例如，使用链表或动态数组）
-// 对于此实现，我们在内部使用双向链表方法。
+// 对于此实现，我们在内部使用双向链表。
 
 typedef struct DequeNode {
     void* data;
@@ -60,7 +60,7 @@ bool deque_add_first(Deque* deque, void* data) {
     }
     deque->head = newNode;
 
-    if (deque->tail == NULL) { // 如果列表为空
+    if (deque->tail == NULL) { // 如果队列为空
         deque->tail = newNode;
     }
 
@@ -85,7 +85,7 @@ bool deque_add_last(Deque* deque, void* data) {
     }
     deque->tail = newNode;
 
-    if (deque->head == NULL) { // 如果列表为空
+    if (deque->head == NULL) { // 如果队列为空
         deque->head = newNode;
     }
 
@@ -105,7 +105,7 @@ void* deque_remove_first(Deque* deque) {
     if (deque->head) {
         deque->head->prev = NULL;
     } else {
-        // 列表变为空
+        // 队列变为空
         deque->tail = NULL;
     }
 
@@ -126,7 +126,7 @@ void* deque_remove_last(Deque* deque) {
     if (deque->tail) {
         deque->tail->next = NULL;
     } else {
-        // 列表变为空
+        // 队列变为空
         deque->head = NULL;
     }
 

@@ -4,63 +4,63 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-// Opaque pointer type for the Stack structure
+// 栈结构的不透明指针类型
 typedef struct Stack Stack;
 
 /**
- * @brief Creates a new empty stack.
+ * @brief 创建一个新的空栈。
  *
- * @return A pointer to the newly created stack, or NULL if memory allocation fails.
+ * @return 指向新创建的栈的指针，如果内存分配失败则返回 NULL。
  */
 Stack* stack_create();
 
 /**
- * @brief Destroys the stack and frees its associated memory.
- *        Note: This function does not free the elements stored in the stack.
- *        The caller is responsible for managing the memory of the elements themselves.
+ * @brief 销毁栈并释放其关联的内存。
+ *        注意：此函数不会释放栈中存储的元素。
+ *        调用者负责管理元素本身的内存。
  *
- * @param stack A pointer to the stack to be destroyed.
+ * @param stack 指向要销毁的栈的指针。
  */
 void stack_destroy(Stack* stack);
 
 /**
- * @brief Pushes an element onto the top of the stack.
+ * @brief 将元素压入栈顶。
  *
- * @param stack A pointer to the stack.
- * @param element A pointer to the element to push.
- * @return true if the element was pushed successfully, false otherwise (e.g., memory allocation failure).
+ * @param stack 指向栈的指针。
+ * @param element 指向要压入的元素的指针。
+ * @return 如果元素压入成功则返回 true，否则返回 false（例如，内存分配失败）。
  */
 bool stack_push(Stack* stack, void* element);
 
 /**
- * @brief Removes and returns the element from the top of the stack.
+ * @brief 从栈顶移除并返回元素。
  *
- * @param stack A pointer to the stack.
- * @return A pointer to the element removed from the top, or NULL if the stack is empty.
+ * @param stack 指向栈的指针。
+ * @return 指向从栈顶移除的元素的指针，如果栈为空则返回 NULL。
  */
 void* stack_pop(Stack* stack);
 
 /**
- * @brief Returns the element at the top of the stack without removing it.
+ * @brief 返回栈顶的元素但不移除它。
  *
- * @param stack A pointer to the stack.
- * @return A pointer to the element at the top, or NULL if the stack is empty.
+ * @param stack 指向栈的指针。
+ * @return 指向栈顶元素的指针，如果栈为空则返回 NULL。
  */
 void* stack_peek(const Stack* stack);
 
 /**
- * @brief Returns the number of elements in the stack.
+ * @brief 返回栈中的元素数量。
  *
- * @param stack A pointer to the stack.
- * @return The number of elements in the stack.
+ * @param stack 指向栈的指针。
+ * @return 栈中的元素数量。
  */
 size_t stack_size(const Stack* stack);
 
 /**
- * @brief Checks if the stack is empty.
+ * @brief 检查栈是否为空。
  *
- * @param stack A pointer to the stack.
- * @return true if the stack is empty, false otherwise.
+ * @param stack 指向栈的指针。
+ * @return 如果栈为空则返回 true，否则返回 false。
  */
 bool stack_is_empty(const Stack* stack);
 

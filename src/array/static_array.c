@@ -2,7 +2,7 @@
 #include <string.h> // For memcpy and memmove
 #include <assert.h> // For assert
 
-// Helper macro to get the address of an element at a given index
+// 辅助宏，用于获取给定索引处元素的地址
 #define ELEMENT_ADDR(arr, index) ((char*)((arr)->data) + (index) * (arr)->element_size)
 
 bool static_array_init(StaticArray *arr, void *data_buffer, size_t capacity, size_t element_size) {
@@ -17,8 +17,8 @@ bool static_array_init(StaticArray *arr, void *data_buffer, size_t capacity, siz
 }
 
 void static_array_destroy(StaticArray *arr) {
-    // For static arrays where memory is managed externally (e.g., VLA on stack),
-    // destroy doesn't need to free memory. It just resets the structure.
+    // 对于内存由外部管理的静态数组（例如栈上的 VLA），
+    // destroy 不需要释放内存。它只是重置结构体。
     if (arr) {
         arr->data = NULL;
         arr->size = 0;
@@ -30,7 +30,7 @@ void static_array_destroy(StaticArray *arr) {
 ElementPtr static_array_get(const StaticArray *arr, size_t index) {
     assert(arr != NULL);
     if (index >= arr->size) {
-        return NULL; // Index out of bounds
+        return NULL; // 索引越界
     }
     return ELEMENT_ADDR(arr, index);
 }
@@ -39,7 +39,7 @@ bool static_array_set(StaticArray *arr, size_t index, ElementPtr value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (index >= arr->size) {
-        return false; // Index out of bounds
+        return false; // 索引越界
     }
     memcpy(ELEMENT_ADDR(arr, index), value, arr->element_size);
     return true;
@@ -69,7 +69,7 @@ bool static_array_push_back(StaticArray *arr, ElementPtr value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (static_array_is_full(arr)) {
-        return false; // Array is full
+        return false; // 数组已满
     }
     memcpy(ELEMENT_ADDR(arr, arr->size), value, arr->element_size);
     arr->size++;
@@ -79,10 +79,10 @@ bool static_array_push_back(StaticArray *arr, ElementPtr value) {
 bool static_array_pop_back(StaticArray *arr) {
     assert(arr != NULL);
     if (static_array_is_empty(arr)) {
-        return false; // Array is empty
+        return false; // 数组为空
     }
     arr->size--;
-    // Optionally clear the popped element's memory (not strictly necessary)
+    // 可选：清除弹出元素的内存（非严格必要）
     // memset(ELEMENT_ADDR(arr, arr->size), 0, arr->element_size);
     return true;
 }
@@ -91,20 +91,20 @@ bool static_array_insert(StaticArray *arr, size_t index, ElementPtr value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (static_array_is_full(arr)) {
-        return false; // Array is full
+        return false; // 数组已满
     }
-    if (index > arr->size) { // Allow insertion at the end (index == size)
-        return false; // Index out of bounds
+    if (index > arr->size) { // 允许在末尾插入 (index == size)
+        return false; // 索引越界
     }
 
-    // Shift elements to the right to make space for the new element
+    // 向右移动元素，为新元素腾出空间
     if (index < arr->size) {
         memmove(ELEMENT_ADDR(arr, index + 1),
                 ELEMENT_ADDR(arr, index),
                 (arr->size - index) * arr->element_size);
     }
 
-    // Insert the new element
+    // 插入新元素
     memcpy(ELEMENT_ADDR(arr, index), value, arr->element_size);
     arr->size++;
     return true;
@@ -113,10 +113,10 @@ bool static_array_insert(StaticArray *arr, size_t index, ElementPtr value) {
 bool static_array_delete(StaticArray *arr, size_t index) {
     assert(arr != NULL);
     if (static_array_is_empty(arr) || index >= arr->size) {
-        return false; // Array is empty or index out of bounds
+        return false; // 数组为空或索引越界
     }
 
-    // Shift elements to the left to fill the gap
+    // 向左移动元素以填补空缺
     if (index < arr->size - 1) {
         memmove(ELEMENT_ADDR(arr, index),
                 ELEMENT_ADDR(arr, index + 1),
@@ -124,7 +124,7 @@ bool static_array_delete(StaticArray *arr, size_t index) {
     }
 
     arr->size--;
-    // Optionally clear the last element's old memory (not strictly necessary)
+    // 可选：清除最后一个元素旧的内存（非严格必要）
     // memset(ELEMENT_ADDR(arr, arr->size), 0, arr->element_size);
     return true;
 }
@@ -132,6 +132,6 @@ bool static_array_delete(StaticArray *arr, size_t index) {
 void static_array_clear(StaticArray *arr) {
     assert(arr != NULL);
     arr->size = 0;
-    // Optionally clear the memory (not strictly necessary)
+    // 可选：清除内存（非严格必要）
     // memset(arr->data, 0, arr->capacity * arr->element_size);
 }

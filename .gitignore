@@ -28,3 +28,6 @@ Testing/
 
 # Other temporary files
 *.log
+
+# JetBrains IDEs
+.idea

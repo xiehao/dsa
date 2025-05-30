@@ -6,7 +6,7 @@
 
 // 定义链表节点的结构（内部）
 typedef struct Node {
-    ElementPtr data;       // 指向节点存储数据的指针
+    dsa_element_pt data;       // 指向节点存储数据的指针
     struct Node* next; // 指向列表中下一个节点的指针
 } Node;
 
@@ -18,7 +18,7 @@ struct LinkedList {
 };
 
 // 内部辅助函数，用于创建新节点
-static Node* create_node(ElementPtr data) {
+static Node* create_node(dsa_element_pt data) {
     Node* new_node = (Node*)malloc(sizeof(Node));
     if (!new_node) {
         perror("为新列表节点分配内存失败");
@@ -58,7 +58,7 @@ void linked_list_destroy(LinkedList* list, FreeDataFunc free_data_func) {
     free(list);
 }
 
-bool linked_list_add_first(LinkedList* list, ElementPtr data) {
+bool linked_list_add_first(LinkedList* list, dsa_element_pt data) {
     if (!list) {
         return false;
     }
@@ -78,7 +78,7 @@ bool linked_list_add_first(LinkedList* list, ElementPtr data) {
     return true;
 }
 
-bool linked_list_add_last(LinkedList* list, ElementPtr data) {
+bool linked_list_add_last(LinkedList* list, dsa_element_pt data) {
     if (!list) {
         return false;
     }
@@ -98,7 +98,7 @@ bool linked_list_add_last(LinkedList* list, ElementPtr data) {
     return true;
 }
 
-bool linked_list_insert(LinkedList* list, size_t index, ElementPtr data) {
+bool linked_list_insert(LinkedList* list, size_t index, dsa_element_pt data) {
     if (!list || index > list->size) {
         fprintf(stderr, "错误：索引 %zu 超出链表大小 %zu 的范围。\n", index, list->size);
         return false; // 索引越界（允许 index == size 用于追加）
@@ -127,13 +127,13 @@ bool linked_list_insert(LinkedList* list, size_t index, ElementPtr data) {
     return true;
 }
 
-ElementPtr linked_list_remove_first(LinkedList* list) {
+dsa_element_pt linked_list_remove_first(LinkedList* list) {
     if (!list || list->head == NULL) {
         return NULL; // 列表为空或为 null
     }
 
     Node* node_to_remove = list->head;
-    ElementPtr data = node_to_remove->data;
+    dsa_element_pt data = node_to_remove->data;
 
     list->head = list->head->next;
     if (list->head == NULL) { // 列表变为空
@@ -145,12 +145,12 @@ ElementPtr linked_list_remove_first(LinkedList* list) {
     return data;
 }
 
-ElementPtr linked_list_remove_last(LinkedList* list) {
+dsa_element_pt linked_list_remove_last(LinkedList* list) {
      if (!list || list->head == NULL) {
         return NULL; // 列表为空或为 null
     }
 
-    ElementPtr data;
+    dsa_element_pt data;
     if (list->head == list->tail) { // 只有一个元素
         data = list->head->data;
         free(list->head);
@@ -171,7 +171,7 @@ ElementPtr linked_list_remove_last(LinkedList* list) {
     return data;
 }
 
-ElementPtr linked_list_remove(LinkedList* list, size_t index) {
+dsa_element_pt linked_list_remove(LinkedList* list, size_t index) {
     if (!list || index >= list->size) {
          if(list) {
             fprintf(stderr, "错误：索引 %zu 超出链表大小 %zu 的范围。\n", index, list->size);
@@ -192,7 +192,7 @@ ElementPtr linked_list_remove(LinkedList* list, size_t index) {
     }
 
     Node* node_to_remove = current->next;
-    ElementPtr data = node_to_remove->data;
+    dsa_element_pt data = node_to_remove->data;
     current->next = node_to_remove->next;
 
     free(node_to_remove);
@@ -200,7 +200,7 @@ ElementPtr linked_list_remove(LinkedList* list, size_t index) {
     return data;
 }
 
-ElementPtr linked_list_get(const LinkedList* list, size_t index) {
+dsa_element_pt linked_list_get(const LinkedList* list, size_t index) {
     if (!list || index >= list->size) {
          if(list) {
              fprintf(stderr, "错误：索引 %zu 超出链表大小 %zu 的范围。\n", index, list->size);
@@ -215,7 +215,7 @@ ElementPtr linked_list_get(const LinkedList* list, size_t index) {
     return current->data;
 }
 
-bool linked_list_set(LinkedList* list, size_t index, ElementPtr data) {
+bool linked_list_set(LinkedList* list, size_t index, dsa_element_pt data) {
     if (!list || index >= list->size) {
         if(list) {
             fprintf(stderr, "错误：索引 %zu 超出链表大小 %zu 的范围。\n", index, list->size);

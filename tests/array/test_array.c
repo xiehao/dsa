@@ -11,7 +11,7 @@ static void test_static_array_unified_interface(void **state) {
     (void)state; // 未使用
 
     int buffer[5];
-    Array* arr = array_create_static(buffer, 5, sizeof(int));
+    dsa_array_t* arr = array_create_static(buffer, 5, sizeof(int));
     assert_non_null(arr);
 
     // 测试初始状态
@@ -59,7 +59,7 @@ static void test_static_array_unified_interface(void **state) {
     assert_int_equal(value, 25);
 
     // 测试移除操作
-    ElementPtr removed = array_remove(arr, 1);
+    dsa_element_pt removed = array_remove(arr, 1);
     assert_non_null(removed);
     assert_int_equal(ELEMENT_VALUE(int, removed), 15);
     free(removed);
@@ -69,7 +69,7 @@ static void test_static_array_unified_interface(void **state) {
     assert_int_equal(value, 25);
 
     // 测试弹出操作
-    ElementPtr popped = array_pop_back(arr);
+    dsa_element_pt popped = array_pop_back(arr);
     assert_non_null(popped);
     assert_int_equal(ELEMENT_VALUE(int, popped), 30);
     free(popped);
@@ -92,7 +92,7 @@ static void test_static_array_unified_interface(void **state) {
 static void test_dynamic_array_unified_interface(void **state) {
     (void)state; // 未使用
 
-    Array* arr = array_create_dynamic(2);
+    dsa_array_t* arr = array_create_dynamic(2);
     assert_non_null(arr);
 
     // 测试初始状态
@@ -135,7 +135,7 @@ static void test_dynamic_array_unified_interface(void **state) {
 
     // 清理所有元素
     while (!array_is_empty(arr)) {
-        ElementPtr elem = array_pop_back(arr);
+        dsa_element_pt elem = array_pop_back(arr);
         if (elem) free(elem);
     }
 
@@ -146,7 +146,7 @@ static void test_dynamic_array_unified_interface(void **state) {
 static void test_double_array_operations(void **state) {
     (void)state; // 未使用
 
-    Array* arr = array_create_dynamic(3);
+    dsa_array_t* arr = array_create_dynamic(3);
     assert_non_null(arr);
 
     // 添加双精度浮点数
@@ -171,7 +171,7 @@ static void test_double_array_operations(void **state) {
 
     // 清理
     while (!array_is_empty(arr)) {
-        ElementPtr elem = array_pop_back(arr);
+        dsa_element_pt elem = array_pop_back(arr);
         if (elem) free(elem);
     }
 
@@ -205,7 +205,7 @@ static void test_error_handling(void **state) {
 
     // 测试有效数组的越界访问
     int buffer[2];
-    Array* arr = array_create_static(buffer, 2, sizeof(int));
+    dsa_array_t* arr = array_create_static(buffer, 2, sizeof(int));
     assert_non_null(arr);
 
     // 空数组的越界访问
@@ -225,7 +225,7 @@ static void test_array_clear(void **state) {
 
     // 测试静态数组清空
     int buffer[5];
-    Array* static_arr = array_create_static(buffer, 5, sizeof(int));
+    dsa_array_t* static_arr = array_create_static(buffer, 5, sizeof(int));
     assert_non_null(static_arr);
 
     array_push_back_int(static_arr, 1);
@@ -240,7 +240,7 @@ static void test_array_clear(void **state) {
     array_destroy(static_arr);
 
     // 测试动态数组清空
-    Array* dynamic_arr = array_create_dynamic(3);
+    dsa_array_t* dynamic_arr = array_create_dynamic(3);
     assert_non_null(dynamic_arr);
 
     array_push_back_int(dynamic_arr, 10);

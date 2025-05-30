@@ -4,7 +4,7 @@
 
 // 在内部定义 Stack 结构
 struct Stack {
-    Array* array;
+    dsa_array_t* array;
 };
 
 Stack* stack_create() {

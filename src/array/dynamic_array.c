@@ -7,7 +7,7 @@
 
 // 定义动态数组的结构（实现细节）
 struct DynamicArray {
-    ElementPtr* data;   // 指向元素指针数组的指针
+    dsa_element_pt* data;   // 指向元素指针数组的指针
     size_t size;        // 当前元素数量
     size_t capacity;    // 当前分配的容量
 };
@@ -23,7 +23,7 @@ static bool dynamic_array_resize(DynamicArray* array, size_t new_capacity) {
         return false;
     }
 
-    ElementPtr* new_data = realloc(array->data, new_capacity * sizeof(ElementPtr));
+    dsa_element_pt* new_data = realloc(array->data, new_capacity * sizeof(dsa_element_pt));
     if (!new_data) {
         fprintf(stderr, "错误：无法为动态数组重新分配内存。\n");
         return false; // 分配失败
@@ -44,7 +44,7 @@ DynamicArray* dynamic_array_create(size_t initial_capacity) {
     array->size = 0;
     array->capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
 
-    array->data = (ElementPtr*)malloc(array->capacity * sizeof(ElementPtr));
+    array->data = (dsa_element_pt*)malloc(array->capacity * sizeof(dsa_element_pt));
     if (!array->data) {
         perror("为动态数组数据分配内存失败");
         free(array); // 清理结构分配
@@ -90,7 +90,7 @@ void dynamic_array_destroy_with_free(DynamicArray* array) {
 }
 
 
-bool dynamic_array_push_back(DynamicArray* array, ElementPtr element) {
+bool dynamic_array_push_back(DynamicArray* array, dsa_element_pt element) {
     // 添加元素等同于在末尾插入
     return dynamic_array_insert(array, dynamic_array_size(array), element);
 }
@@ -122,26 +122,26 @@ static bool is_insert_index_invalid(const DynamicArray* array, size_t index) {
     return false;
 }
 
-ElementPtr dynamic_array_get(const DynamicArray* array, size_t index) {
+dsa_element_pt dynamic_array_get(const DynamicArray* array, size_t index) {
     if (is_index_out_of_bounds(array, index)) {
         return NULL;
     }
     return array->data[index];
 }
 
-ElementPtr dynamic_array_set(DynamicArray* array, size_t index, ElementPtr element) {
+dsa_element_pt dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element) {
     if (is_index_out_of_bounds(array, index)) {
         return NULL; // 错误/越界时返回 NULL
     }
     // 存储旧元素
-    ElementPtr old_element = array->data[index];
+    dsa_element_pt old_element = array->data[index];
     // 设置新元素
     array->data[index] = element;
     // 返回旧元素
     return old_element;
 }
 
-bool dynamic_array_insert(DynamicArray* array, size_t index, ElementPtr element) {
+bool dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt element) {
     // 使用新的辅助函数检查索引
     if (is_insert_index_invalid(array, index)) {
         return false;
@@ -159,7 +159,7 @@ bool dynamic_array_insert(DynamicArray* array, size_t index, ElementPtr element)
     if (index < array->size) {
         // 将从 index 开始的元素向后移动一个位置
         memmove(&array->data[index + 1], &array->data[index],
-                (array->size - index) * sizeof(ElementPtr));
+                (array->size - index) * sizeof(dsa_element_pt));
     }
 
     // 在指定位置插入新元素
@@ -180,20 +180,20 @@ bool dynamic_array_insert(DynamicArray* array, size_t index, ElementPtr element)
  * @param index 要移除元素的索引
  * @return 指向被移除元素的指针，如果索引无效或数组为空则返回NULL
  */
-ElementPtr dynamic_array_remove(DynamicArray* array, size_t index) {
+dsa_element_pt dynamic_array_remove(DynamicArray* array, size_t index) {
     // 使用现有的辅助函数检查索引是否越界
     if (is_index_out_of_bounds(array, index)) {
         return NULL; // 索引无效或数组为空
     }
 
     // 存储要移除的元素
-    ElementPtr removed_element = array->data[index];
+    dsa_element_pt removed_element = array->data[index];
 
     // 如果移除的不是最后一个元素，则需要移动后续元素
     if (index < array->size - 1) {
         // 将从 index + 1 开始的元素向前移动一个位置
         memmove(&array->data[index], &array->data[index + 1],
-                (array->size - 1 - index) * sizeof(ElementPtr));
+                (array->size - 1 - index) * sizeof(dsa_element_pt));
     }
 
     // 减少数组大小
@@ -225,7 +225,7 @@ size_t dynamic_array_capacity(const DynamicArray* array) {
  * @param array 指向DynamicArray的指针
  * @return 指向被移除元素的指针，如果数组为空或无效则返回NULL
  */
-ElementPtr dynamic_array_pop_back(DynamicArray* array) {
+dsa_element_pt dynamic_array_pop_back(DynamicArray* array) {
     // 检查数组是否为空或无效
     if (!array || dynamic_array_is_empty(array)) {
         return NULL;

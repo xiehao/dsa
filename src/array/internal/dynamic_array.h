@@ -42,7 +42,7 @@ void dynamic_array_destroy_with_free(DynamicArray* array);
  * @param element 指向要添加的元素的指针。数组存储指针而不是副本
  * @return 如果元素添加成功返回true，否则返回false（例如，分配失败）
  */
-bool dynamic_array_push_back(DynamicArray* array, ElementPtr element);
+bool dynamic_array_push_back(DynamicArray* array, dsa_element_pt element);
 
 /**
  * @brief 获取指定索引处的元素
@@ -51,7 +51,7 @@ bool dynamic_array_push_back(DynamicArray* array, ElementPtr element);
  * @param index 要检索的元素的索引
  * @return 指向指定索引处元素的指针，如果索引越界则返回NULL
  */
-ElementPtr dynamic_array_get(const DynamicArray* array, size_t index);
+dsa_element_pt dynamic_array_get(const DynamicArray* array, size_t index);
 
 /**
  * @brief 设置指定索引处的元素
@@ -61,7 +61,7 @@ ElementPtr dynamic_array_get(const DynamicArray* array, size_t index);
  * @param element 指向新元素的指针。该索引处的旧元素会被覆盖但不会被释放
  * @return 指向被替换元素的指针，如果索引越界或发生错误则返回NULL
  */
-ElementPtr dynamic_array_set(DynamicArray* array, size_t index, ElementPtr element);
+dsa_element_pt dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 在动态数组的指定索引处插入一个元素
@@ -73,7 +73,7 @@ ElementPtr dynamic_array_set(DynamicArray* array, size_t index, ElementPtr eleme
  * @param element 指向要插入的元素的指针
  * @return 如果元素插入成功返回true，否则返回false（例如，索引无效、分配失败）
  */
-bool dynamic_array_insert(DynamicArray* array, size_t index, ElementPtr element);
+bool dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 从动态数组的指定索引处移除一个元素
@@ -85,7 +85,7 @@ bool dynamic_array_insert(DynamicArray* array, size_t index, ElementPtr element)
  * @param index 要移除元素的索引
  * @return 指向被移除元素的指针，如果索引无效或数组为空则返回NULL
  */
-ElementPtr dynamic_array_remove(DynamicArray* array, size_t index);
+dsa_element_pt dynamic_array_remove(DynamicArray* array, size_t index);
 
 /**
  * @brief 移除并返回动态数组的最后一个元素
@@ -93,7 +93,7 @@ ElementPtr dynamic_array_remove(DynamicArray* array, size_t index);
  * @param array 指向DynamicArray的指针
  * @return 指向被移除元素的指针，如果数组为空则返回NULL
  */
-ElementPtr dynamic_array_pop_back(DynamicArray* array);
+dsa_element_pt dynamic_array_pop_back(DynamicArray* array);
 
 /**
  * @brief 获取动态数组中当前的元素数量

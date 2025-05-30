@@ -10,7 +10,7 @@
 // 注意：此结构体本身不直接包含数组，而是指向在栈上分配的数组
 // 实际使用时，通常结合 alloca 或直接在函数作用域内声明 VLA
 typedef struct {
-    ElementPtr data;    // 指向实际数据存储的指针 (通常是 VLA)
+    dsa_element_pt data;    // 指向实际数据存储的指针 (通常是 VLA)
     size_t size;        // 当前元素数量
     size_t capacity;    // 数组的总容量 (固定)
     size_t element_size; // 单个元素的大小（字节）
@@ -40,7 +40,7 @@ void static_array_destroy(StaticArray *arr);
  * @param index 要获取元素的索引。
  * @return 指向元素的指针，如果索引无效则返回 NULL。
  */
-ElementPtr static_array_get(const StaticArray *arr, size_t index);
+dsa_element_pt static_array_get(const StaticArray *arr, size_t index);
 
 /**
  * @brief 设置静态数组中指定索引处的值。
@@ -49,7 +49,7 @@ ElementPtr static_array_get(const StaticArray *arr, size_t index);
  * @param value 要设置的元素指针。
  * @return 如果成功则返回 true，否则返回 false（例如索引无效）。
  */
-bool static_array_set(StaticArray *arr, size_t index, ElementPtr value);
+bool static_array_set(StaticArray *arr, size_t index, dsa_element_pt value);
 
 /**
  * @brief 获取静态数组的当前大小（元素数量）。
@@ -85,7 +85,7 @@ bool static_array_is_full(const StaticArray *arr);
  * @param value 要添加的元素指针。
  * @return 如果成功添加则返回 true，如果数组已满则返回 false。
  */
-bool static_array_push_back(StaticArray *arr, ElementPtr value);
+bool static_array_push_back(StaticArray *arr, dsa_element_pt value);
 
 /**
  * @brief 从静态数组末尾移除一个元素。
@@ -101,7 +101,7 @@ bool static_array_pop_back(StaticArray *arr);
  * @param value 要插入的元素指针。
  * @return 如果成功插入则返回 true，如果数组已满或索引无效则返回 false。
  */
-bool static_array_insert(StaticArray *arr, size_t index, ElementPtr value);
+bool static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value);
 
 /**
  * @brief 从静态数组的指定索引处删除一个元素。

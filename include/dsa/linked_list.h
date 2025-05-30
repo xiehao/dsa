@@ -9,7 +9,7 @@
 typedef struct LinkedList LinkedList;
 
 // 用于释放用户提供的数据的函数指针类型定义
-typedef void (*FreeDataFunc)(ElementPtr data);
+typedef void (*FreeDataFunc)(dsa_element_pt data);
 
 /**
  * @brief 创建一个新的链表。
@@ -36,7 +36,7 @@ void linked_list_destroy(LinkedList* list, FreeDataFunc free_data_func);
  * @param data 指向要添加的数据的指针。
  * @return 如果元素添加成功则返回 True，否则返回 false（例如，分配失败）。
  */
-bool linked_list_add_first(LinkedList* list, ElementPtr data);
+bool linked_list_add_first(LinkedList* list, dsa_element_pt data);
 
 /**
  * @brief 在链表的末尾添加一个元素。
@@ -45,7 +45,7 @@ bool linked_list_add_first(LinkedList* list, ElementPtr data);
  * @param data 指向要添加的数据的指针。
  * @return 如果元素添加成功则返回 True，否则返回 false（例如，分配失败）。
  */
-bool linked_list_add_last(LinkedList* list, ElementPtr data);
+bool linked_list_add_last(LinkedList* list, dsa_element_pt data);
 
 /**
  * @brief 在链表的指定索引处插入一个元素。
@@ -55,7 +55,7 @@ bool linked_list_add_last(LinkedList* list, ElementPtr data);
  * @param data 指向要插入的数据的指针。
  * @return 如果元素插入成功则返回 True，否则返回 false（例如，索引越界或分配失败）。
  */
-bool linked_list_insert(LinkedList* list, size_t index, ElementPtr data);
+bool linked_list_insert(LinkedList* list, size_t index, dsa_element_pt data);
 
 /**
  * @brief 从链表的开头移除并返回元素。
@@ -64,7 +64,7 @@ bool linked_list_insert(LinkedList* list, size_t index, ElementPtr data);
  * @return 指向被移除元素数据的指针，如果列表为空则返回 NULL。
  *         如果需要，调用者负责释放返回的数据。
  */
-ElementPtr linked_list_remove_first(LinkedList* list);
+dsa_element_pt linked_list_remove_first(LinkedList* list);
 
 /**
  * @brief 从链表的末尾移除并返回元素。
@@ -73,7 +73,7 @@ ElementPtr linked_list_remove_first(LinkedList* list);
  * @return 指向被移除元素数据的指针，如果列表为空则返回 NULL。
  *         如果需要，调用者负责释放返回的数据。
  */
-ElementPtr linked_list_remove_last(LinkedList* list);
+dsa_element_pt linked_list_remove_last(LinkedList* list);
 
 /**
  * @brief 从链表的指定索引处移除并返回元素。
@@ -83,7 +83,7 @@ ElementPtr linked_list_remove_last(LinkedList* list);
  * @return 指向被移除元素数据的指针，如果索引越界或列表为空则返回 NULL。
  *         如果需要，调用者负责释放返回的数据。
  */
-ElementPtr linked_list_remove(LinkedList* list, size_t index);
+dsa_element_pt linked_list_remove(LinkedList* list, size_t index);
 
 /**
  * @brief 获取链表中指定索引处的元素但不移除它。
@@ -92,7 +92,7 @@ ElementPtr linked_list_remove(LinkedList* list, size_t index);
  * @param index 要检索元素的索引（从 0 开始）。
  * @return 指向指定索引处数据的指针，如果索引越界则返回 NULL。
  */
-ElementPtr linked_list_get(const LinkedList* list, size_t index);
+dsa_element_pt linked_list_get(const LinkedList* list, size_t index);
 
 /**
  * @brief Sets the data at the specified index.
@@ -102,7 +102,7 @@ ElementPtr linked_list_get(const LinkedList* list, size_t index);
  * @param data A pointer to the new data. The old data at this index is overwritten but not freed by this function.
  * @return True if the data was set successfully, false if the index is out of bounds.
  */
-bool linked_list_set(LinkedList* list, size_t index, ElementPtr data);
+bool linked_list_set(LinkedList* list, size_t index, dsa_element_pt data);
 
 /**
  * @brief 获取链表中的元素数量。

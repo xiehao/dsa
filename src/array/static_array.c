@@ -27,7 +27,7 @@ void static_array_destroy(StaticArray *arr) {
     }
 }
 
-ElementPtr static_array_get(const StaticArray *arr, size_t index) {
+dsa_element_pt static_array_get(const StaticArray *arr, size_t index) {
     assert(arr != NULL);
     if (index >= arr->size) {
         return NULL; // 索引越界
@@ -35,7 +35,7 @@ ElementPtr static_array_get(const StaticArray *arr, size_t index) {
     return ELEMENT_ADDR(arr, index);
 }
 
-bool static_array_set(StaticArray *arr, size_t index, ElementPtr value) {
+bool static_array_set(StaticArray *arr, size_t index, dsa_element_pt value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (index >= arr->size) {
@@ -65,7 +65,7 @@ bool static_array_is_full(const StaticArray *arr) {
     return arr->size == arr->capacity;
 }
 
-bool static_array_push_back(StaticArray *arr, ElementPtr value) {
+bool static_array_push_back(StaticArray *arr, dsa_element_pt value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (static_array_is_full(arr)) {
@@ -87,7 +87,7 @@ bool static_array_pop_back(StaticArray *arr) {
     return true;
 }
 
-bool static_array_insert(StaticArray *arr, size_t index, ElementPtr value) {
+bool static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (static_array_is_full(arr)) {

@@ -7,7 +7,7 @@
  *
  * 这个函数接受任意类型的数组（静态或动态），并执行相同的操作
  */
-void demonstrate_unified_array_interface(Array* arr, const char* description) {
+void demonstrate_unified_array_interface(dsa_array_t* arr, const char* description) {
     printf("\n=== %s ===\n", description);
 
     // 显示数组初始状态
@@ -16,7 +16,7 @@ void demonstrate_unified_array_interface(Array* arr, const char* description) {
 
     // 使用类型安全的函数添加整数
     printf("\n添加整数: 10, 20, 30\n");
-    ArrayResult result;
+    dsa_array_result_t result;
 
     result = array_push_back_int(arr, 10);
     if (result != ARRAY_SUCCESS) {
@@ -95,7 +95,7 @@ void demonstrate_unified_array_interface(Array* arr, const char* description) {
 
     // 移除索引1处的元素
     printf("\n移除索引1处的元素\n");
-    ElementPtr removed = array_remove(arr, 1);
+    dsa_element_pt removed = array_remove(arr, 1);
     if (removed) {
         printf("移除的元素: %d\n", ELEMENT_VALUE(int, removed));
         free(removed);  // 释放移除的元素
@@ -114,7 +114,7 @@ void demonstrate_unified_array_interface(Array* arr, const char* description) {
 
     // 弹出最后一个元素
     printf("\n弹出最后一个元素\n");
-    ElementPtr popped = array_pop_back(arr);
+    dsa_element_pt popped = array_pop_back(arr);
     if (popped) {
         printf("弹出的元素: %d\n", ELEMENT_VALUE(int, popped));
         free(popped);  // 释放弹出的元素
@@ -138,10 +138,10 @@ void demonstrate_unified_array_interface(Array* arr, const char* description) {
 /**
  * @brief 清理数组中的所有元素（仅适用于动态数组）
  */
-void cleanup_dynamic_array_elements(Array* arr) {
+void cleanup_dynamic_array_elements(dsa_array_t* arr) {
     if (array_get_type(arr) == ARRAY_TYPE_DYNAMIC) {
         while (!array_is_empty(arr)) {
-            ElementPtr element = array_pop_back(arr);
+            dsa_element_pt element = array_pop_back(arr);
             if (element) {
                 free(element);
             }
@@ -152,7 +152,7 @@ void cleanup_dynamic_array_elements(Array* arr) {
 /**
  * @brief 演示双精度浮点数组操作
  */
-void demonstrate_double_array(Array* arr) {
+void demonstrate_double_array(dsa_array_t* arr) {
     printf("\n=== 双精度浮点数组演示 ===\n");
 
     // 添加一些双精度浮点数
@@ -191,7 +191,7 @@ int main() {
     // 1. 创建并测试静态数组
     printf("\n1. 测试静态数组\n");
     int static_buffer[10];  // 静态缓冲区
-    Array* static_arr = array_create_static(static_buffer, 10, sizeof(int));
+    dsa_array_t* static_arr = array_create_static(static_buffer, 10, sizeof(int));
 
     if (static_arr) {
         demonstrate_unified_array_interface(static_arr, "静态数组演示");
@@ -202,7 +202,7 @@ int main() {
 
     // 2. 创建并测试动态数组
     printf("\n\n2. 测试动态数组\n");
-    Array* dynamic_arr = array_create_dynamic(5);
+    dsa_array_t* dynamic_arr = array_create_dynamic(5);
 
     if (dynamic_arr) {
         demonstrate_unified_array_interface(dynamic_arr, "动态数组演示");
@@ -214,7 +214,7 @@ int main() {
 
     // 3. 演示双精度浮点数组
     printf("\n\n3. 测试双精度浮点数组\n");
-    Array* double_arr = array_create_dynamic(3);
+    dsa_array_t* double_arr = array_create_dynamic(3);
     if (double_arr) {
         demonstrate_double_array(double_arr);
         array_destroy(double_arr);
@@ -223,19 +223,19 @@ int main() {
     // 4. 演示容量限制（静态数组）
     printf("\n\n4. 测试静态数组容量限制\n");
     int small_buffer[3];
-    Array* small_arr = array_create_static(small_buffer, 3, sizeof(int));
+    dsa_array_t* small_arr = array_create_static(small_buffer, 3, sizeof(int));
     if (small_arr) {
         printf("创建容量为3的静态数组\n");
 
         // 添加3个元素
         for (int i = 1; i <= 3; i++) {
-            ArrayResult result = array_push_back_int(small_arr, i * 10);
+            dsa_array_result_t result = array_push_back_int(small_arr, i * 10);
             printf("添加 %d: %s\n", i * 10,
                    result == ARRAY_SUCCESS ? "成功" : "失败");
         }
 
         // 尝试添加第4个元素（应该失败）
-        ArrayResult result = array_push_back_int(small_arr, 40);
+        dsa_array_result_t result = array_push_back_int(small_arr, 40);
         printf("尝试添加第4个元素 40: %s\n",
                result == ARRAY_SUCCESS ? "成功" : "失败（预期）");
 

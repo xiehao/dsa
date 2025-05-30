@@ -10,7 +10,7 @@ int main() {
 
     // Unified Array Demo
     printf("=== Unified Array Demo ===\n");
-    Array* arr = array_create_dynamic(10);
+    dsa_array_t* arr = array_create_dynamic(10);
     for (int i = 0; i < 5; i++) {
         array_push_back_int(arr, i);
     }

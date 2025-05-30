@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "dsa/dynamic_array.h"
+#include "dsa/array.h"
 #include "dsa/linked_list.h"
 #include "dsa/stack.h"
 #include "dsa/deque.h"
@@ -8,23 +8,28 @@
 int main() {
     printf("Data Structures and Algorithms Demo\n\n");
 
-    // Dynamic Array Demo
-    printf("=== Dynamic Array Demo ===\n");
-    DynamicArray* arr = dynamic_array_create(10);
+    // Unified Array Demo
+    printf("=== Unified Array Demo ===\n");
+    Array* arr = array_create_dynamic(10);
     for (int i = 0; i < 5; i++) {
-        int* value = malloc(sizeof(int));
-        *value = i;
-        dynamic_array_push_back(arr, value);
+        array_push_back_int(arr, i);
     }
-    printf("Array size: %zu\n", dynamic_array_size(arr));
+    printf("Array size: %zu\n", array_size(arr));
+    printf("Array type: %s\n", array_get_type_name(arr));
     printf("Array elements: ");
-    for (size_t i = 0; i < dynamic_array_size(arr); i++) {
-        int* value = dynamic_array_get(arr, i);
-        printf("%d ", *value);
-        free(value);
+    for (size_t i = 0; i < array_size(arr); i++) {
+        int value;
+        if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+            printf("%d ", value);
+        }
     }
     printf("\n\n");
-    dynamic_array_destroy(arr);
+    // 清理动态数组中的元素
+    while (!array_is_empty(arr)) {
+        void* element = array_pop_back(arr);
+        if (element) free(element);
+    }
+    array_destroy(arr);
 
     // Linked List Demo
     printf("=== Linked List Demo ===\n");

@@ -1,6 +1,9 @@
 #ifndef DSA_COMMON_H
 #define DSA_COMMON_H
 
+#include <stddef.h>
+#include <stdbool.h>
+
 // 定义通用的元素指针类型别名
 typedef void* ElementPtr;
 

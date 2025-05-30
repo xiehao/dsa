@@ -1,4 +1,4 @@
-#include "dsa/static_array.h"
+#include "internal/static_array.h"
 #include <string.h> // For memcpy and memmove
 #include <assert.h> // For assert
 

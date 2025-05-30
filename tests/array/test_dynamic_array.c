@@ -4,7 +4,7 @@
 #include <cmocka.h>
 #include <stdlib.h>
 
-#include "dsa/dynamic_array.h"
+#include "../src/array/internal/dynamic_array.h"
 #include "dsa/common.h" // 包含通用定义
 
 // 动态数组创建测试用例

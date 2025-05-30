@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "dsa/static_array.h"
+#include "../src/array/internal/static_array.h"
 #include "dsa/common.h" // 包含通用定义
 
 // Test case for static_array_init and basic properties

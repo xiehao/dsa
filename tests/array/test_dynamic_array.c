@@ -215,37 +215,37 @@ static void test_dynamic_array_remove(void **state) {
     // 1. 从中间移除
     void* removed = dynamic_array_remove(arr, 1); // 移除 20
     assert_non_null(removed);
-    assert_int_equal(*(int*)removed, 20);
+    assert_int_equal(ELEMENT_VALUE(int, removed), 20);
     free(removed); // 释放被移除元素的数据
     assert_int_equal(dynamic_array_size(arr), 3);
-    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
-    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 30); // 30 移到索引 1
-    assert_int_equal(*(int*)dynamic_array_get(arr, 2), 40);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 10);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 1)), 30); // 30 移到索引 1
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 2)), 40);
     // 当前数组: [10, 30, 40], size = 3
 
     // 2. 从末尾移除
     removed = dynamic_array_remove(arr, 2); // 移除 40
     assert_non_null(removed);
-    assert_int_equal(*(int*)removed, 40);
+    assert_int_equal(ELEMENT_VALUE(int, removed), 40);
     free(removed);
     assert_int_equal(dynamic_array_size(arr), 2);
-    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 10);
-    assert_int_equal(*(int*)dynamic_array_get(arr, 1), 30);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 10);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 1)), 30);
     // 当前数组: [10, 30], size = 2
 
     // 3. 从开头移除
     removed = dynamic_array_remove(arr, 0); // 移除 10
     assert_non_null(removed);
-    assert_int_equal(*(int*)removed, 10);
+    assert_int_equal(ELEMENT_VALUE(int, removed), 10);
     free(removed);
     assert_int_equal(dynamic_array_size(arr), 1);
-    assert_int_equal(*(int*)dynamic_array_get(arr, 0), 30); // 30 移到索引 0
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 30); // 30 移到索引 0
     // 当前数组: [30], size = 1
 
     // 4. 移除最后一个元素
     removed = dynamic_array_remove(arr, 0); // 移除 30
     assert_non_null(removed);
-    assert_int_equal(*(int*)removed, 30);
+    assert_int_equal(ELEMENT_VALUE(int, removed), 30);
     free(removed);
     assert_int_equal(dynamic_array_size(arr), 0);
     // 当前数组: [], size = 0

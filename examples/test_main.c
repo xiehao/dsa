@@ -43,7 +43,7 @@ int main() {
     printf("List elements: ");
     for (size_t i = 0; i < linked_list_size(list); i++) {
         int* value = linked_list_get(list, i);
-        printf("%d ", *value);
+        printf("%d ", ELEMENT_VALUE(int, value));
     }
     printf("\n\n");
     linked_list_destroy(list, free);
@@ -61,7 +61,7 @@ int main() {
     while (!stack_is_empty(stack)) {
         int* value = stack_pop(stack);
         if (value != NULL) {
-            printf("%d ", *value);
+            printf("%d ", ELEMENT_VALUE(int, value));
             free(value);
         }
     }
@@ -83,7 +83,7 @@ int main() {
     printf("Deque elements (front to back): ");
     while (!deque_is_empty(deque)) {
         int* value = deque_remove_first(deque);
-        printf("%d ", *value);
+        printf("%d ", ELEMENT_VALUE(int, value));
         free(value);
     }
     printf("\n");

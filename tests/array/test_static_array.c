@@ -115,7 +115,7 @@ static void test_static_array_pop_back(void **state) {
     // Verify remaining elements (optional check, depends on whether pop clears)
     char *val = (char*)static_array_get(&arr, 1);
     assert_non_null(val);
-    assert_int_equal(*val, 'b');
+    assert_int_equal(ELEMENT_VALUE(char, val), 'b');
 
     popped = static_array_pop_back(&arr);
     assert_true(popped);
@@ -153,26 +153,26 @@ static void test_static_array_insert(void **state) {
     bool inserted = static_array_insert(&arr, 0, &v_insert_begin);
     assert_true(inserted);
     assert_int_equal(static_array_size(&arr), 3);
-    assert_double_equal(*(double*)static_array_get(&arr, 0), 0.5, 1e-9);
-    assert_double_equal(*(double*)static_array_get(&arr, 1), 1.1, 1e-9);
-    assert_double_equal(*(double*)static_array_get(&arr, 2), 2.2, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 0)), 0.5, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 1)), 1.1, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 2)), 2.2, 1e-9);
 
     // Insert in the middle
     double v_insert_mid = 1.5;
     inserted = static_array_insert(&arr, 2, &v_insert_mid);
     assert_true(inserted);
     assert_int_equal(static_array_size(&arr), 4);
-    assert_double_equal(*(double*)static_array_get(&arr, 0), 0.5, 1e-9);
-    assert_double_equal(*(double*)static_array_get(&arr, 1), 1.1, 1e-9);
-    assert_double_equal(*(double*)static_array_get(&arr, 2), 1.5, 1e-9);
-    assert_double_equal(*(double*)static_array_get(&arr, 3), 2.2, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 0)), 0.5, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 1)), 1.1, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 2)), 1.5, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 3)), 2.2, 1e-9);
 
     // Insert at the end (equivalent to push_back)
     double v_insert_end = 4.4;
     inserted = static_array_insert(&arr, 4, &v_insert_end);
     assert_true(inserted);
     assert_int_equal(static_array_size(&arr), 5);
-    assert_double_equal(*(double*)static_array_get(&arr, 4), 4.4, 1e-9);
+    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 4)), 4.4, 1e-9);
 
     // Try inserting when full
     double v_extra = 5.5;
@@ -274,7 +274,7 @@ static void test_static_array_clear(void **state) {
     bool pushed = static_array_push_back(&arr, &v);
     assert_true(pushed);
     assert_int_equal(static_array_size(&arr), 1);
-    assert_int_equal(*(int*)static_array_get(&arr, 0), 10);
+    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 10);
 
     static_array_destroy(&arr);
 }

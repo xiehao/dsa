@@ -8,6 +8,6 @@
 typedef void* ElementPtr;
 
 // 宏定义，用于简化获取元素值的操作
-#define ELEMENT_VALUE(type, ptr) (*(type*)(ptr))
+#define ELEMENT_VALUE(type, ptr) (*(type *)(ptr))
 
 #endif // DSA_COMMON_H

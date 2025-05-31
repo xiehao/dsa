@@ -270,6 +270,88 @@ static void test_dynamic_array_remove(void **state) {
     dynamic_array_destroy_with_free(arr); // 释放 val5
 }
 
+// 测试动态数组清空操作
+static void test_dynamic_array_clear(void **state) {
+    (void) state; // 未使用
+    DynamicArray* arr = dynamic_array_create(3);
+    assert_non_null(arr);
+
+    // 添加一些元素
+    int* val1 = malloc(sizeof(int)); *val1 = 10;
+    int* val2 = malloc(sizeof(int)); *val2 = 20;
+    int* val3 = malloc(sizeof(int)); *val3 = 30;
+    dynamic_array_push_back(arr, val1);
+    dynamic_array_push_back(arr, val2);
+    dynamic_array_push_back(arr, val3);
+    assert_int_equal(dynamic_array_size(arr), 3);
+
+    // 测试普通clear
+    dynamic_array_clear(arr);
+    assert_int_equal(dynamic_array_size(arr), 0);
+    assert_true(dynamic_array_is_empty(arr));
+
+    // 验证容量保持不变
+    assert_int_equal(dynamic_array_capacity(arr), 3);
+
+    // 验证数组仍然可用
+    int* val4 = malloc(sizeof(int)); *val4 = 40;
+    dynamic_array_push_back(arr, val4);
+    assert_int_equal(dynamic_array_size(arr), 1);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 40);
+
+    // 清理：注意val1, val2, val3的内存没有被释放，这里手动释放
+    free(val1);
+    free(val2);
+    free(val3);
+    dynamic_array_destroy_with_free(arr); // 释放val4
+}
+
+// 测试动态数组清空并释放元素操作
+static void test_dynamic_array_clear_with_free(void **state) {
+    (void) state; // 未使用
+    DynamicArray* arr = dynamic_array_create(3);
+    assert_non_null(arr);
+
+    // 添加一些元素
+    int* val1 = malloc(sizeof(int)); *val1 = 10;
+    int* val2 = malloc(sizeof(int)); *val2 = 20;
+    int* val3 = malloc(sizeof(int)); *val3 = 30;
+    dynamic_array_push_back(arr, val1);
+    dynamic_array_push_back(arr, val2);
+    dynamic_array_push_back(arr, val3);
+    assert_int_equal(dynamic_array_size(arr), 3);
+
+    // 测试clear_with_free
+    dynamic_array_clear_with_free(arr);
+    assert_int_equal(dynamic_array_size(arr), 0);
+    assert_true(dynamic_array_is_empty(arr));
+
+    // 验证容量保持不变
+    assert_int_equal(dynamic_array_capacity(arr), 3);
+
+    // 验证数组仍然可用
+    int* val4 = malloc(sizeof(int)); *val4 = 40;
+    dynamic_array_push_back(arr, val4);
+    assert_int_equal(dynamic_array_size(arr), 1);
+    assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 40);
+
+    dynamic_array_destroy_with_free(arr); // 释放val4
+
+    // 测试空数组的clear_with_free
+    DynamicArray* empty_arr = dynamic_array_create(2);
+    assert_non_null(empty_arr);
+
+    dynamic_array_clear_with_free(empty_arr);
+    assert_int_equal(dynamic_array_size(empty_arr), 0);
+    assert_true(dynamic_array_is_empty(empty_arr));
+
+    dynamic_array_destroy(empty_arr);
+
+    // 测试NULL指针
+    dynamic_array_clear_with_free(NULL); // 应该安全处理
+    dynamic_array_clear(NULL); // 应该安全处理
+}
+
 
 int main(void) {
     const struct CMUnitTest tests[] = {
@@ -282,6 +364,8 @@ int main(void) {
         cmocka_unit_test(test_dynamic_array_invalid_index),
         cmocka_unit_test(test_dynamic_array_insert),
         cmocka_unit_test(test_dynamic_array_remove),
+        cmocka_unit_test(test_dynamic_array_clear),
+        cmocka_unit_test(test_dynamic_array_clear_with_free),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

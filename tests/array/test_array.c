@@ -49,8 +49,9 @@ static void test_static_array_unified_interface(void **state) {
     assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
     assert_int_equal(value, 25);
 
-    // 测试插入操作
-    assert_int_equal(array_insert(arr, 1, &(int){15}), ARRAY_SUCCESS);
+    // 测试插入操作 - 静态数组需要使用栈上变量
+    int insert_value = 15;
+    assert_int_equal(array_insert(arr, 1, &insert_value), ARRAY_SUCCESS);
     assert_int_equal(array_size(arr), 4);
 
     assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
@@ -58,21 +59,21 @@ static void test_static_array_unified_interface(void **state) {
     assert_int_equal(array_get_int(arr, 2, &value), ARRAY_SUCCESS);
     assert_int_equal(value, 25);
 
-    // 测试移除操作
+    // 测试移除操作 - 静态数组返回的是元素副本，需要释放
     dsa_element_pt removed = array_remove(arr, 1);
     assert_non_null(removed);
     assert_int_equal(ELEMENT_VALUE(int, removed), 15);
-    free(removed);
+    free(removed); // 静态数组的remove返回malloc分配的元素副本，需要释放
 
     assert_int_equal(array_size(arr), 3);
     assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
     assert_int_equal(value, 25);
 
-    // 测试弹出操作
+    // 测试弹出操作 - 静态数组返回的是元素副本，需要释放
     dsa_element_pt popped = array_pop_back(arr);
     assert_non_null(popped);
     assert_int_equal(ELEMENT_VALUE(int, popped), 30);
-    free(popped);
+    free(popped); // 静态数组的pop_back返回malloc分配的元素副本，需要释放
 
     assert_int_equal(array_size(arr), 2);
 
@@ -184,8 +185,16 @@ static void test_error_handling(void **state) {
 
     // 测试无效参数
     assert_null(array_create_static(NULL, 5, sizeof(int)));
-    assert_null(array_create_static(malloc(20), 0, sizeof(int)));
-    assert_null(array_create_static(malloc(20), 5, 0));
+
+    // 测试无效容量 - 需要释放分配的内存
+    void* buffer1 = malloc(20);
+    assert_null(array_create_static(buffer1, 0, sizeof(int)));
+    free(buffer1);
+
+    // 测试无效元素大小 - 需要释放分配的内存
+    void* buffer2 = malloc(20);
+    assert_null(array_create_static(buffer2, 5, 0));
+    free(buffer2);
 
     // 测试空指针操作
     assert_int_equal(array_size(NULL), 0);

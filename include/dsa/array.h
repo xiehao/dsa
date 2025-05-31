@@ -47,7 +47,7 @@ typedef enum {
  * @param buffer 预分配的内存缓冲区
  * @param capacity 数组容量
  * @param element_size 单个元素的大小（字节）
- * @return Array* 成功返回数组指针，失败返回NULL
+ * @return dsa_array_t* 成功返回数组指针，失败返回NULL
  */
 dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_size);
 
@@ -55,7 +55,7 @@ dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_s
  * @brief 创建动态数组
  *
  * @param initial_capacity 初始容量，0表示使用默认容量
- * @return Array* 成功返回数组指针，失败返回NULL
+ * @return dsa_array_t* 成功返回数组指针，失败返回NULL
  */
 dsa_array_t* array_create_dynamic(size_t initial_capacity);
 
@@ -83,7 +83,7 @@ void array_destroy_with_free(dsa_array_t* array);
  *
  * @param array 数组指针
  * @param index 元素索引
- * @return ElementPtr 成功返回元素指针，失败返回NULL
+ * @return dsa_element_pt 成功返回元素指针，失败返回NULL
  */
 dsa_element_pt array_get(const dsa_array_t* array, size_t index);
 
@@ -93,7 +93,7 @@ dsa_element_pt array_get(const dsa_array_t* array, size_t index);
  * @param array 数组指针
  * @param index 元素索引
  * @param element 要设置的元素
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element);
 
@@ -102,7 +102,7 @@ dsa_array_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt el
  *
  * @param array 数组指针
  * @param element 要添加的元素
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
 
@@ -110,7 +110,7 @@ dsa_array_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
  * @brief 移除并返回数组末尾的元素
  *
  * @param array 数组指针
- * @return ElementPtr 成功返回被移除的元素，失败返回NULL
+ * @return dsa_element_pt 成功返回被移除的元素，失败返回NULL
  */
 dsa_element_pt array_pop_back(dsa_array_t* array);
 
@@ -120,7 +120,7 @@ dsa_element_pt array_pop_back(dsa_array_t* array);
  * @param array 数组指针
  * @param index 插入位置的索引
  * @param element 要插入的元素
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element);
 
@@ -129,7 +129,7 @@ dsa_array_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt
  *
  * @param array 数组指针
  * @param index 要移除元素的索引
- * @return ElementPtr 成功返回被移除的元素，失败返回NULL
+ * @return dsa_element_pt 成功返回被移除的元素，失败返回NULL
  */
 dsa_element_pt array_remove(dsa_array_t* array, size_t index);
 
@@ -173,7 +173,7 @@ bool array_is_full(const dsa_array_t* array);
  * @brief 获取数组类型
  *
  * @param array 数组指针
- * @return ArrayType 数组类型
+ * @return dsa_array_type_t 数组类型
  */
 dsa_array_type_t array_get_type(const dsa_array_t* array);
 
@@ -212,7 +212,7 @@ void array_print_info(const dsa_array_t* array);
  *
  * @param array 数组指针
  * @param value 整型值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_push_back_int(dsa_array_t* array, int value);
 
@@ -222,7 +222,7 @@ dsa_array_result_t array_push_back_int(dsa_array_t* array, int value);
  * @param array 数组指针
  * @param index 元素索引
  * @param value 输出参数，存储获取的值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
 
@@ -232,7 +232,7 @@ dsa_array_result_t array_get_int(const dsa_array_t* array, size_t index, int* va
  * @param array 数组指针
  * @param index 元素索引
  * @param value 要设置的值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value);
 
@@ -241,7 +241,7 @@ dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value);
  *
  * @param array 数组指针
  * @param value 双精度浮点值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_push_back_double(dsa_array_t* array, double value);
 
@@ -251,7 +251,7 @@ dsa_array_result_t array_push_back_double(dsa_array_t* array, double value);
  * @param array 数组指针
  * @param index 元素索引
  * @param value 输出参数，存储获取的值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
 
@@ -261,7 +261,7 @@ dsa_array_result_t array_get_double(const dsa_array_t* array, size_t index, doub
  * @param array 数组指针
  * @param index 元素索引
  * @param value 要设置的值
- * @return ArrayResult 操作结果
+ * @return dsa_array_result_t 操作结果
  */
 dsa_array_result_t array_set_double(dsa_array_t* array, size_t index, double value);
 

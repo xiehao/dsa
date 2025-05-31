@@ -197,6 +197,16 @@ const char* array_get_type_name(const dsa_array_t* array);
 void array_clear(dsa_array_t* array);
 
 /**
+ * @brief 清空数组并释放元素内存
+ *
+ * 对于动态数组：释放所有元素指向的内存，然后清空数组
+ * 对于静态数组：只清空数组，不释放元素内存（静默降级为普通clear）
+ *
+ * @param array 数组指针
+ */
+void array_clear_with_free(dsa_array_t* array);
+
+/**
  * @brief 打印数组信息（用于调试）
  *
  * @param array 数组指针

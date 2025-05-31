@@ -237,3 +237,42 @@ dsa_element_pt dynamic_array_pop_back(DynamicArray* array) {
 bool dynamic_array_is_empty(const DynamicArray* array) {
     return array ? (array->size == 0) : true;
 }
+
+/**
+ * @brief 清空动态数组但保留容量
+ *
+ * 此函数将数组大小重置为0，但不释放元素指向的内存，
+ * 也不释放数组的存储空间。数组可以继续使用。
+ *
+ * @param array 指向要清空的DynamicArray的指针
+ */
+void dynamic_array_clear(DynamicArray* array) {
+    if (!array) {
+        return;
+    }
+    // 只重置大小，保留容量和数据指针
+    array->size = 0;
+}
+
+/**
+ * @brief 清空动态数组并释放所有元素
+ *
+ * 此函数首先释放数组中每个元素指向的内存，
+ * 然后将数组大小重置为0。数组结构本身保留，可以继续使用。
+ *
+ * @param array 指向要清空的DynamicArray的指针
+ */
+void dynamic_array_clear_with_free(DynamicArray* array) {
+    if (!array) {
+        return;
+    }
+
+    // 释放每个元素指向的内存
+    for (size_t i = 0; i < array->size; i++) {
+        free(array->data[i]);
+        array->data[i] = NULL;  // 防止悬空指针
+    }
+
+    // 重置大小，保留容量
+    array->size = 0;
+}

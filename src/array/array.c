@@ -393,10 +393,23 @@ void array_clear(dsa_array_t* array) {
             static_array_clear(&array->impl.static_array);
             break;
         case ARRAY_TYPE_DYNAMIC:
-            // 动态数组没有clear函数，手动实现
-            while (!dynamic_array_is_empty(array->impl.dynamic_array)) {
-                dynamic_array_pop_back(array->impl.dynamic_array);
-            }
+            dynamic_array_clear(array->impl.dynamic_array);
+            break;
+    }
+}
+
+void array_clear_with_free(dsa_array_t* array) {
+    if (!is_valid_array(array)) {
+        return;
+    }
+
+    switch (array->type) {
+        case ARRAY_TYPE_STATIC:
+            // 静态数组不支持释放元素，静默降级为普通clear
+            static_array_clear(&array->impl.static_array);
+            break;
+        case ARRAY_TYPE_DYNAMIC:
+            dynamic_array_clear_with_free(array->impl.dynamic_array);
             break;
     }
 }

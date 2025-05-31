@@ -254,6 +254,71 @@ static void test_array_clear(void **state) {
     array_destroy(dynamic_arr);
 }
 
+// 测试数组清空并释放元素操作
+static void test_array_clear_with_free(void **state) {
+    (void)state; // 未使用
+
+    // 测试静态数组clear_with_free（应该降级为普通clear）
+    int buffer[3];
+    dsa_array_t* static_arr = array_create_static(buffer, 3, sizeof(int));
+    assert_non_null(static_arr);
+
+    array_push_back_int(static_arr, 1);
+    array_push_back_int(static_arr, 2);
+    assert_int_equal(array_size(static_arr), 2);
+
+    // 对静态数组调用clear_with_free应该静默降级为普通clear
+    array_clear_with_free(static_arr);
+    assert_int_equal(array_size(static_arr), 0);
+    assert_true(array_is_empty(static_arr));
+
+    array_destroy(static_arr);
+
+    // 测试动态数组clear_with_free
+    dsa_array_t* dynamic_arr = array_create_dynamic(3);
+    assert_non_null(dynamic_arr);
+
+    // 添加动态分配的元素
+    int* val1 = malloc(sizeof(int)); *val1 = 10;
+    int* val2 = malloc(sizeof(int)); *val2 = 20;
+    int* val3 = malloc(sizeof(int)); *val3 = 30;
+
+    assert_int_equal(array_push_back(dynamic_arr, val1), ARRAY_SUCCESS);
+    assert_int_equal(array_push_back(dynamic_arr, val2), ARRAY_SUCCESS);
+    assert_int_equal(array_push_back(dynamic_arr, val3), ARRAY_SUCCESS);
+    assert_int_equal(array_size(dynamic_arr), 3);
+
+    // 清空并释放所有元素
+    array_clear_with_free(dynamic_arr);
+    assert_int_equal(array_size(dynamic_arr), 0);
+    assert_true(array_is_empty(dynamic_arr));
+
+    // 验证数组仍然可用
+    array_push_back_int(dynamic_arr, 100);
+    assert_int_equal(array_size(dynamic_arr), 1);
+
+    // 清理
+    while (!array_is_empty(dynamic_arr)) {
+        dsa_element_pt elem = array_pop_back(dynamic_arr);
+        if (elem) free(elem);
+    }
+
+    array_destroy(dynamic_arr);
+
+    // 测试空数组的clear_with_free
+    dsa_array_t* empty_arr = array_create_dynamic(2);
+    assert_non_null(empty_arr);
+
+    array_clear_with_free(empty_arr);
+    assert_int_equal(array_size(empty_arr), 0);
+    assert_true(array_is_empty(empty_arr));
+
+    array_destroy(empty_arr);
+
+    // 测试NULL指针
+    array_clear_with_free(NULL); // 应该安全处理
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_static_array_unified_interface),
@@ -261,6 +326,7 @@ int main(void) {
         cmocka_unit_test(test_double_array_operations),
         cmocka_unit_test(test_error_handling),
         cmocka_unit_test(test_array_clear),
+        cmocka_unit_test(test_array_clear_with_free),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

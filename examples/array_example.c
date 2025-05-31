@@ -136,17 +136,14 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
 }
 
 /**
- * @brief 清理数组中的所有元素（仅适用于动态数组）
+ * @brief 清理数组中的所有元素
+ *
+ * 使用统一的清理接口，自动根据数组类型选择合适的清理方式：
+ * - 动态数组：释放所有元素内存并清空
+ * - 静态数组：只清空，不释放元素内存
  */
-void cleanup_dynamic_array_elements(dsa_array_t* arr) {
-    if (array_get_type(arr) == ARRAY_TYPE_DYNAMIC) {
-        while (!array_is_empty(arr)) {
-            dsa_element_pt element = array_pop_back(arr);
-            if (element) {
-                free(element);
-            }
-        }
-    }
+void cleanup_array_elements(dsa_array_t* arr) {
+    array_clear_with_free(arr);
 }
 
 /**
@@ -181,7 +178,7 @@ void demonstrate_double_array(dsa_array_t* arr) {
     printf("\n");
 
     // 清理
-    cleanup_dynamic_array_elements(arr);
+    cleanup_array_elements(arr);
 }
 
 int main() {
@@ -206,7 +203,7 @@ int main() {
 
     if (dynamic_arr) {
         demonstrate_unified_array_interface(dynamic_arr, "动态数组演示");
-        cleanup_dynamic_array_elements(dynamic_arr);
+        cleanup_array_elements(dynamic_arr);
         array_destroy(dynamic_arr);
     } else {
         printf("创建动态数组失败\n");

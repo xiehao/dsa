@@ -153,7 +153,12 @@ dsa_array_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt el
         }
         case ARRAY_TYPE_DYNAMIC: {
             dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, element);
-            return old_element ? ARRAY_SUCCESS : ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+            if (old_element) {
+                free(old_element);  // 释放旧元素，保持与类型安全函数的一致性
+                return ARRAY_SUCCESS;
+            } else {
+                return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+            }
         }
         default:
             return ARRAY_ERROR_INVALID_PARAMETER;

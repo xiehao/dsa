@@ -37,14 +37,14 @@ static bool is_valid_array(const dsa_array_t* array) {
  */
 static const char* get_error_string(dsa_array_result_t result) {
     switch (result) {
-        case ARRAY_SUCCESS: return "Success";
-        case ARRAY_ERROR_NULL_POINTER: return "Null pointer";
-        case ARRAY_ERROR_INDEX_OUT_OF_BOUNDS: return "Index out of bounds";
-        case ARRAY_ERROR_CAPACITY_FULL: return "Capacity full";
-        case ARRAY_ERROR_EMPTY: return "Array empty";
-        case ARRAY_ERROR_MEMORY_ALLOCATION: return "Memory allocation failed";
-        case ARRAY_ERROR_INVALID_PARAMETER: return "Invalid parameter";
-        default: return "Unknown error";
+        case ARRAY_SUCCESS: return "成功";
+        case ARRAY_ERROR_NULL_POINTER: return "空指针错误";
+        case ARRAY_ERROR_INDEX_OUT_OF_BOUNDS: return "索引越界";
+        case ARRAY_ERROR_CAPACITY_FULL: return "容量已满";
+        case ARRAY_ERROR_EMPTY: return "数组为空";
+        case ARRAY_ERROR_MEMORY_ALLOCATION: return "内存分配失败";
+        case ARRAY_ERROR_INVALID_PARAMETER: return "无效参数";
+        default: return "未知错误";
     }
 }
 
@@ -366,16 +366,16 @@ dsa_array_type_t array_get_type(const dsa_array_t* array) {
 
 const char* array_get_type_name(const dsa_array_t* array) {
     if (!is_valid_array(array)) {
-        return "Invalid";
+        return "无效数组";
     }
 
     switch (array->type) {
         case ARRAY_TYPE_STATIC:
-            return "StaticArray";
+            return "静态数组";
         case ARRAY_TYPE_DYNAMIC:
-            return "DynamicArray";
+            return "动态数组";
         default:
-            return "Unknown";
+            return "未知类型";
     }
 }
 
@@ -403,19 +403,19 @@ void array_clear(dsa_array_t* array) {
 
 void array_print_info(const dsa_array_t* array) {
     if (!is_valid_array(array)) {
-        printf("Array: Invalid (NULL pointer)\n");
+        printf("数组: 无效 (空指针)\n");
         return;
     }
 
-    printf("Array Information:\n");
-    printf("  Type: %s\n", array_get_type_name(array));
-    printf("  Size: %zu\n", array_size(array));
-    printf("  Capacity: %zu\n", array_capacity(array));
-    printf("  Is Empty: %s\n", array_is_empty(array) ? "Yes" : "No");
-    printf("  Is Full: %s\n", array_is_full(array) ? "Yes" : "No");
+    printf("数组信息:\n");
+    printf("  类型: %s\n", array_get_type_name(array));
+    printf("  大小: %zu\n", array_size(array));
+    printf("  容量: %zu\n", array_capacity(array));
+    printf("  是否为空: %s\n", array_is_empty(array) ? "是" : "否");
+    printf("  是否已满: %s\n", array_is_full(array) ? "是" : "否");
 
     if (array->type == ARRAY_TYPE_STATIC) {
-        printf("  Element Size: %zu bytes\n", array->impl.static_array.element_size);
+        printf("  元素大小: %zu 字节\n", array->impl.static_array.element_size);
     }
 }
 

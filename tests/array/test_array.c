@@ -22,9 +22,9 @@ static void test_static_array_unified_interface(void **state) {
     assert_int_equal(array_get_type(arr), ARRAY_TYPE_STATIC);
 
     // 测试类型安全的添加操作
-    assert_int_equal(array_push_back_int(arr, 10), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_int(arr, 20), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_int(arr, 30), ARRAY_SUCCESS);
+    assert_int_equal(array_push_back_int(arr, 10), DSA_SUCCESS);
+    assert_int_equal(array_push_back_int(arr, 20), DSA_SUCCESS);
+    assert_int_equal(array_push_back_int(arr, 30), DSA_SUCCESS);
 
     assert_int_equal(array_size(arr), 3);
     assert_false(array_is_empty(arr));
@@ -32,31 +32,31 @@ static void test_static_array_unified_interface(void **state) {
 
     // 测试类型安全的获取操作
     int value;
-    assert_int_equal(array_get_int(arr, 0, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 0, &value), DSA_SUCCESS);
     assert_int_equal(value, 10);
 
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 20);
 
-    assert_int_equal(array_get_int(arr, 2, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 2, &value), DSA_SUCCESS);
     assert_int_equal(value, 30);
 
     // 测试越界访问
-    assert_int_equal(array_get_int(arr, 3, &value), ARRAY_ERROR_INDEX_OUT_OF_BOUNDS);
+    assert_int_equal(array_get_int(arr, 3, &value), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 
     // 测试类型安全的设置操作
-    assert_int_equal(array_set_int(arr, 1, 25), ARRAY_SUCCESS);
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_set_int(arr, 1, 25), DSA_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 25);
 
     // 测试插入操作 - 静态数组需要使用栈上变量
     int insert_value = 15;
-    assert_int_equal(array_insert(arr, 1, &insert_value), ARRAY_SUCCESS);
+    assert_int_equal(array_insert(arr, 1, &insert_value), DSA_SUCCESS);
     assert_int_equal(array_size(arr), 4);
 
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 15);
-    assert_int_equal(array_get_int(arr, 2, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 2, &value), DSA_SUCCESS);
     assert_int_equal(value, 25);
 
     // 测试移除操作 - 静态数组返回的是元素副本，需要释放
@@ -66,7 +66,7 @@ static void test_static_array_unified_interface(void **state) {
     free(removed); // 静态数组的remove返回malloc分配的元素副本，需要释放
 
     assert_int_equal(array_size(arr), 3);
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 25);
 
     // 测试弹出操作 - 静态数组返回的是元素副本，需要释放
@@ -84,7 +84,7 @@ static void test_static_array_unified_interface(void **state) {
     assert_true(array_is_full(arr));
 
     // 尝试添加到已满的数组
-    assert_int_equal(array_push_back_int(arr, 70), ARRAY_ERROR_CAPACITY_FULL);
+    assert_int_equal(array_push_back_int(arr, 70), DSA_ERROR_CAPACITY_FULL);
 
     array_destroy(arr);
 }
@@ -104,9 +104,9 @@ static void test_dynamic_array_unified_interface(void **state) {
     assert_int_equal(array_get_type(arr), ARRAY_TYPE_DYNAMIC);
 
     // 测试类型安全的添加操作（触发扩容）
-    assert_int_equal(array_push_back_int(arr, 100), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_int(arr, 200), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_int(arr, 300), ARRAY_SUCCESS); // 应该触发扩容
+    assert_int_equal(array_push_back_int(arr, 100), DSA_SUCCESS);
+    assert_int_equal(array_push_back_int(arr, 200), DSA_SUCCESS);
+    assert_int_equal(array_push_back_int(arr, 300), DSA_SUCCESS); // 应该触发扩容
 
     assert_int_equal(array_size(arr), 3);
     assert_true(array_capacity(arr) >= 3); // 容量应该已经扩展
@@ -114,24 +114,24 @@ static void test_dynamic_array_unified_interface(void **state) {
 
     // 测试类型安全的获取操作
     int value;
-    assert_int_equal(array_get_int(arr, 0, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 0, &value), DSA_SUCCESS);
     assert_int_equal(value, 100);
 
-    assert_int_equal(array_get_int(arr, 2, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 2, &value), DSA_SUCCESS);
     assert_int_equal(value, 300);
 
     // 测试类型安全的设置操作
-    assert_int_equal(array_set_int(arr, 1, 250), ARRAY_SUCCESS);
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_set_int(arr, 1, 250), DSA_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 250);
 
     // 测试插入操作
     int* insert_value = malloc(sizeof(int));
     *insert_value = 150;
-    assert_int_equal(array_insert(arr, 1, insert_value), ARRAY_SUCCESS);
+    assert_int_equal(array_insert(arr, 1, insert_value), DSA_SUCCESS);
     assert_int_equal(array_size(arr), 4);
 
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 150);
 
     // 清理所有元素
@@ -151,23 +151,23 @@ static void test_double_array_operations(void **state) {
     assert_non_null(arr);
 
     // 添加双精度浮点数
-    assert_int_equal(array_push_back_double(arr, 3.14), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_double(arr, 2.71), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back_double(arr, 1.41), ARRAY_SUCCESS);
+    assert_int_equal(array_push_back_double(arr, 3.14), DSA_SUCCESS);
+    assert_int_equal(array_push_back_double(arr, 2.71), DSA_SUCCESS);
+    assert_int_equal(array_push_back_double(arr, 1.41), DSA_SUCCESS);
 
     assert_int_equal(array_size(arr), 3);
 
     // 测试获取操作
     double value;
-    assert_int_equal(array_get_double(arr, 0, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_double(arr, 0, &value), DSA_SUCCESS);
     assert_double_equal(value, 3.14, 0.001);
 
-    assert_int_equal(array_get_double(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_get_double(arr, 1, &value), DSA_SUCCESS);
     assert_double_equal(value, 2.71, 0.001);
 
     // 测试设置操作
-    assert_int_equal(array_set_double(arr, 1, 2.72), ARRAY_SUCCESS);
-    assert_int_equal(array_get_double(arr, 1, &value), ARRAY_SUCCESS);
+    assert_int_equal(array_set_double(arr, 1, 2.72), DSA_SUCCESS);
+    assert_int_equal(array_get_double(arr, 1, &value), DSA_SUCCESS);
     assert_double_equal(value, 2.72, 0.001);
 
     // 清理
@@ -202,15 +202,15 @@ static void test_error_handling(void **state) {
     assert_true(array_is_empty(NULL));
     assert_false(array_is_full(NULL));
     assert_null(array_get(NULL, 0));
-    assert_int_equal(array_set(NULL, 0, &(int){42}), ARRAY_ERROR_NULL_POINTER);
-    assert_int_equal(array_push_back(NULL, &(int){42}), ARRAY_ERROR_NULL_POINTER);
+    assert_int_equal(array_set(NULL, 0, &(int){42}), DSA_ERROR_NULL_POINTER);
+    assert_int_equal(array_push_back(NULL, &(int){42}), DSA_ERROR_NULL_POINTER);
     assert_null(array_pop_back(NULL));
 
     // 测试类型安全函数的错误处理
     int value;
-    assert_int_equal(array_get_int(NULL, 0, &value), ARRAY_ERROR_NULL_POINTER);
-    assert_int_equal(array_set_int(NULL, 0, 42), ARRAY_ERROR_NULL_POINTER);
-    assert_int_equal(array_push_back_int(NULL, 42), ARRAY_ERROR_NULL_POINTER);
+    assert_int_equal(array_get_int(NULL, 0, &value), DSA_ERROR_NULL_POINTER);
+    assert_int_equal(array_set_int(NULL, 0, 42), DSA_ERROR_NULL_POINTER);
+    assert_int_equal(array_push_back_int(NULL, 42), DSA_ERROR_NULL_POINTER);
 
     // 测试有效数组的越界访问
     int buffer[2];
@@ -218,12 +218,12 @@ static void test_error_handling(void **state) {
     assert_non_null(arr);
 
     // 空数组的越界访问
-    assert_int_equal(array_get_int(arr, 0, &value), ARRAY_ERROR_INDEX_OUT_OF_BOUNDS);
-    assert_int_equal(array_set_int(arr, 0, 42), ARRAY_ERROR_INDEX_OUT_OF_BOUNDS);
+    assert_int_equal(array_get_int(arr, 0, &value), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
+    assert_int_equal(array_set_int(arr, 0, 42), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 
     // 添加一个元素后测试越界
-    assert_int_equal(array_push_back_int(arr, 42), ARRAY_SUCCESS);
-    assert_int_equal(array_get_int(arr, 1, &value), ARRAY_ERROR_INDEX_OUT_OF_BOUNDS);
+    assert_int_equal(array_push_back_int(arr, 42), DSA_SUCCESS);
+    assert_int_equal(array_get_int(arr, 1, &value), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 
     array_destroy(arr);
 }
@@ -292,9 +292,9 @@ static void test_array_clear_with_free(void **state) {
     int* val2 = malloc(sizeof(int)); *val2 = 20;
     int* val3 = malloc(sizeof(int)); *val3 = 30;
 
-    assert_int_equal(array_push_back(dynamic_arr, val1), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back(dynamic_arr, val2), ARRAY_SUCCESS);
-    assert_int_equal(array_push_back(dynamic_arr, val3), ARRAY_SUCCESS);
+    assert_int_equal(array_push_back(dynamic_arr, val1), DSA_SUCCESS);
+    assert_int_equal(array_push_back(dynamic_arr, val2), DSA_SUCCESS);
+    assert_int_equal(array_push_back(dynamic_arr, val3), DSA_SUCCESS);
     assert_int_equal(array_size(dynamic_arr), 3);
 
     // 清空并释放所有元素

@@ -35,15 +35,15 @@ static bool is_valid_array(const dsa_array_t* array) {
 /**
  * @brief 获取错误信息字符串
  */
-static const char* get_error_string(dsa_array_result_t result) {
+static const char* get_error_string(dsa_result_t result) {
     switch (result) {
-        case ARRAY_SUCCESS: return "成功";
-        case ARRAY_ERROR_NULL_POINTER: return "空指针错误";
-        case ARRAY_ERROR_INDEX_OUT_OF_BOUNDS: return "索引越界";
-        case ARRAY_ERROR_CAPACITY_FULL: return "容量已满";
-        case ARRAY_ERROR_EMPTY: return "数组为空";
-        case ARRAY_ERROR_MEMORY_ALLOCATION: return "内存分配失败";
-        case ARRAY_ERROR_INVALID_PARAMETER: return "无效参数";
+        case DSA_SUCCESS: return "成功";
+        case DSA_ERROR_NULL_POINTER: return "空指针错误";
+        case DSA_ERROR_INDEX_OUT_OF_BOUNDS: return "索引越界";
+        case DSA_ERROR_CAPACITY_FULL: return "容量已满";
+        case DSA_ERROR_EMPTY: return "数组为空";
+        case DSA_ERROR_MEMORY_ALLOCATION: return "内存分配失败";
+        case DSA_ERROR_INVALID_PARAMETER: return "无效参数";
         default: return "未知错误";
     }
 }
@@ -141,33 +141,33 @@ dsa_element_pt array_get(const dsa_array_t* array, size_t index) {
     }
 }
 
-dsa_array_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element) {
+dsa_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
         case ARRAY_TYPE_STATIC: {
             bool result = static_array_set(&array->impl.static_array, index, element);
-            return result ? ARRAY_SUCCESS : ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+            return result ? DSA_SUCCESS : DSA_ERROR_INDEX_OUT_OF_BOUNDS;
         }
         case ARRAY_TYPE_DYNAMIC: {
             dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, element);
             if (old_element) {
                 free(old_element);  // 释放旧元素，保持与类型安全函数的一致性
-                return ARRAY_SUCCESS;
+                return DSA_SUCCESS;
             } else {
-                return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
             }
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_array_result_t array_push_back(dsa_array_t* array, dsa_element_pt element) {
+dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -175,18 +175,18 @@ dsa_array_result_t array_push_back(dsa_array_t* array, dsa_element_pt element) {
             bool result = static_array_push_back(&array->impl.static_array, element);
             if (!result) {
                 if (static_array_is_full(&array->impl.static_array)) {
-                    return ARRAY_ERROR_CAPACITY_FULL;
+                    return DSA_ERROR_CAPACITY_FULL;
                 }
-                return ARRAY_ERROR_INVALID_PARAMETER;
+                return DSA_ERROR_INVALID_PARAMETER;
             }
-            return ARRAY_SUCCESS;
+            return DSA_SUCCESS;
         }
         case ARRAY_TYPE_DYNAMIC: {
             bool result = dynamic_array_push_back(array->impl.dynamic_array, element);
-            return result ? ARRAY_SUCCESS : ARRAY_ERROR_MEMORY_ALLOCATION;
+            return result ? DSA_SUCCESS : DSA_ERROR_MEMORY_ALLOCATION;
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
@@ -227,9 +227,9 @@ dsa_element_pt array_pop_back(dsa_array_t* array) {
     }
 }
 
-dsa_array_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element) {
+dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -237,27 +237,27 @@ dsa_array_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt
             bool result = static_array_insert(&array->impl.static_array, index, element);
             if (!result) {
                 if (static_array_is_full(&array->impl.static_array)) {
-                    return ARRAY_ERROR_CAPACITY_FULL;
+                    return DSA_ERROR_CAPACITY_FULL;
                 }
                 if (index > array->impl.static_array.size) {
-                    return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+                    return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
                 }
-                return ARRAY_ERROR_INVALID_PARAMETER;
+                return DSA_ERROR_INVALID_PARAMETER;
             }
-            return ARRAY_SUCCESS;
+            return DSA_SUCCESS;
         }
         case ARRAY_TYPE_DYNAMIC: {
             bool result = dynamic_array_insert(array->impl.dynamic_array, index, element);
             if (!result) {
                 if (index > dynamic_array_size(array->impl.dynamic_array)) {
-                    return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+                    return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
                 }
-                return ARRAY_ERROR_MEMORY_ALLOCATION;
+                return DSA_ERROR_MEMORY_ALLOCATION;
             }
-            return ARRAY_SUCCESS;
+            return DSA_SUCCESS;
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
@@ -441,9 +441,9 @@ void array_print_info(const dsa_array_t* array) {
 // 类型安全的便利函数
 // ============================================================================
 
-dsa_array_result_t array_push_back_int(dsa_array_t* array, int value) {
+dsa_result_t array_push_back_int(dsa_array_t* array, int value) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -455,38 +455,38 @@ dsa_array_result_t array_push_back_int(dsa_array_t* array, int value) {
             // 动态数组：需要在堆上分配内存
             int* heap_value = malloc(sizeof(int));
             if (!heap_value) {
-                return ARRAY_ERROR_MEMORY_ALLOCATION;
+                return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
-            dsa_array_result_t result = array_push_back(array, heap_value);
-            if (result != ARRAY_SUCCESS) {
+            dsa_result_t result = array_push_back(array, heap_value);
+            if (result != DSA_SUCCESS) {
                 free(heap_value);
             }
             return result;
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_array_result_t array_get_int(const dsa_array_t* array, size_t index, int* value) {
+dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value) {
     if (!is_valid_array(array) || !value) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     dsa_element_pt element = array_get(array, index);
     if (!element) {
-        return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
 
     *value = ELEMENT_VALUE(int, element);
-    return ARRAY_SUCCESS;
+    return DSA_SUCCESS;
 }
 
-dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
+dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -498,7 +498,7 @@ dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
             // 动态数组：需要在堆上分配内存
             int* heap_value = malloc(sizeof(int));
             if (!heap_value) {
-                return ARRAY_ERROR_MEMORY_ALLOCATION;
+                return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
@@ -506,20 +506,20 @@ dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
             dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
             if (old_element) {
                 free(old_element);  // 释放旧值
-                return ARRAY_SUCCESS;
+                return DSA_SUCCESS;
             } else {
                 free(heap_value);   // 设置失败，释放新分配的内存
-                return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
             }
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_array_result_t array_push_back_double(dsa_array_t* array, double value) {
+dsa_result_t array_push_back_double(dsa_array_t* array, double value) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -531,38 +531,38 @@ dsa_array_result_t array_push_back_double(dsa_array_t* array, double value) {
             // 动态数组：需要在堆上分配内存
             double* heap_value = malloc(sizeof(double));
             if (!heap_value) {
-                return ARRAY_ERROR_MEMORY_ALLOCATION;
+                return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
-            dsa_array_result_t result = array_push_back(array, heap_value);
-            if (result != ARRAY_SUCCESS) {
+            dsa_result_t result = array_push_back(array, heap_value);
+            if (result != DSA_SUCCESS) {
                 free(heap_value);
             }
             return result;
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_array_result_t array_get_double(const dsa_array_t* array, size_t index, double* value) {
+dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value) {
     if (!is_valid_array(array) || !value) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     dsa_element_pt element = array_get(array, index);
     if (!element) {
-        return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
 
     *value = ELEMENT_VALUE(double, element);
-    return ARRAY_SUCCESS;
+    return DSA_SUCCESS;
 }
 
-dsa_array_result_t array_set_double(dsa_array_t* array, size_t index, double value) {
+dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value) {
     if (!is_valid_array(array)) {
-        return ARRAY_ERROR_NULL_POINTER;
+        return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
@@ -574,7 +574,7 @@ dsa_array_result_t array_set_double(dsa_array_t* array, size_t index, double val
             // 动态数组：需要在堆上分配内存
             double* heap_value = malloc(sizeof(double));
             if (!heap_value) {
-                return ARRAY_ERROR_MEMORY_ALLOCATION;
+                return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
@@ -582,13 +582,13 @@ dsa_array_result_t array_set_double(dsa_array_t* array, size_t index, double val
             dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
             if (old_element) {
                 free(old_element);  // 释放旧值
-                return ARRAY_SUCCESS;
+                return DSA_SUCCESS;
             } else {
                 free(heap_value);   // 设置失败，释放新分配的内存
-                return ARRAY_ERROR_INDEX_OUT_OF_BOUNDS;
+                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
             }
         }
         default:
-            return ARRAY_ERROR_INVALID_PARAMETER;
+            return DSA_ERROR_INVALID_PARAMETER;
     }
 }

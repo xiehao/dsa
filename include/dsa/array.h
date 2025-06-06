@@ -16,18 +16,6 @@
 // 前向声明，隐藏内部实现
 typedef struct array_t dsa_array_t;
 
-/**
- * @brief 数组操作结果枚举
- */
-typedef enum {
-    ARRAY_SUCCESS = 0,              ///< 操作成功
-    ARRAY_ERROR_NULL_POINTER,       ///< 空指针错误
-    ARRAY_ERROR_INDEX_OUT_OF_BOUNDS,///< 索引越界
-    ARRAY_ERROR_CAPACITY_FULL,      ///< 容量已满（仅静态数组）
-    ARRAY_ERROR_EMPTY,              ///< 数组为空
-    ARRAY_ERROR_MEMORY_ALLOCATION,  ///< 内存分配失败
-    ARRAY_ERROR_INVALID_PARAMETER   ///< 无效参数
-} dsa_array_result_t;
 
 /**
  * @brief 数组类型枚举
@@ -93,18 +81,18 @@ dsa_element_pt array_get(const dsa_array_t* array, size_t index);
  * @param array 数组指针
  * @param index 元素索引
  * @param element 要设置的元素
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element);
+dsa_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 在数组末尾添加元素
  *
  * @param array 数组指针
  * @param element 要添加的元素
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
+dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
 
 /**
  * @brief 移除并返回数组末尾的元素
@@ -120,9 +108,9 @@ dsa_element_pt array_pop_back(dsa_array_t* array);
  * @param array 数组指针
  * @param index 插入位置的索引
  * @param element 要插入的元素
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element);
+dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 移除指定索引处的元素
@@ -222,9 +210,9 @@ void array_print_info(const dsa_array_t* array);
  *
  * @param array 数组指针
  * @param value 整型值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_push_back_int(dsa_array_t* array, int value);
+dsa_result_t array_push_back_int(dsa_array_t* array, int value);
 
 /**
  * @brief 从整型数组获取元素
@@ -232,9 +220,9 @@ dsa_array_result_t array_push_back_int(dsa_array_t* array, int value);
  * @param array 数组指针
  * @param index 元素索引
  * @param value 输出参数，存储获取的值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
+dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
 
 /**
  * @brief 向整型数组设置元素
@@ -242,18 +230,18 @@ dsa_array_result_t array_get_int(const dsa_array_t* array, size_t index, int* va
  * @param array 数组指针
  * @param index 元素索引
  * @param value 要设置的值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_set_int(dsa_array_t* array, size_t index, int value);
+dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value);
 
 /**
  * @brief 向双精度浮点数组添加元素
  *
  * @param array 数组指针
  * @param value 双精度浮点值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_push_back_double(dsa_array_t* array, double value);
+dsa_result_t array_push_back_double(dsa_array_t* array, double value);
 
 /**
  * @brief 从双精度浮点数组获取元素
@@ -261,9 +249,9 @@ dsa_array_result_t array_push_back_double(dsa_array_t* array, double value);
  * @param array 数组指针
  * @param index 元素索引
  * @param value 输出参数，存储获取的值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
+dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
 
 /**
  * @brief 向双精度浮点数组设置元素
@@ -271,8 +259,8 @@ dsa_array_result_t array_get_double(const dsa_array_t* array, size_t index, doub
  * @param array 数组指针
  * @param index 元素索引
  * @param value 要设置的值
- * @return dsa_array_result_t 操作结果
+ * @return dsa_result_t 操作结果
  */
-dsa_array_result_t array_set_double(dsa_array_t* array, size_t index, double value);
+dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value);
 
 #endif // DSA_ARRAY_H

@@ -11,6 +11,19 @@
 // 定义通用的元素指针类型别名
 typedef void* dsa_element_pt;
 
+/**
+ * @brief 数据结构操作结果枚举
+ */
+typedef enum {
+    DSA_SUCCESS = 0,               ///< 操作成功
+    DSA_ERROR_NULL_POINTER,        ///< 空指针错误
+    DSA_ERROR_INDEX_OUT_OF_BOUNDS, ///< 索引越界
+    DSA_ERROR_CAPACITY_FULL,       ///< 容量已满
+    DSA_ERROR_EMPTY,               ///< 数据结构为空
+    DSA_ERROR_MEMORY_ALLOCATION,   ///< 内存分配失败
+    DSA_ERROR_INVALID_PARAMETER    ///< 无效参数
+} dsa_result_t;
+
 // 宏定义，用于简化获取元素值的操作
 // 提供全面的安全检查，优先考虑教育代码库的安全性
 #ifdef DEBUG

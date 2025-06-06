@@ -35,7 +35,7 @@ bool stack_push(Stack* stack, void* element) {
         return false;
     }
     // 使用统一数组接口来压入元素
-    return array_push_back(stack->array, element) == ARRAY_SUCCESS;
+    return array_push_back(stack->array, element) == DSA_SUCCESS;
 }
 
 void* stack_pop(Stack* stack) {

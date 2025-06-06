@@ -19,7 +19,7 @@ int main() {
     printf("Array elements: ");
     for (size_t i = 0; i < array_size(arr); i++) {
         int value;
-        if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+        if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
             printf("%d ", value);
         }
     }

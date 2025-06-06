@@ -16,22 +16,22 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
 
     // 使用类型安全的函数添加整数
     printf("\n添加整数: 10, 20, 30\n");
-    dsa_array_result_t result;
+    dsa_result_t result;
 
     result = array_push_back_int(arr, 10);
-    if (result != ARRAY_SUCCESS) {
+    if (result != DSA_SUCCESS) {
         printf("添加 10 失败: %d\n", result);
         return;
     }
 
     result = array_push_back_int(arr, 20);
-    if (result != ARRAY_SUCCESS) {
+    if (result != DSA_SUCCESS) {
         printf("添加 20 失败: %d\n", result);
         return;
     }
 
     result = array_push_back_int(arr, 30);
-    if (result != ARRAY_SUCCESS) {
+    if (result != DSA_SUCCESS) {
         printf("添加 30 失败: %d\n", result);
         return;
     }
@@ -44,7 +44,7 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
     printf("数组元素: ");
     for (size_t i = 0; i < array_size(arr); i++) {
         int value;
-        if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+        if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
             printf("%d ", value);
         }
     }
@@ -60,15 +60,15 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
         int* insert_value = malloc(sizeof(int));
         *insert_value = 15;
         result = array_insert(arr, 1, insert_value);
-        if (result != ARRAY_SUCCESS) {
+        if (result != DSA_SUCCESS) {
             free(insert_value);
         }
     }
-    if (result == ARRAY_SUCCESS) {
+    if (result == DSA_SUCCESS) {
         printf("插入成功，当前数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
             int value;
-            if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
                 printf("%d ", value);
             }
         }
@@ -80,11 +80,11 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
     // 修改索引2处的元素
     printf("\n将索引2处的元素修改为99\n");
     result = array_set_int(arr, 2, 99);
-    if (result == ARRAY_SUCCESS) {
+    if (result == DSA_SUCCESS) {
         printf("修改成功，当前数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
             int value;
-            if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
                 printf("%d ", value);
             }
         }
@@ -103,7 +103,7 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
         printf("移除后数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
             int value;
-            if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
                 printf("%d ", value);
             }
         }
@@ -122,7 +122,7 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
         printf("弹出后数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
             int value;
-            if (array_get_int(arr, i, &value) == ARRAY_SUCCESS) {
+            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
                 printf("%d ", value);
             }
         }
@@ -160,7 +160,7 @@ void demonstrate_double_array(dsa_array_t* arr) {
     printf("双精度数组元素: ");
     for (size_t i = 0; i < array_size(arr); i++) {
         double value;
-        if (array_get_double(arr, i, &value) == ARRAY_SUCCESS) {
+        if (array_get_double(arr, i, &value) == DSA_SUCCESS) {
             printf("%.2f ", value);
         }
     }
@@ -171,7 +171,7 @@ void demonstrate_double_array(dsa_array_t* arr) {
     printf("修改后的数组: ");
     for (size_t i = 0; i < array_size(arr); i++) {
         double value;
-        if (array_get_double(arr, i, &value) == ARRAY_SUCCESS) {
+        if (array_get_double(arr, i, &value) == DSA_SUCCESS) {
             printf("%.2f ", value);
         }
     }
@@ -226,15 +226,15 @@ int main() {
 
         // 添加3个元素
         for (int i = 1; i <= 3; i++) {
-            dsa_array_result_t result = array_push_back_int(small_arr, i * 10);
+            dsa_result_t result = array_push_back_int(small_arr, i * 10);
             printf("添加 %d: %s\n", i * 10,
-                   result == ARRAY_SUCCESS ? "成功" : "失败");
+                   result == DSA_SUCCESS ? "成功" : "失败");
         }
 
         // 尝试添加第4个元素（应该失败）
-        dsa_array_result_t result = array_push_back_int(small_arr, 40);
+        dsa_result_t result = array_push_back_int(small_arr, 40);
         printf("尝试添加第4个元素 40: %s\n",
-               result == ARRAY_SUCCESS ? "成功" : "失败（预期）");
+               result == DSA_SUCCESS ? "成功" : "失败（预期）");
 
         array_print_info(small_arr);
         array_destroy(small_arr);

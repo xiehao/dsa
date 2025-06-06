@@ -495,11 +495,13 @@ dsa_result_t array_set_int(dsa_array_t *array, size_t index, int value) {
             }
             *heap_value = value;
 
-            // 动态数组的set函数现在返回 dsa_result_t
+            // 动态数组的set函数返回 dsa_result_t
             dsa_result_t result = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
             if (result != DSA_SUCCESS) {
                 free(heap_value); // 设置失败，释放新分配的内存
+                return result;
             }
+
             return result;
         }
         default:

@@ -14,11 +14,11 @@
  * 使用联合体来节省内存，同时包含类型信息和虚函数表
  */
 struct array_t {
-    dsa_array_type_t type;                 ///< 数组类型
+    dsa_array_type_t type; ///< 数组类型
     union {
-        StaticArray static_array;   ///< 静态数组实例
-        DynamicArray* dynamic_array;///< 动态数组指针
-    } impl;                         ///< 具体实现
+        StaticArray static_array; ///< 静态数组实例
+        DynamicArray *dynamic_array; ///< 动态数组指针
+    } impl; ///< 具体实现
 };
 
 // ============================================================================
@@ -28,14 +28,14 @@ struct array_t {
 /**
  * @brief 检查数组指针是否有效
  */
-static bool is_valid_array(const dsa_array_t* array) {
+static bool is_valid_array(const dsa_array_t *array) {
     return array != NULL;
 }
 
 /**
  * @brief 获取错误信息字符串
  */
-static const char* get_error_string(dsa_result_t result) {
+static const char *get_error_string(dsa_result_t result) {
     switch (result) {
         case DSA_SUCCESS: return "成功";
         case DSA_ERROR_NULL_POINTER: return "空指针错误";
@@ -52,12 +52,12 @@ static const char* get_error_string(dsa_result_t result) {
 // 创建和销毁函数
 // ============================================================================
 
-dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_size) {
+dsa_array_t *array_create_static(void *buffer, size_t capacity, size_t element_size) {
     if (!buffer || capacity == 0 || element_size == 0) {
         return NULL;
     }
 
-    dsa_array_t* array = malloc(sizeof(dsa_array_t));
+    dsa_array_t *array = malloc(sizeof(dsa_array_t));
     if (!array) {
         return NULL;
     }
@@ -71,8 +71,8 @@ dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_s
     return array;
 }
 
-dsa_array_t* array_create_dynamic(size_t initial_capacity) {
-    dsa_array_t* array = malloc(sizeof(dsa_array_t));
+dsa_array_t *array_create_dynamic(size_t initial_capacity) {
+    dsa_array_t *array = malloc(sizeof(dsa_array_t));
     if (!array) {
         return NULL;
     }
@@ -87,7 +87,7 @@ dsa_array_t* array_create_dynamic(size_t initial_capacity) {
     return array;
 }
 
-void array_destroy(dsa_array_t* array) {
+void array_destroy(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
@@ -104,7 +104,7 @@ void array_destroy(dsa_array_t* array) {
     free(array);
 }
 
-void array_destroy_with_free(dsa_array_t* array) {
+void array_destroy_with_free(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
@@ -126,7 +126,7 @@ void array_destroy_with_free(dsa_array_t* array) {
 // 基本操作函数
 // ============================================================================
 
-dsa_element_pt array_get(const dsa_array_t* array, size_t index) {
+dsa_element_pt array_get(const dsa_array_t *array, size_t index) {
     if (!is_valid_array(array)) {
         return NULL;
     }
@@ -141,31 +141,24 @@ dsa_element_pt array_get(const dsa_array_t* array, size_t index) {
     }
 }
 
-dsa_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element) {
+dsa_result_t array_set(dsa_array_t *array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
 
     switch (array->type) {
         case ARRAY_TYPE_STATIC: {
-            bool result = static_array_set(&array->impl.static_array, index, element);
-            return result ? DSA_SUCCESS : DSA_ERROR_INDEX_OUT_OF_BOUNDS;
+            return static_array_set(&array->impl.static_array, index, element);
         }
         case ARRAY_TYPE_DYNAMIC: {
-            dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, element);
-            if (old_element) {
-                free(old_element);  // 释放旧元素，保持与类型安全函数的一致性
-                return DSA_SUCCESS;
-            } else {
-                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
-            }
+            return dynamic_array_set(array->impl.dynamic_array, index, element);
         }
         default:
             return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element) {
+dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -190,7 +183,7 @@ dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element) {
     }
 }
 
-dsa_element_pt array_pop_back(dsa_array_t* array) {
+dsa_element_pt array_pop_back(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return NULL;
     }
@@ -203,13 +196,13 @@ dsa_element_pt array_pop_back(dsa_array_t* array) {
 
             // 获取最后一个元素的副本
             dsa_element_pt last_element = static_array_get(&array->impl.static_array,
-                                                      array->impl.static_array.size - 1);
+                                                           array->impl.static_array.size - 1);
             if (!last_element) {
                 return NULL;
             }
 
             // 创建元素的副本
-            void* element_copy = malloc(array->impl.static_array.element_size);
+            void *element_copy = malloc(array->impl.static_array.element_size);
             if (!element_copy) {
                 return NULL;
             }
@@ -227,7 +220,7 @@ dsa_element_pt array_pop_back(dsa_array_t* array) {
     }
 }
 
-dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element) {
+dsa_result_t array_insert(dsa_array_t *array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -261,7 +254,7 @@ dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt eleme
     }
 }
 
-dsa_element_pt array_remove(dsa_array_t* array, size_t index) {
+dsa_element_pt array_remove(dsa_array_t *array, size_t index) {
     if (!is_valid_array(array)) {
         return NULL;
     }
@@ -279,7 +272,7 @@ dsa_element_pt array_remove(dsa_array_t* array, size_t index) {
             }
 
             // 创建元素的副本
-            void* element_copy = malloc(array->impl.static_array.element_size);
+            void *element_copy = malloc(array->impl.static_array.element_size);
             if (!element_copy) {
                 return NULL;
             }
@@ -301,7 +294,7 @@ dsa_element_pt array_remove(dsa_array_t* array, size_t index) {
 // 查询函数
 // ============================================================================
 
-size_t array_size(const dsa_array_t* array) {
+size_t array_size(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return 0;
     }
@@ -316,7 +309,7 @@ size_t array_size(const dsa_array_t* array) {
     }
 }
 
-size_t array_capacity(const dsa_array_t* array) {
+size_t array_capacity(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return 0;
     }
@@ -331,7 +324,7 @@ size_t array_capacity(const dsa_array_t* array) {
     }
 }
 
-bool array_is_empty(const dsa_array_t* array) {
+bool array_is_empty(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return true;
     }
@@ -346,7 +339,7 @@ bool array_is_empty(const dsa_array_t* array) {
     }
 }
 
-bool array_is_full(const dsa_array_t* array) {
+bool array_is_full(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return false;
     }
@@ -361,7 +354,7 @@ bool array_is_full(const dsa_array_t* array) {
     }
 }
 
-dsa_array_type_t array_get_type(const dsa_array_t* array) {
+dsa_array_type_t array_get_type(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return ARRAY_TYPE_STATIC; // 默认返回静态类型
     }
@@ -369,7 +362,7 @@ dsa_array_type_t array_get_type(const dsa_array_t* array) {
     return array->type;
 }
 
-const char* array_get_type_name(const dsa_array_t* array) {
+const char *array_get_type_name(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return "无效数组";
     }
@@ -388,7 +381,7 @@ const char* array_get_type_name(const dsa_array_t* array) {
 // 其他操作函数
 // ============================================================================
 
-void array_clear(dsa_array_t* array) {
+void array_clear(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
@@ -403,7 +396,7 @@ void array_clear(dsa_array_t* array) {
     }
 }
 
-void array_clear_with_free(dsa_array_t* array) {
+void array_clear_with_free(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
@@ -419,7 +412,7 @@ void array_clear_with_free(dsa_array_t* array) {
     }
 }
 
-void array_print_info(const dsa_array_t* array) {
+void array_print_info(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         printf("数组: 无效 (空指针)\n");
         return;
@@ -441,7 +434,7 @@ void array_print_info(const dsa_array_t* array) {
 // 类型安全的便利函数
 // ============================================================================
 
-dsa_result_t array_push_back_int(dsa_array_t* array, int value) {
+dsa_result_t array_push_back_int(dsa_array_t *array, int value) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -453,7 +446,7 @@ dsa_result_t array_push_back_int(dsa_array_t* array, int value) {
         }
         case ARRAY_TYPE_DYNAMIC: {
             // 动态数组：需要在堆上分配内存
-            int* heap_value = malloc(sizeof(int));
+            int *heap_value = malloc(sizeof(int));
             if (!heap_value) {
                 return DSA_ERROR_MEMORY_ALLOCATION;
             }
@@ -470,7 +463,7 @@ dsa_result_t array_push_back_int(dsa_array_t* array, int value) {
     }
 }
 
-dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value) {
+dsa_result_t array_get_int(const dsa_array_t *array, size_t index, int *value) {
     if (!is_valid_array(array) || !value) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -484,7 +477,7 @@ dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value) {
     return DSA_SUCCESS;
 }
 
-dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
+dsa_result_t array_set_int(dsa_array_t *array, size_t index, int value) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -496,28 +489,25 @@ dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value) {
         }
         case ARRAY_TYPE_DYNAMIC: {
             // 动态数组：需要在堆上分配内存
-            int* heap_value = malloc(sizeof(int));
+            int *heap_value = malloc(sizeof(int));
             if (!heap_value) {
                 return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
-            // 获取旧值并释放
-            dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
-            if (old_element) {
-                free(old_element);  // 释放旧值
-                return DSA_SUCCESS;
-            } else {
-                free(heap_value);   // 设置失败，释放新分配的内存
-                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
+            // 动态数组的set函数现在返回 dsa_result_t
+            dsa_result_t result = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
+            if (result != DSA_SUCCESS) {
+                free(heap_value); // 设置失败，释放新分配的内存
             }
+            return result;
         }
         default:
             return DSA_ERROR_INVALID_PARAMETER;
     }
 }
 
-dsa_result_t array_push_back_double(dsa_array_t* array, double value) {
+dsa_result_t array_push_back_double(dsa_array_t *array, double value) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -529,7 +519,7 @@ dsa_result_t array_push_back_double(dsa_array_t* array, double value) {
         }
         case ARRAY_TYPE_DYNAMIC: {
             // 动态数组：需要在堆上分配内存
-            double* heap_value = malloc(sizeof(double));
+            double *heap_value = malloc(sizeof(double));
             if (!heap_value) {
                 return DSA_ERROR_MEMORY_ALLOCATION;
             }
@@ -546,7 +536,7 @@ dsa_result_t array_push_back_double(dsa_array_t* array, double value) {
     }
 }
 
-dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value) {
+dsa_result_t array_get_double(const dsa_array_t *array, size_t index, double *value) {
     if (!is_valid_array(array) || !value) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -560,7 +550,7 @@ dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* va
     return DSA_SUCCESS;
 }
 
-dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value) {
+dsa_result_t array_set_double(dsa_array_t *array, size_t index, double value) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -572,21 +562,18 @@ dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value) {
         }
         case ARRAY_TYPE_DYNAMIC: {
             // 动态数组：需要在堆上分配内存
-            double* heap_value = malloc(sizeof(double));
+            double *heap_value = malloc(sizeof(double));
             if (!heap_value) {
                 return DSA_ERROR_MEMORY_ALLOCATION;
             }
             *heap_value = value;
 
-            // 获取旧值并释放
-            dsa_element_pt old_element = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
-            if (old_element) {
-                free(old_element);  // 释放旧值
-                return DSA_SUCCESS;
-            } else {
-                free(heap_value);   // 设置失败，释放新分配的内存
-                return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
+            // 动态数组的set函数现在返回 dsa_result_t
+            dsa_result_t result = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
+            if (result != DSA_SUCCESS) {
+                free(heap_value); // 设置失败，释放新分配的内存
             }
+            return result;
         }
         default:
             return DSA_ERROR_INVALID_PARAMETER;

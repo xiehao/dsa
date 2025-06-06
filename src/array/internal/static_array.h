@@ -49,7 +49,7 @@ dsa_element_pt static_array_get(const StaticArray *arr, size_t index);
  * @param value 要设置的元素指针。
  * @return 如果成功则返回 true，否则返回 false（例如索引无效）。
  */
-bool static_array_set(StaticArray *arr, size_t index, dsa_element_pt value);
+dsa_result_t static_array_set(StaticArray *arr, size_t index, dsa_element_pt value);
 
 /**
  * @brief 获取静态数组的当前大小（元素数量）。

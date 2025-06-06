@@ -73,8 +73,8 @@ static void test_static_array_push_get_set(void **state) {
     // Set elements
     for (int i = 0; i < capacity; ++i) {
         int new_value = i * 100;
-        bool set_result = static_array_set(&arr, i, &new_value);
-        assert_true(set_result);
+        dsa_result_t set_result = static_array_set(&arr, i, &new_value);
+        assert_true(set_result == DSA_SUCCESS);
     }
 
     // Verify set elements
@@ -86,7 +86,7 @@ static void test_static_array_push_get_set(void **state) {
 
     // Test set out of bounds
     int value_out = 1000;
-    assert_false(static_array_set(&arr, capacity, &value_out));
+    assert_true(static_array_set(&arr, capacity, &value_out) == DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 
     static_array_destroy(&arr);
 }

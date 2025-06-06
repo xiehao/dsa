@@ -7,14 +7,15 @@
 
 // 定义动态数组的结构（实现细节）
 struct DynamicArray {
-    dsa_element_pt* data;   // 指向元素指针数组的指针
-    size_t size;        // 当前元素数量
-    size_t capacity;    // 当前分配的容量
+    dsa_element_pt *data; // 指向元素指针数组的指针
+    size_t size; // 当前元素数量
+    size_t capacity; // 当前分配的容量
 };
 
 // 内部辅助函数，用于调整数组大小
-static bool dynamic_array_resize(DynamicArray* array, size_t new_capacity) {
-    if (new_capacity <= 0) { // 避免容量非正
+static bool dynamic_array_resize(DynamicArray *array, size_t new_capacity) {
+    if (new_capacity <= 0) {
+        // 避免容量非正
         new_capacity = DEFAULT_CAPACITY;
     }
     if (new_capacity < array->size) {
@@ -23,7 +24,7 @@ static bool dynamic_array_resize(DynamicArray* array, size_t new_capacity) {
         return false;
     }
 
-    dsa_element_pt* new_data = realloc(array->data, new_capacity * sizeof(dsa_element_pt));
+    dsa_element_pt *new_data = realloc(array->data, new_capacity * sizeof(dsa_element_pt));
     if (!new_data) {
         fprintf(stderr, "错误：无法为动态数组重新分配内存。\n");
         return false; // 分配失败
@@ -34,8 +35,8 @@ static bool dynamic_array_resize(DynamicArray* array, size_t new_capacity) {
     return true;
 }
 
-DynamicArray* dynamic_array_create(size_t initial_capacity) {
-    DynamicArray* array = (DynamicArray*)malloc(sizeof(DynamicArray));
+DynamicArray *dynamic_array_create(size_t initial_capacity) {
+    DynamicArray *array = (DynamicArray *) malloc(sizeof(DynamicArray));
     if (!array) {
         perror("为 DynamicArray 结构分配内存失败");
         return NULL;
@@ -44,7 +45,7 @@ DynamicArray* dynamic_array_create(size_t initial_capacity) {
     array->size = 0;
     array->capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
 
-    array->data = (dsa_element_pt*)malloc(array->capacity * sizeof(dsa_element_pt));
+    array->data = (dsa_element_pt *) malloc(array->capacity * sizeof(dsa_element_pt));
     if (!array->data) {
         perror("为动态数组数据分配内存失败");
         free(array); // 清理结构分配
@@ -54,7 +55,7 @@ DynamicArray* dynamic_array_create(size_t initial_capacity) {
     return array;
 }
 
-void dynamic_array_destroy(DynamicArray* array) {
+void dynamic_array_destroy(DynamicArray *array) {
     if (!array) {
         return;
     }
@@ -74,7 +75,7 @@ void dynamic_array_destroy(DynamicArray* array) {
  *
  * @param array 指向要销毁的DynamicArray的指针
  */
-void dynamic_array_destroy_with_free(DynamicArray* array) {
+void dynamic_array_destroy_with_free(DynamicArray *array) {
     if (!array) {
         return;
     }
@@ -90,14 +91,15 @@ void dynamic_array_destroy_with_free(DynamicArray* array) {
 }
 
 
-bool dynamic_array_push_back(DynamicArray* array, dsa_element_pt element) {
+bool dynamic_array_push_back(DynamicArray *array, dsa_element_pt element) {
     // 添加元素等同于在末尾插入
     return dynamic_array_insert(array, dynamic_array_size(array), element);
 }
 
 // 内部辅助函数，用于检查索引是否越界 (适用于 get/set 操作)
-static bool is_index_out_of_bounds(const DynamicArray* array, size_t index) {
-    if (!array) { // 检查数组指针是否有效
+static bool is_index_out_of_bounds(const DynamicArray *array, size_t index) {
+    if (!array) {
+        // 检查数组指针是否有效
         fprintf(stderr, "错误：动态数组指针无效。\n");
         return true; // 无效指针视为越界
     }
@@ -109,8 +111,9 @@ static bool is_index_out_of_bounds(const DynamicArray* array, size_t index) {
 }
 
 // 内部辅助函数，用于检查插入索引是否无效 (适用于 insert 操作)
-static bool is_insert_index_invalid(const DynamicArray* array, size_t index) {
-    if (!array) { // 检查数组指针是否有效
+static bool is_insert_index_invalid(const DynamicArray *array, size_t index) {
+    if (!array) {
+        // 检查数组指针是否有效
         fprintf(stderr, "错误：动态数组指针无效。\n");
         return true; // 无效指针视为无效索引
     }
@@ -122,26 +125,25 @@ static bool is_insert_index_invalid(const DynamicArray* array, size_t index) {
     return false;
 }
 
-dsa_element_pt dynamic_array_get(const DynamicArray* array, size_t index) {
+dsa_element_pt dynamic_array_get(const DynamicArray *array, size_t index) {
     if (is_index_out_of_bounds(array, index)) {
         return NULL;
     }
     return array->data[index];
 }
 
-dsa_element_pt dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element) {
+dsa_result_t dynamic_array_set(DynamicArray *array, size_t index, dsa_element_pt element) {
     if (is_index_out_of_bounds(array, index)) {
-        return NULL; // 错误/越界时返回 NULL
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS; // 错误/越界时返回错误码
     }
-    // 存储旧元素
-    dsa_element_pt old_element = array->data[index];
+    // 不应该在这里释放旧元素，否则与函数文档不符
+    // 根据dynamic_array.h中的说明，该函数不应释放旧元素
     // 设置新元素
     array->data[index] = element;
-    // 返回旧元素
-    return old_element;
+    return DSA_SUCCESS;
 }
 
-bool dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt element) {
+bool dynamic_array_insert(DynamicArray *array, size_t index, dsa_element_pt element) {
     // 使用新的辅助函数检查索引
     if (is_insert_index_invalid(array, index)) {
         return false;
@@ -180,7 +182,7 @@ bool dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt elem
  * @param index 要移除元素的索引
  * @return 指向被移除元素的指针，如果索引无效或数组为空则返回NULL
  */
-dsa_element_pt dynamic_array_remove(DynamicArray* array, size_t index) {
+dsa_element_pt dynamic_array_remove(DynamicArray *array, size_t index) {
     // 使用现有的辅助函数检查索引是否越界
     if (is_index_out_of_bounds(array, index)) {
         return NULL; // 索引无效或数组为空
@@ -211,11 +213,11 @@ dsa_element_pt dynamic_array_remove(DynamicArray* array, size_t index) {
     return removed_element;
 }
 
-size_t dynamic_array_size(const DynamicArray* array) {
+size_t dynamic_array_size(const DynamicArray *array) {
     return array ? array->size : 0;
 }
 
-size_t dynamic_array_capacity(const DynamicArray* array) {
+size_t dynamic_array_capacity(const DynamicArray *array) {
     return array ? array->capacity : 0;
 }
 
@@ -225,7 +227,7 @@ size_t dynamic_array_capacity(const DynamicArray* array) {
  * @param array 指向DynamicArray的指针
  * @return 指向被移除元素的指针，如果数组为空或无效则返回NULL
  */
-dsa_element_pt dynamic_array_pop_back(DynamicArray* array) {
+dsa_element_pt dynamic_array_pop_back(DynamicArray *array) {
     // 检查数组是否为空或无效
     if (!array || dynamic_array_is_empty(array)) {
         return NULL;
@@ -234,7 +236,8 @@ dsa_element_pt dynamic_array_pop_back(DynamicArray* array) {
     // 此时 size > 0，所以 size - 1 是有效索引
     return dynamic_array_remove(array, dynamic_array_size(array) - 1);
 }
-bool dynamic_array_is_empty(const DynamicArray* array) {
+
+bool dynamic_array_is_empty(const DynamicArray *array) {
     return array ? (array->size == 0) : true;
 }
 
@@ -246,7 +249,7 @@ bool dynamic_array_is_empty(const DynamicArray* array) {
  *
  * @param array 指向要清空的DynamicArray的指针
  */
-void dynamic_array_clear(DynamicArray* array) {
+void dynamic_array_clear(DynamicArray *array) {
     if (!array) {
         return;
     }
@@ -262,7 +265,7 @@ void dynamic_array_clear(DynamicArray* array) {
  *
  * @param array 指向要清空的DynamicArray的指针
  */
-void dynamic_array_clear_with_free(DynamicArray* array) {
+void dynamic_array_clear_with_free(DynamicArray *array) {
     if (!array) {
         return;
     }
@@ -270,7 +273,7 @@ void dynamic_array_clear_with_free(DynamicArray* array) {
     // 释放每个元素指向的内存
     for (size_t i = 0; i < array->size; i++) {
         free(array->data[i]);
-        array->data[i] = NULL;  // 防止悬空指针
+        array->data[i] = NULL; // 防止悬空指针
     }
 
     // 重置大小，保留容量

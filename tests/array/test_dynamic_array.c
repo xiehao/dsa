@@ -82,11 +82,10 @@ static void test_dynamic_array_set(void **state) {
     dynamic_array_push_back(arr, val2);
 
     int* new_val = malloc(sizeof(int)); *new_val = 99;
-    void* old_val = dynamic_array_set(arr, 1, new_val);
+    dsa_result_t result = dynamic_array_set(arr, 1, new_val);
 
-    assert_non_null(old_val);
-    assert_int_equal(ELEMENT_VALUE(int, old_val), 2); // 检查被替换的值
-    free(old_val); // 释放被替换元素的数据
+    assert_int_equal(result, DSA_SUCCESS); // 验证操作成功
+    // 无需检查和释放旧值，因为 dynamic_array_set 现在会自动释放旧值
 
     assert_int_equal(dynamic_array_size(arr), 2);
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 1);
@@ -128,7 +127,7 @@ static void test_dynamic_array_empty(void **state) {
     DynamicArray* arr = dynamic_array_create(5);
     assert_int_equal(dynamic_array_size(arr), 0);
     assert_null(dynamic_array_get(arr, 0)); // 在空数组或越界时获取
-    assert_null(dynamic_array_set(arr, 0, NULL)); // 在空数组或越界时设置
+    assert_int_equal(dynamic_array_set(arr, 0, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 在空数组或越界时设置应返回索引越界错误
     dynamic_array_destroy(arr);
 }
 
@@ -141,8 +140,8 @@ static void test_dynamic_array_invalid_index(void **state) {
 
     assert_null(dynamic_array_get(arr, 1)); // 索引越界（大小为 1）
     assert_null(dynamic_array_get(arr, -1)); // 负索引
-    assert_null(dynamic_array_set(arr, 1, NULL)); // 索引越界
-    assert_null(dynamic_array_set(arr, -1, NULL)); // 负索引
+    assert_int_equal(dynamic_array_set(arr, 1, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 索引越界
+    assert_int_equal(dynamic_array_set(arr, -1, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 负索引
 
     dynamic_array_destroy_with_free(arr);
 }

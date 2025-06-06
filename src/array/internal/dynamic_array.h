@@ -61,7 +61,7 @@ dsa_element_pt dynamic_array_get(const DynamicArray* array, size_t index);
  * @param element 指向新元素的指针。该索引处的旧元素会被覆盖但不会被释放
  * @return 指向被替换元素的指针，如果索引越界或发生错误则返回NULL
  */
-dsa_element_pt dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element);
+dsa_result_t dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 在动态数组的指定索引处插入一个元素

@@ -1,4 +1,5 @@
 #include "internal/static_array.h"
+#include "dsa/common.h"
 #include <string.h> // For memcpy and memmove
 #include <assert.h> // For assert
 
@@ -35,14 +36,14 @@ dsa_element_pt static_array_get(const StaticArray *arr, size_t index) {
     return ELEMENT_ADDR(arr, index);
 }
 
-bool static_array_set(StaticArray *arr, size_t index, dsa_element_pt value) {
+dsa_result_t static_array_set(StaticArray *arr, size_t index, dsa_element_pt value) {
     assert(arr != NULL);
     assert(value != NULL);
     if (index >= arr->size) {
-        return false; // 索引越界
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS; // 索引越界
     }
     memcpy(ELEMENT_ADDR(arr, index), value, arr->element_size);
-    return true;
+    return DSA_SUCCESS;
 }
 
 size_t static_array_size(const StaticArray *arr) {

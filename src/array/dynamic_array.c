@@ -93,8 +93,8 @@ void dynamic_array_destroy_with_free(DynamicArray *array) {
 
 dsa_result_t dynamic_array_push_back(DynamicArray *array, dsa_element_pt element) {
     // 添加元素等同于在末尾插入
-    bool result = dynamic_array_insert(array, dynamic_array_size(array), element);
-    return result ? DSA_SUCCESS : DSA_ERROR_MEMORY_ALLOCATION;
+    // 直接返回插入函数的结果，现在它返回详细的错误码
+    return dynamic_array_insert(array, dynamic_array_size(array), element);
 }
 
 // 内部辅助函数，用于检查索引是否越界 (适用于 get/set 操作)
@@ -144,17 +144,22 @@ dsa_result_t dynamic_array_set(DynamicArray *array, size_t index, dsa_element_pt
     return DSA_SUCCESS;
 }
 
-bool dynamic_array_insert(DynamicArray *array, size_t index, dsa_element_pt element) {
-    // 使用新的辅助函数检查索引
-    if (is_insert_index_invalid(array, index)) {
-        return false;
+dsa_result_t dynamic_array_insert(DynamicArray *array, size_t index, dsa_element_pt element) {
+    // 检查参数有效性
+    if (array == NULL || element == NULL) {
+        return DSA_ERROR_NULL_POINTER;
+    }
+
+    // 检查插入索引是否有效
+    if (index > array->size) {
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
 
     // 检查是否需要调整大小
     if (array->size >= array->capacity) {
         size_t new_capacity = (array->capacity == 0) ? DEFAULT_CAPACITY : array->capacity * 2;
         if (!dynamic_array_resize(array, new_capacity)) {
-            return false; // 调整大小失败
+            return DSA_ERROR_MEMORY_ALLOCATION; // 调整大小失败
         }
     }
 
@@ -170,7 +175,7 @@ bool dynamic_array_insert(DynamicArray *array, size_t index, dsa_element_pt elem
     // 增加数组大小
     array->size++;
 
-    return true;
+    return DSA_SUCCESS;
 }
 
 /**

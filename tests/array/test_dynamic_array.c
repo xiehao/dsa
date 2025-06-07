@@ -83,13 +83,12 @@ static void test_dynamic_array_set(void **state) {
 
     int* new_val = malloc(sizeof(int)); *new_val = 99;
 
-    // 保存旧值以便释放
+    // 保存旧值，因为 dynamic_array_set 不会释放它
     void* old_val = dynamic_array_get(arr, 1);
     dsa_result_t result = dynamic_array_set(arr, 1, new_val);
-    if (result == DSA_SUCCESS && old_val != NULL) {
-        // 成功设置新值后释放旧值
-        free(old_val);
-    }
+    // 根据函数文档，该函数不释放旧元素，由调用者负责
+    // 手动释放旧值
+    free(old_val);
 
     assert_int_equal(result, DSA_SUCCESS); // 验证操作成功
 
@@ -133,7 +132,12 @@ static void test_dynamic_array_empty(void **state) {
     DynamicArray* arr = dynamic_array_create(5);
     assert_int_equal(dynamic_array_size(arr), 0);
     assert_null(dynamic_array_get(arr, 0)); // 在空数组或越界时获取
-    assert_int_equal(dynamic_array_set(arr, 0, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 在空数组或越界时设置应返回索引越界错误
+
+    // 测试在空数组上设置元素
+    int* val = malloc(sizeof(int)); *val = 42;
+    assert_int_equal(dynamic_array_set(arr, 0, val), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 在空数组上设置应返回索引越界错误
+    free(val); // 释放未设置的元素
+
     dynamic_array_destroy(arr);
 }
 
@@ -146,8 +150,16 @@ static void test_dynamic_array_invalid_index(void **state) {
 
     assert_null(dynamic_array_get(arr, 1)); // 索引越界（大小为 1）
     assert_null(dynamic_array_get(arr, -1)); // 负索引
-assert_int_equal(dynamic_array_set(arr, 1, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 索引越界
-assert_int_equal(dynamic_array_set(arr, -1, NULL), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 负索引
+
+    // 测试 set 函数的索引越界
+    int* val_test = malloc(sizeof(int)); *val_test = 100;
+    assert_int_equal(dynamic_array_set(arr, 1, val_test), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 索引越界
+    free(val_test); // 需要释放未成功设置的元素
+
+    // 测试负索引
+    int* val_neg = malloc(sizeof(int)); *val_neg = 200;
+    assert_int_equal(dynamic_array_set(arr, (size_t)-1, val_neg), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 负索引
+    free(val_neg); // 需要释放未成功设置的元素
 
     dynamic_array_destroy_with_free(arr);
 }
@@ -160,19 +172,19 @@ static void test_dynamic_array_insert(void **state) {
 
     // 1. 在末尾插入 (等同于 add)
     int* val1 = malloc(sizeof(int)); *val1 = 10;
-    assert_true(dynamic_array_insert(arr, 0, val1)); // 插入到空数组索引 0
+    assert_int_equal(dynamic_array_insert(arr, 0, val1), DSA_SUCCESS); // 插入到空数组索引 0
     assert_int_equal(dynamic_array_size(arr), 1);
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 10);
 
     int* val2 = malloc(sizeof(int)); *val2 = 20;
-    assert_true(dynamic_array_insert(arr, 1, val2)); // 插入到末尾索引 1
+    assert_int_equal(dynamic_array_insert(arr, 1, val2), DSA_SUCCESS); // 插入到末尾索引 1
     assert_int_equal(dynamic_array_size(arr), 2);
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 10);
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 1)), 20);
 
     // 2. 在开头插入
     int* val0 = malloc(sizeof(int)); *val0 = 5;
-    assert_true(dynamic_array_insert(arr, 0, val0)); // 插入到开头索引 0
+    assert_int_equal(dynamic_array_insert(arr, 0, val0), DSA_SUCCESS); // 插入到开头索引 0
     assert_int_equal(dynamic_array_size(arr), 3);
     assert_true(dynamic_array_capacity(arr) >= 3); // 可能触发扩容
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 5);
@@ -181,7 +193,7 @@ static void test_dynamic_array_insert(void **state) {
 
     // 3. 在中间插入
     int* val1_5 = malloc(sizeof(int)); *val1_5 = 15;
-    assert_true(dynamic_array_insert(arr, 2, val1_5)); // 插入到中间索引 2
+    assert_int_equal(dynamic_array_insert(arr, 2, val1_5), DSA_SUCCESS); // 插入到中间索引 2
     assert_int_equal(dynamic_array_size(arr), 4);
     assert_true(dynamic_array_capacity(arr) >= 4);
     assert_int_equal(ELEMENT_VALUE(int, dynamic_array_get(arr, 0)), 5);
@@ -191,7 +203,7 @@ static void test_dynamic_array_insert(void **state) {
 
     // 4. 插入无效索引
     int* val_invalid = malloc(sizeof(int)); *val_invalid = 100;
-    assert_false(dynamic_array_insert(arr, 5, val_invalid)); // 索引 5 越界 (size 是 4)
+    assert_int_equal(dynamic_array_insert(arr, 5, val_invalid), DSA_ERROR_INDEX_OUT_OF_BOUNDS); // 索引 5 越界 (size 是 4)
     assert_int_equal(dynamic_array_size(arr), 4); // 大小不变
     free(val_invalid); // 释放未插入的数据
 

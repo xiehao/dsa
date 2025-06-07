@@ -121,6 +121,12 @@ static void test_dynamic_array_unified_interface(void **state) {
     assert_int_equal(value, 300);
 
     // 测试类型安全的设置操作
+    // 对于动态数组，array_set_int函数不会释放旧元素
+    // 但我们可以手动获取旧元素并释放它
+    int old_value;
+    array_get_int(arr, 1, &old_value); // 获取旧值用于验证
+    assert_int_equal(old_value, 200);
+
     assert_int_equal(array_set_int(arr, 1, 250), DSA_SUCCESS);
     assert_int_equal(array_get_int(arr, 1, &value), DSA_SUCCESS);
     assert_int_equal(value, 250);

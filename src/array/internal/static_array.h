@@ -101,9 +101,12 @@ bool static_array_pop_back(StaticArray *arr);
  * @param arr 指向 StaticArray 结构的指针。
  * @param index 要插入位置的索引。
  * @param value 要插入的元素指针。
- * @return 如果成功插入则返回 true，如果数组已满或索引无效则返回 false。
+ * @return DSA_SUCCESS 如果成功插入；
+ *         DSA_ERROR_NULL_POINTER 如果arr或value为NULL；
+ *         DSA_ERROR_CAPACITY_FULL 如果数组已满；
+ *         DSA_ERROR_INDEX_OUT_OF_BOUNDS 如果索引无效。
  */
-bool static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value);
+dsa_result_t static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value);
 
 /**
  * @brief 从静态数组的指定索引处删除一个元素。

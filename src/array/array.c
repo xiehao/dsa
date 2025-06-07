@@ -220,27 +220,12 @@ dsa_result_t array_insert(dsa_array_t *array, size_t index, dsa_element_pt eleme
 
     switch (array->type) {
         case ARRAY_TYPE_STATIC: {
-            bool result = static_array_insert(&array->impl.static_array, index, element);
-            if (!result) {
-                if (static_array_is_full(&array->impl.static_array)) {
-                    return DSA_ERROR_CAPACITY_FULL;
-                }
-                if (index > array->impl.static_array.size) {
-                    return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
-                }
-                return DSA_ERROR_INVALID_PARAMETER;
-            }
-            return DSA_SUCCESS;
+            // 直接返回内部函数的错误码
+            return static_array_insert(&array->impl.static_array, index, element);
         }
         case ARRAY_TYPE_DYNAMIC: {
-            bool result = dynamic_array_insert(array->impl.dynamic_array, index, element);
-            if (!result) {
-                if (index > dynamic_array_size(array->impl.dynamic_array)) {
-                    return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
-                }
-                return DSA_ERROR_MEMORY_ALLOCATION;
-            }
-            return DSA_SUCCESS;
+            // 直接返回内部函数的错误码
+            return dynamic_array_insert(array->impl.dynamic_array, index, element);
         }
         default:
             return DSA_ERROR_INVALID_PARAMETER;

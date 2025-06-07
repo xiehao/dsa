@@ -29,7 +29,9 @@ void static_array_destroy(StaticArray *arr) {
 }
 
 dsa_element_pt static_array_get(const StaticArray *arr, size_t index) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return NULL;
+    }
     if (index >= arr->size) {
         return NULL; // 索引越界
     }
@@ -37,8 +39,9 @@ dsa_element_pt static_array_get(const StaticArray *arr, size_t index) {
 }
 
 dsa_result_t static_array_set(StaticArray *arr, size_t index, dsa_element_pt value) {
-    assert(arr != NULL);
-    assert(value != NULL);
+    if (arr == NULL || value == NULL) {
+        return DSA_ERROR_NULL_POINTER;
+    }
     if (index >= arr->size) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS; // 索引越界
     }
@@ -47,22 +50,30 @@ dsa_result_t static_array_set(StaticArray *arr, size_t index, dsa_element_pt val
 }
 
 size_t static_array_size(const StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return 0;
+    }
     return arr->size;
 }
 
 size_t static_array_capacity(const StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return 0;
+    }
     return arr->capacity;
 }
 
 bool static_array_is_empty(const StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return true;
+    }
     return arr->size == 0;
 }
 
 bool static_array_is_full(const StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return false;
+    }
     return arr->size == arr->capacity;
 }
 
@@ -82,7 +93,9 @@ dsa_result_t static_array_push_back(StaticArray *arr, dsa_element_pt value) {
 }
 
 bool static_array_pop_back(StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return false;
+    }
     if (static_array_is_empty(arr)) {
         return false; // 数组为空
     }
@@ -92,14 +105,15 @@ bool static_array_pop_back(StaticArray *arr) {
     return true;
 }
 
-bool static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value) {
-    assert(arr != NULL);
-    assert(value != NULL);
-    if (static_array_is_full(arr)) {
-        return false; // 数组已满
+dsa_result_t static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value) {
+    if (arr == NULL || value == NULL) {
+        return DSA_ERROR_NULL_POINTER;
     }
     if (index > arr->size) { // 允许在末尾插入 (index == size)
-        return false; // 索引越界
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS; // 索引越界
+    }
+    if (static_array_is_full(arr)) {
+        return DSA_ERROR_CAPACITY_FULL; // 数组已满
     }
 
     // 向右移动元素，为新元素腾出空间
@@ -112,11 +126,13 @@ bool static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value) {
     // 插入新元素
     memcpy(ELEMENT_ADDR(arr, index), value, arr->element_size);
     arr->size++;
-    return true;
+    return DSA_SUCCESS;
 }
 
 bool static_array_delete(StaticArray *arr, size_t index) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return false;
+    }
     if (static_array_is_empty(arr) || index >= arr->size) {
         return false; // 数组为空或索引越界
     }
@@ -135,7 +151,9 @@ bool static_array_delete(StaticArray *arr, size_t index) {
 }
 
 void static_array_clear(StaticArray *arr) {
-    assert(arr != NULL);
+    if (arr == NULL) {
+        return;
+    }
     arr->size = 0;
     // 可选：清除内存（非严格必要）
     // memset(arr->data, 0, arr->capacity * arr->element_size);

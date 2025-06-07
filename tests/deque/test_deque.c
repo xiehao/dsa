@@ -80,6 +80,7 @@ static void test_deque_remove_first(void **state) {
     assert_int_equal(deque_size(d), 1);
     assert_ptr_equal(deque_peek_first(d), data2);
     assert_ptr_equal(deque_peek_last(d), data2);
+    assert_int_equal(*(int*)removed_data, 10); // 验证移除的元素内容
     free(removed_data);
 
     removed_data = deque_remove_first(d);
@@ -88,6 +89,7 @@ static void test_deque_remove_first(void **state) {
     assert_true(deque_is_empty(d));
     assert_null(deque_peek_first(d));
     assert_null(deque_peek_last(d));
+    assert_int_equal(*(int*)removed_data, 20); // 验证移除的元素内容
     free(removed_data);
 
     // 测试从空双端队列移除
@@ -112,6 +114,7 @@ static void test_deque_remove_last(void **state) {
     assert_int_equal(deque_size(d), 1);
     assert_ptr_equal(deque_peek_first(d), data1);
     assert_ptr_equal(deque_peek_last(d), data1);
+    assert_int_equal(*(int*)removed_data, 20); // 验证移除的元素内容
     free(removed_data);
 
     removed_data = deque_remove_last(d);
@@ -120,6 +123,7 @@ static void test_deque_remove_last(void **state) {
     assert_true(deque_is_empty(d));
     assert_null(deque_peek_first(d));
     assert_null(deque_peek_last(d));
+    assert_int_equal(*(int*)removed_data, 10); // 验证移除的元素内容
     free(removed_data);
 
     // 测试从空双端队列移除

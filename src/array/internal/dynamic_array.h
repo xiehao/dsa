@@ -75,9 +75,12 @@ dsa_result_t dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt
  * @param array 指向DynamicArray的指针
  * @param index 要插入元素的索引
  * @param element 指向要插入的元素的指针
- * @return 如果元素插入成功返回true，否则返回false（例如，索引无效、分配失败）
+ * @return DSA_SUCCESS 如果元素插入成功；
+ *         DSA_ERROR_NULL_POINTER 如果array或element为NULL；
+ *         DSA_ERROR_INDEX_OUT_OF_BOUNDS 如果索引无效；
+ *         DSA_ERROR_MEMORY_ALLOCATION 如果内存分配失败。
  */
-bool dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt element);
+dsa_result_t dynamic_array_insert(DynamicArray* array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 从动态数组的指定索引处移除一个元素

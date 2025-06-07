@@ -78,31 +78,17 @@ bool static_array_is_full(const StaticArray *arr) {
 }
 
 dsa_result_t static_array_push_back(StaticArray *arr, dsa_element_pt value) {
-    if (arr == NULL) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-    if (value == NULL) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-    if (static_array_is_full(arr)) {
-        return DSA_ERROR_CAPACITY_FULL; // 数组已满
-    }
-    memcpy(ELEMENT_ADDR(arr, arr->size), value, arr->element_size);
-    arr->size++;
-    return DSA_SUCCESS;
+    // 通过调用insert函数在末尾插入元素
+    return static_array_insert(arr, arr->size, value);
 }
 
-bool static_array_pop_back(StaticArray *arr) {
-    if (arr == NULL) {
-        return false;
+dsa_element_pt static_array_pop_back(StaticArray *arr) {
+    if (arr == NULL || static_array_is_empty(arr)) {
+        return NULL;
     }
-    if (static_array_is_empty(arr)) {
-        return false; // 数组为空
-    }
-    arr->size--;
-    // 可选：清除弹出元素的内存（非严格必要）
-    // memset(ELEMENT_ADDR(arr, arr->size), 0, arr->element_size);
-    return true;
+
+    // 删除并返回最后一个元素
+    return static_array_delete(arr, arr->size - 1);
 }
 
 dsa_result_t static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value) {
@@ -129,13 +115,16 @@ dsa_result_t static_array_insert(StaticArray *arr, size_t index, dsa_element_pt 
     return DSA_SUCCESS;
 }
 
-bool static_array_delete(StaticArray *arr, size_t index) {
+dsa_element_pt static_array_delete(StaticArray *arr, size_t index) {
     if (arr == NULL) {
-        return false;
+        return NULL;
     }
     if (static_array_is_empty(arr) || index >= arr->size) {
-        return false; // 数组为空或索引越界
+        return NULL; // 数组为空或索引越界
     }
+
+    // 获取要删除元素的指针
+    dsa_element_pt element_to_delete = ELEMENT_ADDR(arr, index);
 
     // 向左移动元素以填补空缺
     if (index < arr->size - 1) {
@@ -145,9 +134,9 @@ bool static_array_delete(StaticArray *arr, size_t index) {
     }
 
     arr->size--;
-    // 可选：清除最后一个元素旧的内存（非严格必要）
-    // memset(ELEMENT_ADDR(arr, arr->size), 0, arr->element_size);
-    return true;
+
+    // 返回被删除元素的指针
+    return element_to_delete;
 }
 
 void static_array_clear(StaticArray *arr) {

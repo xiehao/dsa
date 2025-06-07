@@ -90,11 +90,11 @@ bool static_array_is_full(const StaticArray *arr);
 dsa_result_t static_array_push_back(StaticArray *arr, dsa_element_pt value);
 
 /**
- * @brief 从静态数组末尾移除一个元素。
+ * @brief 从静态数组末尾移除一个元素并返回指向该元素的指针。
  * @param arr 指向 StaticArray 结构的指针。
- * @return 如果成功移除则返回 true，如果数组为空则返回 false。
+ * @return 指向被移除元素的指针，如果数组为空或arr为NULL则返回NULL。
  */
-bool static_array_pop_back(StaticArray *arr);
+dsa_element_pt static_array_pop_back(StaticArray *arr);
 
 /**
  * @brief 在静态数组的指定索引处插入一个元素。
@@ -109,12 +109,12 @@ bool static_array_pop_back(StaticArray *arr);
 dsa_result_t static_array_insert(StaticArray *arr, size_t index, dsa_element_pt value);
 
 /**
- * @brief 从静态数组的指定索引处删除一个元素。
+ * @brief 从静态数组的指定索引处删除一个元素并返回被删除元素的指针。
  * @param arr 指向 StaticArray 结构的指针。
  * @param index 要删除元素的索引。
- * @return 如果成功删除则返回 true，如果索引无效或数组为空则返回 false。
+ * @return 指向被删除元素的指针，如果索引无效或数组为空则返回NULL。
  */
-bool static_array_delete(StaticArray *arr, size_t index);
+dsa_element_pt static_array_delete(StaticArray *arr, size_t index);
 
 /**
  * @brief 清空静态数组（将大小重置为0，不改变容量或释放内存）。

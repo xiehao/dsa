@@ -46,8 +46,8 @@ static void test_static_array_push_get_set(void **state) {
     // Push elements
     for (int i = 0; i < capacity; ++i) {
         int value = i * 10;
-        bool pushed = static_array_push_back(&arr, &value);
-        assert_true(pushed);
+        dsa_result_t pushed = static_array_push_back(&arr, &value);
+        assert_true(pushed == DSA_SUCCESS);
         assert_int_equal(static_array_size(&arr), i + 1);
     }
 
@@ -56,8 +56,8 @@ static void test_static_array_push_get_set(void **state) {
 
     // Try pushing when full
     int extra_value = 99;
-    bool pushed_full = static_array_push_back(&arr, &extra_value);
-    assert_false(pushed_full);
+    dsa_result_t pushed_full = static_array_push_back(&arr, &extra_value);
+    assert_true(pushed_full == DSA_ERROR_CAPACITY_FULL);
     assert_int_equal(static_array_size(&arr), capacity); // Size should not change
 
     // Get and verify elements
@@ -271,8 +271,8 @@ static void test_static_array_clear(void **state) {
 
     // Can push again after clear
     v = 10;
-    bool pushed = static_array_push_back(&arr, &v);
-    assert_true(pushed);
+    dsa_result_t pushed = static_array_push_back(&arr, &v);
+    assert_true(pushed == DSA_SUCCESS);
     assert_int_equal(static_array_size(&arr), 1);
     assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 10);
 

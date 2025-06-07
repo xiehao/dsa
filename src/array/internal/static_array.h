@@ -83,9 +83,11 @@ bool static_array_is_full(const StaticArray *arr);
  * @brief 在静态数组末尾添加一个元素。
  * @param arr 指向 StaticArray 结构的指针。
  * @param value 要添加的元素指针。
- * @return 如果成功添加则返回 true，如果数组已满则返回 false。
+ * @return DSA_SUCCESS 如果元素添加成功；
+ *         DSA_ERROR_NULL_POINTER 如果arr或value为NULL；
+ *         DSA_ERROR_CAPACITY_FULL 如果数组已满。
  */
-bool static_array_push_back(StaticArray *arr, dsa_element_pt value);
+dsa_result_t static_array_push_back(StaticArray *arr, dsa_element_pt value);
 
 /**
  * @brief 从静态数组末尾移除一个元素。

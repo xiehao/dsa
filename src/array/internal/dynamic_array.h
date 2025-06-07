@@ -40,9 +40,11 @@ void dynamic_array_destroy_with_free(DynamicArray* array);
  * 如果需要，数组会自动调整大小
  * @param array 指向DynamicArray的指针
  * @param element 指向要添加的元素的指针。数组存储指针而不是副本
- * @return 如果元素添加成功返回true，否则返回false（例如，分配失败）
+ * @return DSA_SUCCESS 如果元素添加成功；
+ *         DSA_ERROR_NULL_POINTER 如果array或element为NULL；
+ *         DSA_ERROR_MEMORY_ALLOCATION 如果内存分配失败
  */
-bool dynamic_array_push_back(DynamicArray* array, dsa_element_pt element);
+dsa_result_t dynamic_array_push_back(DynamicArray* array, dsa_element_pt element);
 
 /**
  * @brief 获取指定索引处的元素
@@ -59,7 +61,9 @@ dsa_element_pt dynamic_array_get(const DynamicArray* array, size_t index);
  * @param array 指向DynamicArray的指针
  * @param index 要设置元素的索引
  * @param element 指向新元素的指针。该索引处的旧元素会被覆盖但不会被释放
- * @return 指向被替换元素的指针，如果索引越界或发生错误则返回NULL
+ * @return DSA_SUCCESS 如果元素设置成功；
+ *         DSA_ERROR_NULL_POINTER 如果array或element为NULL；
+ *         DSA_ERROR_INDEX_OUT_OF_BOUNDS 如果索引越界
  */
 dsa_result_t dynamic_array_set(DynamicArray* array, size_t index, dsa_element_pt element);
 

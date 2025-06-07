@@ -91,9 +91,10 @@ void dynamic_array_destroy_with_free(DynamicArray *array) {
 }
 
 
-bool dynamic_array_push_back(DynamicArray *array, dsa_element_pt element) {
+dsa_result_t dynamic_array_push_back(DynamicArray *array, dsa_element_pt element) {
     // 添加元素等同于在末尾插入
-    return dynamic_array_insert(array, dynamic_array_size(array), element);
+    bool result = dynamic_array_insert(array, dynamic_array_size(array), element);
+    return result ? DSA_SUCCESS : DSA_ERROR_MEMORY_ALLOCATION;
 }
 
 // 内部辅助函数，用于检查索引是否越界 (适用于 get/set 操作)

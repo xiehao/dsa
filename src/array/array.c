@@ -165,18 +165,11 @@ dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element) {
 
     switch (array->type) {
         case ARRAY_TYPE_STATIC: {
-            bool result = static_array_push_back(&array->impl.static_array, element);
-            if (!result) {
-                if (static_array_is_full(&array->impl.static_array)) {
-                    return DSA_ERROR_CAPACITY_FULL;
-                }
-                return DSA_ERROR_INVALID_PARAMETER;
-            }
-            return DSA_SUCCESS;
+            // 直接返回static_array_push_back的结果，已经包含了错误判断
+            return static_array_push_back(&array->impl.static_array, element);
         }
         case ARRAY_TYPE_DYNAMIC: {
-            bool result = dynamic_array_push_back(array->impl.dynamic_array, element);
-            return result ? DSA_SUCCESS : DSA_ERROR_MEMORY_ALLOCATION;
+            return dynamic_array_push_back(array->impl.dynamic_array, element);
         }
         default:
             return DSA_ERROR_INVALID_PARAMETER;

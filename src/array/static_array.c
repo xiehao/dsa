@@ -66,15 +66,19 @@ bool static_array_is_full(const StaticArray *arr) {
     return arr->size == arr->capacity;
 }
 
-bool static_array_push_back(StaticArray *arr, dsa_element_pt value) {
-    assert(arr != NULL);
-    assert(value != NULL);
+dsa_result_t static_array_push_back(StaticArray *arr, dsa_element_pt value) {
+    if (arr == NULL) {
+        return DSA_ERROR_NULL_POINTER;
+    }
+    if (value == NULL) {
+        return DSA_ERROR_NULL_POINTER;
+    }
     if (static_array_is_full(arr)) {
-        return false; // 数组已满
+        return DSA_ERROR_CAPACITY_FULL; // 数组已满
     }
     memcpy(ELEMENT_ADDR(arr, arr->size), value, arr->element_size);
     arr->size++;
-    return true;
+    return DSA_SUCCESS;
 }
 
 bool static_array_pop_back(StaticArray *arr) {

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "dsa/array.h"
-#include "dsa/linked_list.h"
-#include "dsa/stack.h"
-#include "dsa/deque.h"
+#include <ds/array.h>
+#include <ds/linked_list.h>
+#include <adt/stack.h>
+#include <adt/deque.h>
 
 int main() {
     printf("Data Structures and Algorithms Demo\n\n");

@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <dsa/common.h> // 包含通用定义
+#include <common.h>
 
 // 动态数组的不透明指针类型
 typedef struct DynamicArray DynamicArray;

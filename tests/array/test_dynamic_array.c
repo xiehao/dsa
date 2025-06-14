@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "../src/array/internal/dynamic_array.h"
-#include "dsa/common.h" // 包含通用定义
+#include <common.h>
 
 // 动态数组创建测试用例
 static void test_dynamic_array_creation(void **state) {

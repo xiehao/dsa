@@ -4,7 +4,7 @@
 #include <cmocka.h>
 #include <stdlib.h> // Include for malloc/free
 
-#include "dsa/deque.h"
+#include "../../include/adt/deque.h"
 
 // 辅助函数，用于创建整数数据
 static int* create_int(int value) {

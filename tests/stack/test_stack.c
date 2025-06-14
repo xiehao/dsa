@@ -4,7 +4,7 @@
 #include <cmocka.h>
 #include <stdlib.h> // Include for malloc/free
 
-#include "dsa/stack.h"
+#include "../../include/adt/stack.h"
 
 // 辅助函数，用于创建整数数据
 static int* create_int(int value) {

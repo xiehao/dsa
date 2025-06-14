@@ -1,5 +1,5 @@
-#include "dsa/stack.h"
-#include "dsa/array.h"
+#include "../../include/adt/stack.h"
+#include "ds/array.h"
 #include <stdlib.h>
 
 // 在内部定义 Stack 结构

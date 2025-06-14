@@ -7,7 +7,7 @@
 // 双端队列结构的不透明指针类型
 typedef struct Deque Deque;
 
-#include "linked_list.h"  // 用于 FreeDataFunc 定义
+#include "../ds/linked_list.h"
 
 /**
  * @brief 创建一个新的空双端队列。

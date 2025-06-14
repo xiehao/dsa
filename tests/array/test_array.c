@@ -4,7 +4,7 @@
 #include <cmocka.h>
 #include <stdlib.h>
 
-#include "dsa/array.h"
+#include <ds/array.h>
 
 // 测试静态数组的统一接口
 static void test_static_array_unified_interface(void **state) {

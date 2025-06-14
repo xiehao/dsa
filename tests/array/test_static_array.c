@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #include "../src/array/internal/static_array.h"
-#include "dsa/common.h" // 包含通用定义
+#include <common.h>
 
 // Test case for static_array_init and basic properties
 static void test_static_array_init(void **state) {

@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <dsa/common.h> // 包含通用定义
+#include <common.h>
 
 // 定义静态数组结构
 // 使用 C99 的 VLA (Variable Length Array) 特性，在栈上分配

@@ -1,4 +1,4 @@
-#include <dsa/array.h>
+#include <ds/array.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

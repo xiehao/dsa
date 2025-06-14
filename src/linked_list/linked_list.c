@@ -1,8 +1,8 @@
-#include "dsa/linked_list.h"
+#include "ds/linked_list.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <dsa/common.h> // 包含通用定义
+#include <common.h>
 
 // 定义链表节点的结构（内部）
 typedef struct Node {

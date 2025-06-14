@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dsa/array.h>
+#include <ds/array.h>
 
 /**
  * @brief 演示统一数组接口的使用

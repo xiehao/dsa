@@ -1,5 +1,5 @@
 #include "internal/static_array.h"
-#include "dsa/common.h"
+#include "../../include/common.h"
 #include <string.h> // For memcpy and memmove
 #include <assert.h> // For assert
 

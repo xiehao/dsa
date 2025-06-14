@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <dsa/common.h>
+#include <common.h>
 
 /**
  * @file array.h

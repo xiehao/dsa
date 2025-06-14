@@ -1,4 +1,4 @@
-#include "dsa/deque.h"
+#include "../../include/adt/deque.h"
 #include <stdlib.h>
 
 // 定义双端队列的底层结构（例如，使用链表或动态数组）

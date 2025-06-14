@@ -9,7 +9,7 @@ add_library(dsa_internal INTERFACE)
 
 # Link sub-libraries to the interface library
 target_link_libraries(dsa_internal INTERFACE
-    dsa_array
+    ds_array
     dsa_linked_list
     dsa_stack
     dsa_deque

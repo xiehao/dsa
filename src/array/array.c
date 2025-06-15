@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <traits.h>
+
 // 包含内部头文件
-#include "internal/static_array.h"
-#include "internal/dynamic_array.h"
+#include <internal/static_array.h>
+#include <internal/dynamic_array.h>
 
 /**
  * @brief 统一数组结构体

@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <dsa/common.h>
-#include <dsa/array.h>
+#include <common.h>
+#include <ds/array.h>
 
 /**
  * @brief 数组基类抽象接口

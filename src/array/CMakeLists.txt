@@ -5,12 +5,12 @@ add_library(ds_array STATIC
     array.c
 )
 
-# Set target properties
+# 继承公共设置
+target_link_libraries(ds_array PUBLIC dsa_common)
+
+# 只需要设置私有的include目录
 target_include_directories(ds_array
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
-        $<INSTALL_INTERFACE:include>
-    PRIVATE
+        PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 

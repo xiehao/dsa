@@ -16,10 +16,10 @@ target_link_libraries(dsa_internal INTERFACE
 )
 
 # Propagate include directories from the interface library
-target_include_directories(dsa_internal INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    $<INSTALL_INTERFACE:include>
-)
+#target_include_directories(dsa_internal INTERFACE
+#    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+#    $<INSTALL_INTERFACE:include>
+#)
 
 # Propagate compile options if needed (or set globally in root CMakeLists.txt)
 # target_compile_options(dsa_internal INTERFACE ...)

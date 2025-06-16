@@ -14,23 +14,56 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
     printf("初始状态:\n");
     array_print_info(arr);
 
-    // 使用类型安全的函数添加整数
+    // 使用通用函数添加整数
     printf("\n添加整数: 10, 20, 30\n");
     dsa_result_t result;
 
-    result = array_push_back_int(arr, 10);
+    // 添加整数 10
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        int value1 = 10;
+        result = array_push_back(arr, &value1);
+    } else {
+        int* value1 = malloc(sizeof(int));
+        *value1 = 10;
+        result = array_push_back(arr, value1);
+        if (result != DSA_SUCCESS) {
+            free(value1);
+        }
+    }
     if (result != DSA_SUCCESS) {
         printf("添加 10 失败: %d\n", result);
         return;
     }
 
-    result = array_push_back_int(arr, 20);
+    // 添加整数 20
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        int value2 = 20;
+        result = array_push_back(arr, &value2);
+    } else {
+        int* value2 = malloc(sizeof(int));
+        *value2 = 20;
+        result = array_push_back(arr, value2);
+        if (result != DSA_SUCCESS) {
+            free(value2);
+        }
+    }
     if (result != DSA_SUCCESS) {
         printf("添加 20 失败: %d\n", result);
         return;
     }
 
-    result = array_push_back_int(arr, 30);
+    // 添加整数 30
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        int value3 = 30;
+        result = array_push_back(arr, &value3);
+    } else {
+        int* value3 = malloc(sizeof(int));
+        *value3 = 30;
+        result = array_push_back(arr, value3);
+        if (result != DSA_SUCCESS) {
+            free(value3);
+        }
+    }
     if (result != DSA_SUCCESS) {
         printf("添加 30 失败: %d\n", result);
         return;
@@ -43,8 +76,9 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
     // 显示所有元素
     printf("数组元素: ");
     for (size_t i = 0; i < array_size(arr); i++) {
-        int value;
-        if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
+        dsa_element_pt element = array_get(arr, i);
+        if (element) {
+            int value = ELEMENT_VALUE(int, element);
             printf("%d ", value);
         }
     }
@@ -67,8 +101,9 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
     if (result == DSA_SUCCESS) {
         printf("插入成功，当前数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
-            int value;
-            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
+            dsa_element_pt element = array_get(arr, i);
+            if (element) {
+                int value = ELEMENT_VALUE(int, element);
                 printf("%d ", value);
             }
         }
@@ -79,12 +114,23 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
 
     // 修改索引2处的元素
     printf("\n将索引2处的元素修改为99\n");
-    result = array_set_int(arr, 2, 99);
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        int new_value = 99;
+        result = array_set(arr, 2, &new_value);
+    } else {
+        int* new_value = malloc(sizeof(int));
+        *new_value = 99;
+        result = array_set(arr, 2, new_value);
+        if (result != DSA_SUCCESS) {
+            free(new_value);
+        }
+    }
     if (result == DSA_SUCCESS) {
         printf("修改成功，当前数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
-            int value;
-            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
+            dsa_element_pt element = array_get(arr, i);
+            if (element) {
+                int value = ELEMENT_VALUE(int, element);
                 printf("%d ", value);
             }
         }
@@ -102,8 +148,9 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
 
         printf("移除后数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
-            int value;
-            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
+            dsa_element_pt element = array_get(arr, i);
+            if (element) {
+                int value = ELEMENT_VALUE(int, element);
                 printf("%d ", value);
             }
         }
@@ -121,8 +168,9 @@ void demonstrate_unified_array_interface(dsa_array_t* arr, const char* descripti
 
         printf("弹出后数组: ");
         for (size_t i = 0; i < array_size(arr); i++) {
-            int value;
-            if (array_get_int(arr, i, &value) == DSA_SUCCESS) {
+            dsa_element_pt element = array_get(arr, i);
+            if (element) {
+                int value = ELEMENT_VALUE(int, element);
                 printf("%d ", value);
             }
         }
@@ -153,25 +201,48 @@ void demonstrate_double_array(dsa_array_t* arr) {
     printf("\n=== 双精度浮点数组演示 ===\n");
 
     // 添加一些双精度浮点数
-    array_push_back_double(arr, 3.14);
-    array_push_back_double(arr, 2.71);
-    array_push_back_double(arr, 1.41);
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        double val1 = 3.14, val2 = 2.71, val3 = 1.41;
+        array_push_back(arr, &val1);
+        array_push_back(arr, &val2);
+        array_push_back(arr, &val3);
+    } else {
+        double* val1 = malloc(sizeof(double));
+        double* val2 = malloc(sizeof(double));
+        double* val3 = malloc(sizeof(double));
+        *val1 = 3.14;
+        *val2 = 2.71;
+        *val3 = 1.41;
+        array_push_back(arr, val1);
+        array_push_back(arr, val2);
+        array_push_back(arr, val3);
+    }
 
     printf("双精度数组元素: ");
     for (size_t i = 0; i < array_size(arr); i++) {
-        double value;
-        if (array_get_double(arr, i, &value) == DSA_SUCCESS) {
+        dsa_element_pt element = array_get(arr, i);
+        if (element) {
+            double value = ELEMENT_VALUE(double, element);
             printf("%.2f ", value);
         }
     }
     printf("\n");
 
     // 修改第二个元素
-    array_set_double(arr, 1, 2.72);
+    if (array_get_type(arr) == ARRAY_TYPE_STATIC) {
+        double new_val = 2.72;
+        array_set(arr, 1, &new_val);
+    } else {
+        double* new_val = malloc(sizeof(double));
+        *new_val = 2.72;
+        array_set(arr, 1, new_val);
+    }
+    
     printf("修改后的数组: ");
     for (size_t i = 0; i < array_size(arr); i++) {
-        double value;
-        if (array_get_double(arr, i, &value) == DSA_SUCCESS) {
+        dsa_element_pt element = array_get(arr, i);
+        if (element) {
+            double value = ELEMENT_VALUE(double, element);
             printf("%.2f ", value);
         }
     }
@@ -226,13 +297,35 @@ int main() {
 
         // 添加3个元素
         for (int i = 1; i <= 3; i++) {
-            dsa_result_t result = array_push_back_int(small_arr, i * 10);
+            dsa_result_t result;
+            if (array_get_type(small_arr) == ARRAY_TYPE_STATIC) {
+                int value = i * 10;
+                result = array_push_back(small_arr, &value);
+            } else {
+                int* value = malloc(sizeof(int));
+                *value = i * 10;
+                result = array_push_back(small_arr, value);
+                if (result != DSA_SUCCESS) {
+                    free(value);
+                }
+            }
             printf("添加 %d: %s\n", i * 10,
                    result == DSA_SUCCESS ? "成功" : "失败");
         }
 
         // 尝试添加第4个元素（应该失败）
-        dsa_result_t result = array_push_back_int(small_arr, 40);
+        dsa_result_t result;
+        if (array_get_type(small_arr) == ARRAY_TYPE_STATIC) {
+            int value = 40;
+            result = array_push_back(small_arr, &value);
+        } else {
+            int* value = malloc(sizeof(int));
+            *value = 40;
+            result = array_push_back(small_arr, value);
+            if (result != DSA_SUCCESS) {
+                free(value);
+            }
+        }
         printf("尝试添加第4个元素 40: %s\n",
                result == DSA_SUCCESS ? "成功" : "失败（预期）");
 

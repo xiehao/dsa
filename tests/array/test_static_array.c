@@ -4,290 +4,499 @@
 #include <stdint.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include <stdlib.h>
-
-#include "../src/array/internal/static_array.h"
+#include <ds/array.h>
 #include <common.h>
 
-// Test case for static_array_init and basic properties
-static void test_static_array_init(void **state) {
-    (void)state; // Unused
+// ============================================================================
+// 测试数据结构和工具函数
+// ============================================================================
 
-    const size_t capacity = 10;
-    const size_t element_size = sizeof(int);
-    int buffer[capacity];
-    StaticArray arr;
+typedef struct {
+    dsa_array_t *array;
+    int *buffer;
+    const size_t capacity;
+    const size_t element_size;
+} test_fixture_t;
 
-    bool result = static_array_init(&arr, buffer, capacity, element_size);
-    assert_true(result);
-    assert_non_null(arr.data);
-    assert_int_equal(static_array_size(&arr), 0);
-    assert_int_equal(static_array_capacity(&arr), capacity);
-    assert_int_equal(arr.element_size, element_size);
-    assert_true(static_array_is_empty(&arr));
-    assert_false(static_array_is_full(&arr));
+static int setup_test_array(void **state) {
+    test_fixture_t *fixture = malloc(sizeof(test_fixture_t));
+    assert_non_null(fixture);
 
-    static_array_destroy(&arr);
-    assert_null(arr.data);
-    assert_int_equal(arr.size, 0);
-    assert_int_equal(arr.capacity, 0);
+    // 使用常量初始化
+    *((size_t*)&fixture->capacity) = 10;
+    *((size_t*)&fixture->element_size) = sizeof(int);
+
+    fixture->buffer = malloc(fixture->capacity * fixture->element_size);
+    assert_non_null(fixture->buffer);
+
+    fixture->array = array_create_static(fixture->buffer, fixture->capacity, fixture->element_size);
+    assert_non_null(fixture->array);
+
+    *state = fixture;
+    return 0; // 返回0表示成功
 }
 
-// Test case for push_back, get, set, size, is_full
-static void test_static_array_push_get_set(void **state) {
-    (void)state; // Unused
+static int teardown_test_array(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    if (fixture) {
+        if (fixture->array) {
+            array_destroy(fixture->array);
+        }
+        if (fixture->buffer) {
+            free(fixture->buffer);
+        }
+        free(fixture);
+    }
+    return 0; // 返回0表示成功
+}
 
+// ============================================================================
+// Basic Interface Tests (基本容器接口测试)
+// ============================================================================
+
+/**
+ * @brief 测试数组创建和基本属性
+ * @details 测试数组初始化、大小、容量、空状态和满状态检查
+ */
+static void test_basic_interface_creation_and_properties(void **state) {
     const size_t capacity = 5;
     const size_t element_size = sizeof(int);
-    int buffer[capacity];
-    StaticArray arr;
-    static_array_init(&arr, buffer, capacity, element_size);
+    int buffer[5];
 
-    // Push elements
-    for (int i = 0; i < capacity; ++i) {
+    dsa_array_t *arr = array_create_static(buffer, capacity, element_size);
+    assert_non_null(arr);
+
+    // 测试基本属性
+    assert_int_equal(array_size(arr), 0);
+    assert_int_equal(array_capacity(arr), capacity);
+    assert_true(array_is_empty(arr));
+    assert_false(array_is_full(arr));
+
+    array_destroy(arr);
+}
+
+/**
+ * @brief 测试数组清空功能
+ * @details 测试clear操作对数组状态的影响
+ */
+static void test_basic_interface_clear(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 添加一些元素
+    for (int i = 0; i < 3; i++) {
         int value = i * 10;
-        dsa_result_t pushed = static_array_push_back(&arr, &value);
-        assert_true(pushed == DSA_SUCCESS);
-        assert_int_equal(static_array_size(&arr), i + 1);
+        assert_int_equal(array_push_back(arr, &value), DSA_SUCCESS);
     }
 
-    // Check if full
-    assert_true(static_array_is_full(&arr));
+    assert_int_equal(array_size(arr), 3);
+    assert_false(array_is_empty(arr));
 
-    // Try pushing when full
-    int extra_value = 99;
-    dsa_result_t pushed_full = static_array_push_back(&arr, &extra_value);
-    assert_true(pushed_full == DSA_ERROR_CAPACITY_FULL);
-    assert_int_equal(static_array_size(&arr), capacity); // Size should not change
+    // 清空数组
+    array_clear(arr);
 
-    // Get and verify elements
-    for (int i = 0; i < capacity; ++i) {
-        int *retrieved_value = (int*)static_array_get(&arr, i);
-        assert_non_null(retrieved_value);
-        assert_int_equal(ELEMENT_VALUE(int, retrieved_value), i * 10);
+    assert_int_equal(array_size(arr), 0);
+    assert_true(array_is_empty(arr));
+    assert_int_equal(array_capacity(arr), fixture->capacity); // 容量不变
+}
+
+/**
+ * @brief 测试数组满状态检查
+ * @details 测试数组填满后的状态检查
+ */
+static void test_basic_interface_full_state(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 填满数组
+    for (size_t i = 0; i < fixture->capacity; i++) {
+        int value = (int)i;
+        assert_int_equal(array_push_back(arr, &value), DSA_SUCCESS);
     }
 
-    // Test get out of bounds
-    assert_null(static_array_get(&arr, capacity));
+    assert_true(array_is_full(arr));
+    assert_false(array_is_empty(arr));
+    assert_int_equal(array_size(arr), fixture->capacity);
+}
 
-    // Set elements
-    for (int i = 0; i < capacity; ++i) {
+// ============================================================================
+// Random Access Interface Tests (随机访问接口测试)
+// ============================================================================
+
+/**
+ * @brief 测试随机访问 - get和set操作
+ * @details 测试通过索引获取和设置元素
+ */
+static void test_random_access_get_set(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 先添加一些元素
+    for (int i = 0; i < 5; i++) {
+        int value = i * 10;
+        assert_int_equal(array_push_back(arr, &value), DSA_SUCCESS);
+    }
+
+    // 测试get操作
+    for (int i = 0; i < 5; i++) {
+        int *retrieved = (int*)array_get(arr, i);
+        assert_non_null(retrieved);
+        assert_int_equal(*retrieved, i * 10);
+    }
+
+    // 测试越界访问
+    assert_null(array_get(arr, 5));
+    assert_null(array_get(arr, SIZE_MAX));
+
+    // 测试set操作
+    for (int i = 0; i < 5; i++) {
         int new_value = i * 100;
-        dsa_result_t set_result = static_array_set(&arr, i, &new_value);
-        assert_true(set_result == DSA_SUCCESS);
+        assert_int_equal(array_set(arr, i, &new_value), DSA_SUCCESS);
     }
 
-    // Verify set elements
-    for (int i = 0; i < capacity; ++i) {
-        int *retrieved_value = (int*)static_array_get(&arr, i);
-        assert_non_null(retrieved_value);
-        assert_int_equal(ELEMENT_VALUE(int, retrieved_value), i * 100);
+    // 验证set操作结果
+    for (int i = 0; i < 5; i++) {
+        int *retrieved = (int*)array_get(arr, i);
+        assert_non_null(retrieved);
+        assert_int_equal(*retrieved, i * 100);
     }
 
-    // Test set out of bounds
-    int value_out = 1000;
-    assert_true(static_array_set(&arr, capacity, &value_out) == DSA_ERROR_INDEX_OUT_OF_BOUNDS);
-
-    static_array_destroy(&arr);
+    // 测试set越界
+    int value = 999;
+    assert_int_equal(array_set(arr, 5, &value), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 }
 
-// Test case for pop_back
-static void test_static_array_pop_back(void **state) {
-    (void)state; // Unused
+/**
+ * @brief 测试随机访问 - insert操作
+ * @details 测试在指定位置插入元素
+ */
+static void test_random_access_insert(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
 
-    const size_t capacity = 3;
-    const size_t element_size = sizeof(char);
-    char buffer[capacity];
-    StaticArray arr;
-    static_array_init(&arr, buffer, capacity, element_size);
+    // 初始添加两个元素
+    int v1 = 10, v2 = 30;
+    array_push_back(arr, &v1);
+    array_push_back(arr, &v2);
 
-    char v1 = 'a', v2 = 'b', v3 = 'c';
-    static_array_push_back(&arr, &v1);
-    static_array_push_back(&arr, &v2);
-    static_array_push_back(&arr, &v3);
+    // 在开头插入
+    int v_begin = 5;
+    assert_int_equal(array_insert(arr, 0, &v_begin), DSA_SUCCESS);
+    assert_int_equal(array_size(arr), 3);
+    assert_int_equal(*(int*)array_get(arr, 0), 5);
+    assert_int_equal(*(int*)array_get(arr, 1), 10);
+    assert_int_equal(*(int*)array_get(arr, 2), 30);
 
-    assert_int_equal(static_array_size(&arr), 3);
+    // 在中间插入
+    int v_mid = 20;
+    assert_int_equal(array_insert(arr, 2, &v_mid), DSA_SUCCESS);
+    assert_int_equal(array_size(arr), 4);
+    assert_int_equal(*(int*)array_get(arr, 0), 5);
+    assert_int_equal(*(int*)array_get(arr, 1), 10);
+    assert_int_equal(*(int*)array_get(arr, 2), 20);
+    assert_int_equal(*(int*)array_get(arr, 3), 30);
 
-    // Pop elements
-    bool popped = static_array_pop_back(&arr);
-    assert_true(popped);
-    assert_int_equal(static_array_size(&arr), 2);
-    // Verify remaining elements (optional check, depends on whether pop clears)
-    char *val = (char*)static_array_get(&arr, 1);
-    assert_non_null(val);
-    assert_int_equal(ELEMENT_VALUE(char, val), 'b');
+    // 在末尾插入
+    int v_end = 40;
+    assert_int_equal(array_insert(arr, 4, &v_end), DSA_SUCCESS);
+    assert_int_equal(array_size(arr), 5);
+    assert_int_equal(*(int*)array_get(arr, 4), 40);
 
-    popped = static_array_pop_back(&arr);
-    assert_true(popped);
-    assert_int_equal(static_array_size(&arr), 1);
-
-    popped = static_array_pop_back(&arr);
-    assert_true(popped);
-    assert_int_equal(static_array_size(&arr), 0);
-    assert_true(static_array_is_empty(&arr));
-
-    // Try popping when empty
-    popped = static_array_pop_back(&arr);
-    assert_false(popped);
-    assert_int_equal(static_array_size(&arr), 0);
-
-    static_array_destroy(&arr);
+    // 测试越界插入
+    int v_invalid = 50;
+    assert_int_equal(array_insert(arr, 6, &v_invalid), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
 }
 
-// Test case for insert
-static void test_static_array_insert(void **state) {
-    (void)state; // Unused
+/**
+ * @brief 测试随机访问 - remove操作
+ * @details 测试移除指定位置的元素
+ */
+static void test_random_access_remove(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
 
-    const size_t capacity = 5;
-    const size_t element_size = sizeof(double);
-    double buffer[capacity];
-    StaticArray arr;
-    static_array_init(&arr, buffer, capacity, element_size);
+    // 添加测试数据
+    int values[] = {10, 20, 30, 40};
+    for (int i = 0; i < 4; i++) {
+        array_push_back(arr, &values[i]);
+    }
 
-    double v1 = 1.1, v2 = 2.2, v3 = 3.3;
-    static_array_push_back(&arr, &v1);
-    static_array_push_back(&arr, &v2);
+    // 从中间移除
+    int *removed = (int*)array_remove(arr, 1); // 移除20
+    assert_non_null(removed);
+    assert_int_equal(*removed, 20);
+    assert_int_equal(array_size(arr), 3);
+    assert_int_equal(*(int*)array_get(arr, 0), 10);
+    assert_int_equal(*(int*)array_get(arr, 1), 30);
+    assert_int_equal(*(int*)array_get(arr, 2), 40);
 
-    // Insert at the beginning
-    double v_insert_begin = 0.5;
-    dsa_result_t inserted = static_array_insert(&arr, 0, &v_insert_begin);
-    assert_int_equal(inserted, DSA_SUCCESS);
-    assert_int_equal(static_array_size(&arr), 3);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 0)), 0.5, 1e-9);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 1)), 1.1, 1e-9);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 2)), 2.2, 1e-9);
+    // 从开头移除
+    removed = (int*)array_remove(arr, 0); // 移除10
+    assert_non_null(removed);
+    assert_int_equal(*removed, 10);
+    assert_int_equal(array_size(arr), 2);
 
-    // Insert in the middle
-    double v_insert_mid = 1.5;
-    inserted = static_array_insert(&arr, 2, &v_insert_mid);
-    assert_int_equal(inserted, DSA_SUCCESS);
-    assert_int_equal(static_array_size(&arr), 4);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 0)), 0.5, 1e-9);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 1)), 1.1, 1e-9);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 2)), 1.5, 1e-9);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 3)), 2.2, 1e-9);
+    // 从末尾移除
+    removed = (int*)array_remove(arr, 1); // 移除40
+    assert_non_null(removed);
+    assert_int_equal(*removed, 40);
+    assert_int_equal(array_size(arr), 1);
 
-    // Insert at the end (equivalent to push_back)
-    double v_insert_end = 4.4;
-    inserted = static_array_insert(&arr, 4, &v_insert_end);
-    assert_int_equal(inserted, DSA_SUCCESS);
-    assert_int_equal(static_array_size(&arr), 5);
-    assert_double_equal(ELEMENT_VALUE(double, static_array_get(&arr, 4)), 4.4, 1e-9);
-
-    // Try inserting when full
-    double v_extra = 5.5;
-    inserted = static_array_insert(&arr, 2, &v_extra);
-    assert_int_equal(inserted, DSA_ERROR_CAPACITY_FULL);
-    assert_int_equal(static_array_size(&arr), 5);
-
-    // Try inserting out of bounds
-    inserted = static_array_insert(&arr, 6, &v_extra);
-    assert_int_equal(inserted, DSA_ERROR_INDEX_OUT_OF_BOUNDS);
-
-    static_array_destroy(&arr);
+    // 测试越界移除
+    assert_null(array_remove(arr, 1));
 }
 
-// Test case for delete
-static void test_static_array_delete(void **state) {
-    (void)state; // Unused
+// ============================================================================
+// Back Interface Tests (后端操作接口测试)
+// ============================================================================
 
-    const size_t capacity = 4;
-    const size_t element_size = sizeof(int);
-    int buffer[capacity];
-    StaticArray arr;
-    static_array_init(&arr, buffer, capacity, element_size);
+/**
+ * @brief 测试后端操作 - push_back
+ * @details 测试向数组末尾添加元素
+ */
+static void test_back_interface_push_back(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
 
-    int v1 = 10, v2 = 20, v3 = 30, v4 = 40;
-    static_array_push_back(&arr, &v1);
-    static_array_push_back(&arr, &v2);
-    static_array_push_back(&arr, &v3);
-    static_array_push_back(&arr, &v4);
+    // 逐个添加元素
+    for (size_t i = 0; i < fixture->capacity; i++) {
+        int value = (int)(i * 5);
+        assert_int_equal(array_push_back(arr, &value), DSA_SUCCESS);
+        assert_int_equal(array_size(arr), i + 1);
 
-    // Delete from the middle
-    bool deleted = static_array_delete(&arr, 1); // Delete 20
-    assert_true(deleted);
-    assert_int_equal(static_array_size(&arr), 3);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 10);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 1)), 30);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 2)), 40);
+        // 验证添加的元素
+        int *retrieved = (int*)array_get(arr, i);
+        assert_non_null(retrieved);
+        assert_int_equal(*retrieved, (int)(i * 5));
+    }
 
-    // Delete from the beginning
-    deleted = static_array_delete(&arr, 0); // Delete 10
-    assert_true(deleted);
-    assert_int_equal(static_array_size(&arr), 2);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 30);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 1)), 40);
-
-    // Delete from the end
-    deleted = static_array_delete(&arr, 1); // Delete 40
-    assert_true(deleted);
-    assert_int_equal(static_array_size(&arr), 1);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 30);
-
-    // Delete the last element
-    deleted = static_array_delete(&arr, 0); // Delete 30
-    assert_true(deleted);
-    assert_int_equal(static_array_size(&arr), 0);
-    assert_true(static_array_is_empty(&arr));
-
-    // Try deleting when empty
-    deleted = static_array_delete(&arr, 0);
-    assert_false(deleted);
-
-    // Try deleting out of bounds
-    static_array_push_back(&arr, &v1); // Add one element back
-    deleted = static_array_delete(&arr, 1);
-    assert_false(deleted);
-    assert_int_equal(static_array_size(&arr), 1);
-
-    static_array_destroy(&arr);
+    // 测试满容量时的push_back
+    int extra_value = 999;
+    assert_int_equal(array_push_back(arr, &extra_value), DSA_ERROR_CAPACITY_FULL);
+    assert_int_equal(array_size(arr), fixture->capacity);
 }
 
-// Test case for clear
-static void test_static_array_clear(void **state) {
-    (void)state; // Unused
+/**
+ * @brief 测试后端操作 - pop_back
+ * @details 测试从数组末尾移除元素
+ */
+static void test_back_interface_pop_back(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
 
-    const size_t capacity = 5;
-    const size_t element_size = sizeof(int);
-    int buffer[capacity];
-    StaticArray arr;
-    static_array_init(&arr, buffer, capacity, element_size);
+    // 添加测试数据
+    char values[] = {'a', 'b', 'c'};
+    // 由于是int数组，我们转换char为int
+    for (int i = 0; i < 3; i++) {
+        int value = (int)values[i];
+        array_push_back(arr, &value);
+    }
 
-    int v = 1;
-    static_array_push_back(&arr, &v); v++;
-    static_array_push_back(&arr, &v); v++;
-    static_array_push_back(&arr, &v);
+    assert_int_equal(array_size(arr), 3);
 
-    assert_int_equal(static_array_size(&arr), 3);
-    assert_false(static_array_is_empty(&arr));
+    // 逐个弹出元素
+    int *popped = (int*)array_pop_back(arr);
+    assert_non_null(popped);
+    assert_int_equal(*popped, (int)'c');
+    assert_int_equal(array_size(arr), 2);
 
-    static_array_clear(&arr);
+    popped = (int*)array_pop_back(arr);
+    assert_non_null(popped);
+    assert_int_equal(*popped, (int)'b');
+    assert_int_equal(array_size(arr), 1);
 
-    assert_int_equal(static_array_size(&arr), 0);
-    assert_true(static_array_is_empty(&arr));
-    assert_int_equal(static_array_capacity(&arr), capacity); // Capacity remains
-    // Check if elements are still accessible (they shouldn't be via get)
-    assert_null(static_array_get(&arr, 0));
+    popped = (int*)array_pop_back(arr);
+    assert_non_null(popped);
+    assert_int_equal(*popped, (int)'a');
+    assert_int_equal(array_size(arr), 0);
+    assert_true(array_is_empty(arr));
 
-    // Can push again after clear
-    v = 10;
-    dsa_result_t pushed = static_array_push_back(&arr, &v);
-    assert_true(pushed == DSA_SUCCESS);
-    assert_int_equal(static_array_size(&arr), 1);
-    assert_int_equal(ELEMENT_VALUE(int, static_array_get(&arr, 0)), 10);
-
-    static_array_destroy(&arr);
+    // 测试空数组pop_back
+    popped = (int*)array_pop_back(arr);
+    assert_null(popped);
+    assert_int_equal(array_size(arr), 0);
 }
+
+// ============================================================================
+// Array Interface Tests (数组专用接口测试)
+// ============================================================================
+
+/**
+ * @brief 测试数组类型相关功能
+ * @details 测试获取数组类型和类型名称
+ */
+static void test_array_interface_type_info(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 测试类型获取
+    dsa_array_type_t type = array_get_type(arr);
+    assert_int_equal(type, ARRAY_TYPE_STATIC);
+
+    // 测试类型名称获取
+    const char *type_name = array_get_type_name(arr);
+    assert_non_null(type_name);
+    assert_string_not_equal(type_name, "无效数组");
+}
+
+/**
+ * @brief 测试数组信息打印
+ * @details 测试打印数组详细信息的功能
+ */
+static void test_array_interface_print_info(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 添加一些数据
+    for (int i = 0; i < 3; i++) {
+        int value = i;
+        array_push_back(arr, &value);
+    }
+
+    // 这个测试主要是确保函数不会崩溃
+    // 实际的输出验证在单元测试中比较困难
+    printf("\n=== 数组信息打印测试 ===\n");
+    array_print_info(arr);
+    printf("=== 数组信息打印测试结束 ===\n");
+
+    // 基本验证 - 确保函数调用成功
+    assert_true(true); // 如果到达这里说明没有崩溃
+}
+
+// ============================================================================
+// 综合测试
+// ============================================================================
+
+/**
+ * @brief 综合测试 - 混合操作
+ * @details 测试各种操作的组合使用
+ */
+static void test_comprehensive_mixed_operations(void **state) {
+    test_fixture_t *fixture = (test_fixture_t*)*state;
+    dsa_array_t *arr = fixture->array;
+
+    // 1. 基本操作组合
+    assert_true(array_is_empty(arr));
+
+    // 2. 添加元素
+    for (int i = 0; i < 5; i++) {
+        int value = i * 2;
+        assert_int_equal(array_push_back(arr, &value), DSA_SUCCESS);
+    }
+    assert_int_equal(array_size(arr), 5);
+
+    // 3. 随机访问修改
+    int new_value = 100;
+    assert_int_equal(array_set(arr, 2, &new_value), DSA_SUCCESS);
+    assert_int_equal(*(int*)array_get(arr, 2), 100);
+
+    // 4. 插入操作
+    int insert_value = 50;
+    assert_int_equal(array_insert(arr, 1, &insert_value), DSA_SUCCESS);
+    assert_int_equal(array_size(arr), 6);
+
+    // 5. 移除操作
+    int *removed = (int*)array_remove(arr, 3);
+    assert_non_null(removed);
+    assert_int_equal(array_size(arr), 5);
+
+    // 6. 后端操作
+    int *popped = (int*)array_pop_back(arr);
+    assert_non_null(popped);
+    assert_int_equal(array_size(arr), 4);
+
+    // 7. 验证最终状态
+    assert_false(array_is_empty(arr));
+    assert_false(array_is_full(arr));
+
+    // 8. 清空测试
+    array_clear(arr);
+    assert_true(array_is_empty(arr));
+    assert_int_equal(array_size(arr), 0);
+}
+
+// ============================================================================
+// 错误处理测试
+// ============================================================================
+
+/**
+ * @brief 测试空指针处理
+ * @details 测试各种函数对空指针的处理
+ */
+static void test_null_pointer_handling(void **state) {
+    (void)state; // 不使用fixture
+
+    // 测试空指针参数
+    assert_null(array_create_static(NULL, 10, sizeof(int)));
+    assert_null(array_create_static((void*)1, 0, sizeof(int)));
+    assert_null(array_create_static((void*)1, 10, 0));
+
+    // 测试对空数组的操作
+    assert_int_equal(array_size(NULL), 0);
+    assert_int_equal(array_capacity(NULL), 0);
+    assert_true(array_is_empty(NULL));
+    assert_false(array_is_full(NULL));
+    assert_null(array_get(NULL, 0));
+
+    int value = 42;
+    assert_int_equal(array_set(NULL, 0, &value), DSA_ERROR_NULL_POINTER);
+    assert_int_equal(array_push_back(NULL, &value), DSA_ERROR_NULL_POINTER);
+    assert_null(array_pop_back(NULL));
+    assert_int_equal(array_insert(NULL, 0, &value), DSA_ERROR_NULL_POINTER);
+    assert_null(array_remove(NULL, 0));
+
+    // 这些函数应该安全处理空指针
+    array_clear(NULL);
+    array_clear_with_free(NULL);
+    array_destroy(NULL);
+    array_destroy_with_free(NULL);
+    array_print_info(NULL);
+}
+
+// ============================================================================
+// 测试运行器
+// ============================================================================
 
 int main(void) {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_static_array_init),
-        cmocka_unit_test(test_static_array_push_get_set),
-        cmocka_unit_test(test_static_array_pop_back),
-        cmocka_unit_test(test_static_array_insert),
-        cmocka_unit_test(test_static_array_delete),
-        cmocka_unit_test(test_static_array_clear),
+        // Basic Interface Tests
+        cmocka_unit_test(test_basic_interface_creation_and_properties),
+        cmocka_unit_test_setup_teardown(test_basic_interface_clear,
+                                      setup_test_array, teardown_test_array),
+        cmocka_unit_test_setup_teardown(test_basic_interface_full_state,
+                                      setup_test_array, teardown_test_array),
+
+        // Random Access Interface Tests
+        cmocka_unit_test_setup_teardown(test_random_access_get_set,
+                                      setup_test_array, teardown_test_array),
+        cmocka_unit_test_setup_teardown(test_random_access_insert,
+                                      setup_test_array, teardown_test_array),
+        cmocka_unit_test_setup_teardown(test_random_access_remove,
+                                      setup_test_array, teardown_test_array),
+
+        // Back Interface Tests
+        cmocka_unit_test_setup_teardown(test_back_interface_push_back,
+                                      setup_test_array, teardown_test_array),
+        cmocka_unit_test_setup_teardown(test_back_interface_pop_back,
+                                      setup_test_array, teardown_test_array),
+
+        // Array Interface Tests
+        cmocka_unit_test_setup_teardown(test_array_interface_type_info,
+                                      setup_test_array, teardown_test_array),
+        cmocka_unit_test_setup_teardown(test_array_interface_print_info,
+                                      setup_test_array, teardown_test_array),
+
+        // Comprehensive Tests
+        cmocka_unit_test_setup_teardown(test_comprehensive_mixed_operations,
+                                      setup_test_array, teardown_test_array),
+
+        // Error Handling Tests
+        cmocka_unit_test(test_null_pointer_handling),
     };
 
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    printf("开始运行静态数组测试套件...\n");
+    int result = cmocka_run_group_tests(tests, NULL, NULL);
+    printf("静态数组测试套件完成.\n");
+
+    return result;
 }

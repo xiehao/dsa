@@ -1,26 +1,31 @@
+/**
+ * @file array.c
+ * @brief 数组数据结构的实现
+ * @details 提供静态数组和动态数组的统一接口实现，支持基本的数组操作
+ * @author DSA项目组
+ * @date 2025-06-15
+ * @version 1.0
+ */
+
 #include <ds/array.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
-#include <assert.h>
-
 #include <traits.h>
+#include <internal/array_traits.h>
 
 // 包含内部头文件
 #include <internal/static_array.h>
 #include <internal/dynamic_array.h>
 
 /**
- * @brief 统一数组结构体
- *
- * 使用联合体来节省内存，同时包含类型信息和虚函数表
+ * @brief 数组结构体定义
+ * @details 包含各种接口指针，用于实现数组的多态行为
  */
 struct array_t {
-    dsa_array_type_t type; ///< 数组类型
-    union {
-        StaticArray static_array; ///< 静态数组实例
-        DynamicArray *dynamic_array; ///< 动态数组指针
-    } impl; ///< 具体实现
+    container_basic_interface_t const *basic;           /**< 基本容器接口 */
+    container_random_access_interface_t const *random_access; /**< 随机访问接口 */
+    container_back_interface_t const *back;             /**< 后端操作接口 */
+    array_interface_t const *array;                     /**< 数组专用接口 */
 };
 
 // ============================================================================
@@ -29,6 +34,9 @@ struct array_t {
 
 /**
  * @brief 检查数组指针是否有效
+ * @param array 要检查的数组指针
+ * @return 如果数组指针有效返回 true，否则返回 false
+ * @note 这是一个内部辅助函数，用于统一的空指针检查
  */
 static bool is_valid_array(const dsa_array_t *array) {
     return array != NULL;
@@ -36,6 +44,9 @@ static bool is_valid_array(const dsa_array_t *array) {
 
 /**
  * @brief 获取错误信息字符串
+ * @param result 错误代码
+ * @return 对应的错误信息字符串
+ * @note 将错误代码转换为可读的中文错误信息
  */
 static const char *get_error_string(dsa_result_t result) {
     switch (result) {
@@ -54,344 +65,269 @@ static const char *get_error_string(dsa_result_t result) {
 // 创建和销毁函数
 // ============================================================================
 
+/**
+ * @brief 创建静态数组
+ * @param buffer 用于存储数组元素的缓冲区
+ * @param capacity 数组容量（最大元素数量）
+ * @param element_size 单个元素的大小（字节）
+ * @return 成功时返回数组指针，失败时返回 NULL
+ * @note 静态数组使用用户提供的缓冲区，不会动态分配内存来存储元素
+ * @warning 用户必须确保缓冲区在数组生命周期内保持有效
+ */
 dsa_array_t *array_create_static(void *buffer, size_t capacity, size_t element_size) {
     if (!buffer || capacity == 0 || element_size == 0) {
         return NULL;
     }
 
-    dsa_array_t *array = malloc(sizeof(dsa_array_t));
-    if (!array) {
-        return NULL;
-    }
-
-    array->type = ARRAY_TYPE_STATIC;
-    if (!static_array_init(&array->impl.static_array, buffer, capacity, element_size)) {
-        free(array);
-        return NULL;
-    }
-
-    return array;
+    // 使用新的static_array_create函数创建静态数组
+    return static_array_create(buffer, capacity, element_size);
 }
 
+/**
+ * @brief 创建动态数组
+ * @param initial_capacity 初始容量
+ * @return 成功时返回数组指针，失败时返回 NULL
+ * @note 动态数组会根据需要自动扩展容量
+ */
 dsa_array_t *array_create_dynamic(size_t initial_capacity) {
-    dsa_array_t *array = malloc(sizeof(dsa_array_t));
-    if (!array) {
-        return NULL;
-    }
-
-    array->type = ARRAY_TYPE_DYNAMIC;
-    array->impl.dynamic_array = dynamic_array_create(initial_capacity);
-    if (!array->impl.dynamic_array) {
-        free(array);
-        return NULL;
-    }
-
-    return array;
+    return dynamic_array_create(initial_capacity);
 }
 
+/**
+ * @brief 销毁数组
+ * @param array 要销毁的数组
+ * @note 释放数组结构体占用的内存，但不释放元素内存
+ */
 void array_destroy(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            static_array_destroy(&array->impl.static_array);
-            break;
-        case ARRAY_TYPE_DYNAMIC:
-            dynamic_array_destroy(array->impl.dynamic_array);
-            break;
-    }
-
-    free(array);
+    array->basic->destroy(array);
 }
 
+/**
+ * @brief 销毁数组并释放所有内存
+ * @param array 要销毁的数组
+ * @note 释放数组结构体和所有元素占用的内存
+ */
 void array_destroy_with_free(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            // 静态数组不支持自动释放元素
-            static_array_destroy(&array->impl.static_array);
-            break;
-        case ARRAY_TYPE_DYNAMIC:
-            dynamic_array_destroy_with_free(array->impl.dynamic_array);
-            break;
-    }
-
-    free(array);
+    array->basic->destroy_with_free(array);
 }
 
 // ============================================================================
 // 基本操作函数
 // ============================================================================
 
+/**
+ * @brief 获取指定索引处的元素
+ * @param array 数组指针
+ * @param index 元素索引
+ * @return 成功时返回元素指针，失败时返回 NULL
+ * @note 返回的是元素的指针，而不是元素的副本
+ */
 dsa_element_pt array_get(const dsa_array_t *array, size_t index) {
     if (!is_valid_array(array)) {
         return NULL;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return static_array_get(&array->impl.static_array, index);
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_get(array->impl.dynamic_array, index);
-        default:
-            return NULL;
-    }
+    return array->random_access->get_at(array, index);
 }
 
+/**
+ * @brief 设置指定索引处的元素
+ * @param array 数组指针
+ * @param index 元素索引
+ * @param element 要设置的元素
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
+ * @retval DSA_ERROR_INDEX_OUT_OF_BOUNDS 索引越界
+ */
 dsa_result_t array_set(dsa_array_t *array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            return static_array_set(&array->impl.static_array, index, element);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            return dynamic_array_set(array->impl.dynamic_array, index, element);
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
+    return array->random_access->set_at(array, index, element);
 }
 
+/**
+ * @brief 在数组末尾添加元素
+ * @param array 数组指针
+ * @param element 要添加的元素
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
+ * @retval DSA_ERROR_CAPACITY_FULL 容量已满
+ */
 dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 直接返回static_array_push_back的结果，已经包含了错误判断
-            return static_array_push_back(&array->impl.static_array, element);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            return dynamic_array_push_back(array->impl.dynamic_array, element);
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
+    return array->back->push_back(array, element);
 }
 
+/**
+ * @brief 移除并返回数组末尾的元素
+ * @param array 数组指针
+ * @return 成功时返回移除的元素指针，失败时返回 NULL
+ * @note 调用者负责释放返回的元素内存（如果需要）
+ */
 dsa_element_pt array_pop_back(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return NULL;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            if (static_array_is_empty(&array->impl.static_array)) {
-                return NULL;
-            }
-
-            // 获取最后一个元素的副本
-            dsa_element_pt last_element = static_array_get(&array->impl.static_array,
-                                                           array->impl.static_array.size - 1);
-            if (!last_element) {
-                return NULL;
-            }
-
-            // 创建元素的副本
-            void *element_copy = malloc(array->impl.static_array.element_size);
-            if (!element_copy) {
-                return NULL;
-            }
-            memcpy(element_copy, last_element, array->impl.static_array.element_size);
-
-            // 移除最后一个元素
-            static_array_pop_back(&array->impl.static_array);
-
-            return element_copy;
-        }
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_pop_back(array->impl.dynamic_array);
-        default:
-            return NULL;
-    }
+    return array->back->pop_back(array);
 }
 
+/**
+ * @brief 在指定位置插入元素
+ * @param array 数组指针
+ * @param index 插入位置的索引
+ * @param element 要插入的元素
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
+ * @retval DSA_ERROR_INDEX_OUT_OF_BOUNDS 索引越界
+ * @retval DSA_ERROR_CAPACITY_FULL 容量已满
+ */
 dsa_result_t array_insert(dsa_array_t *array, size_t index, dsa_element_pt element) {
     if (!is_valid_array(array)) {
         return DSA_ERROR_NULL_POINTER;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 直接返回内部函数的错误码
-            return static_array_insert(&array->impl.static_array, index, element);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            // 直接返回内部函数的错误码
-            return dynamic_array_insert(array->impl.dynamic_array, index, element);
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
+    return array->random_access->insert_at(array, index, element);
 }
 
+/**
+ * @brief 移除指定位置的元素
+ * @param array 数组指针
+ * @param index 要移除元素的索引
+ * @return 成功时返回移除的元素指针，失败时返回 NULL
+ * @note 调用者负责释放返回的元素内存（如果需要）
+ */
 dsa_element_pt array_remove(dsa_array_t *array, size_t index) {
     if (!is_valid_array(array)) {
         return NULL;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            if (index >= array->impl.static_array.size) {
-                return NULL;
-            }
-
-            // 获取要删除元素的副本
-            dsa_element_pt element_to_remove = static_array_get(&array->impl.static_array, index);
-            if (!element_to_remove) {
-                return NULL;
-            }
-
-            // 创建元素的副本
-            void *element_copy = malloc(array->impl.static_array.element_size);
-            if (!element_copy) {
-                return NULL;
-            }
-            memcpy(element_copy, element_to_remove, array->impl.static_array.element_size);
-
-            // 删除元素
-            static_array_delete(&array->impl.static_array, index);
-
-            return element_copy;
-        }
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_remove(array->impl.dynamic_array, index);
-        default:
-            return NULL;
-    }
+    return array->random_access->remove_at(array, index);
 }
 
 // ============================================================================
 // 查询函数
 // ============================================================================
 
+/**
+ * @brief 获取数组当前大小
+ * @param array 数组指针
+ * @return 数组中元素的数量
+ * @note 如果数组指针无效，返回 0
+ */
 size_t array_size(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return 0;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return static_array_size(&array->impl.static_array);
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_size(array->impl.dynamic_array);
-        default:
-            return 0;
-    }
+    return array->basic->get_size(array);
 }
 
+/**
+ * @brief 获取数组容量
+ * @param array 数组指针
+ * @return 数组的最大容量
+ * @note 如果数组指针无效，返回 0
+ */
 size_t array_capacity(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return 0;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return static_array_capacity(&array->impl.static_array);
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_capacity(array->impl.dynamic_array);
-        default:
-            return 0;
-    }
+    return array->basic->get_capacity(array);
 }
 
+/**
+ * @brief 检查数组是否为空
+ * @param array 数组指针
+ * @return 如果数组为空返回 true，否则返回 false
+ * @note 如果数组指针无效，返回 true
+ */
 bool array_is_empty(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return true;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return static_array_is_empty(&array->impl.static_array);
-        case ARRAY_TYPE_DYNAMIC:
-            return dynamic_array_is_empty(array->impl.dynamic_array);
-        default:
-            return true;
-    }
+    return array->basic->is_empty(array);
 }
 
+/**
+ * @brief 检查数组是否已满
+ * @param array 数组指针
+ * @return 如果数组已满返回 true，否则返回 false
+ * @note 如果数组指针无效，返回 false
+ */
 bool array_is_full(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return false;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return static_array_is_full(&array->impl.static_array);
-        case ARRAY_TYPE_DYNAMIC:
-            return false; // 动态数组理论上永远不会满
-        default:
-            return false;
-    }
+    return array->basic->is_full(array);
 }
 
+/**
+ * @brief 获取数组类型
+ * @param array 数组指针
+ * @return 数组类型枚举值
+ * @note 如果数组指针无效，返回默认的静态类型
+ */
 dsa_array_type_t array_get_type(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return ARRAY_TYPE_STATIC; // 默认返回静态类型
     }
-
-    return array->type;
+    return array->array->get_type();
 }
 
+/**
+ * @brief 获取数组类型名称
+ * @param array 数组指针
+ * @return 数组类型的字符串描述
+ * @note 如果数组指针无效，返回"无效数组"
+ */
 const char *array_get_type_name(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return "无效数组";
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            return "静态数组";
-        case ARRAY_TYPE_DYNAMIC:
-            return "动态数组";
-        default:
-            return "未知类型";
-    }
+    return array->array->get_type_name();
 }
 
 // ============================================================================
 // 其他操作函数
 // ============================================================================
 
+/**
+ * @brief 清空数组
+ * @param array 数组指针
+ * @note 移除所有元素但不释放元素内存
+ */
 void array_clear(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            static_array_clear(&array->impl.static_array);
-            break;
-        case ARRAY_TYPE_DYNAMIC:
-            dynamic_array_clear(array->impl.dynamic_array);
-            break;
-    }
+    return array->basic->clear(array);
 }
 
+/**
+ * @brief 清空数组并释放所有元素内存
+ * @param array 数组指针
+ * @note 移除所有元素并释放它们占用的内存
+ */
 void array_clear_with_free(dsa_array_t *array) {
     if (!is_valid_array(array)) {
         return;
     }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC:
-            // 静态数组不支持释放元素，静默降级为普通clear
-            static_array_clear(&array->impl.static_array);
-            break;
-        case ARRAY_TYPE_DYNAMIC:
-            dynamic_array_clear_with_free(array->impl.dynamic_array);
-            break;
-    }
+    return array->basic->clear_with_free(array);
 }
 
+/**
+ * @brief 打印数组信息
+ * @param array 数组指针
+ * @note 在标准输出中打印数组的详细信息，包括类型、大小、容量等
+ */
 void array_print_info(const dsa_array_t *array) {
     if (!is_valid_array(array)) {
         printf("数组: 无效 (空指针)\n");
@@ -405,159 +341,20 @@ void array_print_info(const dsa_array_t *array) {
     printf("  是否为空: %s\n", array_is_empty(array) ? "是" : "否");
     printf("  是否已满: %s\n", array_is_full(array) ? "是" : "否");
 
-    if (array->type == ARRAY_TYPE_STATIC) {
-        printf("  元素大小: %zu 字节\n", array->impl.static_array.element_size);
-    }
+    // if (array->type == ARRAY_TYPE_STATIC) {
+    //     printf("  元素大小: %zu 字节\n", array->impl.static_array.element_size);
+    // }
 }
 
 // ============================================================================
 // 类型安全的便利函数
 // ============================================================================
 
-dsa_result_t array_push_back_int(dsa_array_t *array, int value) {
-    if (!is_valid_array(array)) {
-        return DSA_ERROR_NULL_POINTER;
-    }
+/**
+ * @note 以下被注释的函数提供了类型安全的便利接口
+ * @note 这些函数专门用于处理特定类型（如 int、double）的元素
+ * @note 它们处理了静态数组和动态数组之间内存管理的差异
+ */
 
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 静态数组：直接传递值的地址
-            return array_push_back(array, &value);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            // 动态数组：需要在堆上分配内存
-            int *heap_value = malloc(sizeof(int));
-            if (!heap_value) {
-                return DSA_ERROR_MEMORY_ALLOCATION;
-            }
-            *heap_value = value;
-
-            dsa_result_t result = array_push_back(array, heap_value);
-            if (result != DSA_SUCCESS) {
-                free(heap_value);
-            }
-            return result;
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
-}
-
-dsa_result_t array_get_int(const dsa_array_t *array, size_t index, int *value) {
-    if (!is_valid_array(array) || !value) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-
-    dsa_element_pt element = array_get(array, index);
-    if (!element) {
-        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
-    }
-
-    *value = ELEMENT_VALUE(int, element);
-    return DSA_SUCCESS;
-}
-
-dsa_result_t array_set_int(dsa_array_t *array, size_t index, int value) {
-    if (!is_valid_array(array)) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 静态数组：直接传递值的地址
-            return array_set(array, index, &value);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            // 动态数组：需要在堆上分配内存
-            int *heap_value = malloc(sizeof(int));
-            if (!heap_value) {
-                return DSA_ERROR_MEMORY_ALLOCATION;
-            }
-            *heap_value = value;
-
-            // 动态数组的set函数返回 dsa_result_t
-            dsa_result_t result = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
-            if (result != DSA_SUCCESS) {
-                free(heap_value); // 设置失败，释放新分配的内存
-                return result;
-            }
-
-            return result;
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
-}
-
-dsa_result_t array_push_back_double(dsa_array_t *array, double value) {
-    if (!is_valid_array(array)) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 静态数组：直接传递值的地址
-            return array_push_back(array, &value);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            // 动态数组：需要在堆上分配内存
-            double *heap_value = malloc(sizeof(double));
-            if (!heap_value) {
-                return DSA_ERROR_MEMORY_ALLOCATION;
-            }
-            *heap_value = value;
-
-            dsa_result_t result = array_push_back(array, heap_value);
-            if (result != DSA_SUCCESS) {
-                free(heap_value);
-            }
-            return result;
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
-}
-
-dsa_result_t array_get_double(const dsa_array_t *array, size_t index, double *value) {
-    if (!is_valid_array(array) || !value) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-
-    dsa_element_pt element = array_get(array, index);
-    if (!element) {
-        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
-    }
-
-    *value = ELEMENT_VALUE(double, element);
-    return DSA_SUCCESS;
-}
-
-dsa_result_t array_set_double(dsa_array_t *array, size_t index, double value) {
-    if (!is_valid_array(array)) {
-        return DSA_ERROR_NULL_POINTER;
-    }
-
-    switch (array->type) {
-        case ARRAY_TYPE_STATIC: {
-            // 静态数组：直接传递值的地址
-            return array_set(array, index, &value);
-        }
-        case ARRAY_TYPE_DYNAMIC: {
-            // 动态数组：需要在堆上分配内存
-            double *heap_value = malloc(sizeof(double));
-            if (!heap_value) {
-                return DSA_ERROR_MEMORY_ALLOCATION;
-            }
-            *heap_value = value;
-
-            // 动态数组的set函数现在返回 dsa_result_t
-            dsa_result_t result = dynamic_array_set(array->impl.dynamic_array, index, heap_value);
-            if (result != DSA_SUCCESS) {
-                free(heap_value); // 设置失败，释放新分配的内存
-            }
-            return result;
-        }
-        default:
-            return DSA_ERROR_INVALID_PARAMETER;
-    }
-}
+// 注释掉的函数包含了类型安全的便利函数，用于处理 int 和 double 类型的数据
+// 这些函数在实际使用时需要根据具体的数据结构定义进行调整

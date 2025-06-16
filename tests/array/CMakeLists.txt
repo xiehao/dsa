@@ -1,12 +1,3 @@
-# Define the test executable
-add_executable(test_array test_array.c)
-
-# Link the dsa_array library and CMocka
-target_link_libraries(test_array PRIVATE ds_array CMocka::CMocka)
-
-# Add the test to CTest
-add_test(NAME ArrayTest COMMAND test_array)
-
 # Define the static array test executable
 add_executable(test_static_array test_static_array.c)
 

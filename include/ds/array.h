@@ -205,62 +205,62 @@ void array_print_info(const dsa_array_t* array);
 // 类型安全的便利函数
 // ============================================================================
 
-/**
- * @brief 向整型数组添加元素
- *
- * @param array 数组指针
- * @param value 整型值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_push_back_int(dsa_array_t* array, int value);
-
-/**
- * @brief 从整型数组获取元素
- *
- * @param array 数组指针
- * @param index 元素索引
- * @param value 输出参数，存储获取的值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
-
-/**
- * @brief 向整型数组设置元素
- *
- * @param array 数组指针
- * @param index 元素索引
- * @param value 要设置的值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value);
-
-/**
- * @brief 向双精度浮点数组添加元素
- *
- * @param array 数组指针
- * @param value 双精度浮点值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_push_back_double(dsa_array_t* array, double value);
-
-/**
- * @brief 从双精度浮点数组获取元素
- *
- * @param array 数组指针
- * @param index 元素索引
- * @param value 输出参数，存储获取的值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
-
-/**
- * @brief 向双精度浮点数组设置元素
- *
- * @param array 数组指针
- * @param index 元素索引
- * @param value 要设置的值
- * @return dsa_result_t 操作结果
- */
-dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value);
+// /**
+//  * @brief 向整型数组添加元素
+//  *
+//  * @param array 数组指针
+//  * @param value 整型值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_push_back_int(dsa_array_t* array, int value);
+//
+// /**
+//  * @brief 从整型数组获取元素
+//  *
+//  * @param array 数组指针
+//  * @param index 元素索引
+//  * @param value 输出参数，存储获取的值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
+//
+// /**
+//  * @brief 向整型数组设置元素
+//  *
+//  * @param array 数组指针
+//  * @param index 元素索引
+//  * @param value 要设置的值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value);
+//
+// /**
+//  * @brief 向双精度浮点数组添加元素
+//  *
+//  * @param array 数组指针
+//  * @param value 双精度浮点值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_push_back_double(dsa_array_t* array, double value);
+//
+// /**
+//  * @brief 从双精度浮点数组获取元素
+//  *
+//  * @param array 数组指针
+//  * @param index 元素索引
+//  * @param value 输出参数，存储获取的值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
+//
+// /**
+//  * @brief 向双精度浮点数组设置元素
+//  *
+//  * @param array 数组指针
+//  * @param index 元素索引
+//  * @param value 要设置的值
+//  * @return dsa_result_t 操作结果
+//  */
+// dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value);
 
 #endif // DSA_ARRAY_H

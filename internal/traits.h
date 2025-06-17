@@ -1,15 +1,52 @@
+/**
+ * @file dsa_traits.h
+ * @brief 数据结构算法库（DSA）容器特性定义
+ * @details 定义了各种容器类型的通用接口，提供统一的容器操作抽象层。
+ *          包括基础操作、随机访问、迭代器、批量操作、排序变换等接口。
+ * @author DSA Team
+ * @date 2025-06-17
+ * @version 1.0
+ */
+
 #ifndef DSA_TRAITS_H
 #define DSA_TRAITS_H
 
 #include <common.h>
 
-// 容器类型别名，提高代码可读性
+/**
+ * @defgroup ContainerTypes 容器类型定义
+ * @brief 容器相关的类型别名定义
+ * @{
+ */
+
+/**
+ * @typedef dsa_container_pt
+ * @brief 容器指针类型别名
+ * @details 提高代码可读性的通用容器指针类型，指向可修改的容器实例
+ */
 typedef void *dsa_container_pt;
+
+/**
+ * @typedef dsa_const_container_pt
+ * @brief 常量容器指针类型别名
+ * @details 提高代码可读性的常量容器指针类型，指向不可修改的容器实例
+ */
 typedef const void *dsa_const_container_pt;
 
-// 基础容器操作接口
+/** @} */ // ContainerTypes
+
+/**
+ * @defgroup BasicInterface 基础容器接口
+ * @brief 所有容器都应实现的基础操作接口
+ * @{
+ */
+
+/**
+ * @struct container_basic_interface_t
+ * @brief 基础容器操作接口
+ * @details 定义了所有容器类型都应该实现的基础操作，包括状态查询、清理和内存管理操作
+ */
 typedef struct {
-    // 容器状态查询
     /**
      * @brief 获取容器中的元素数量
      * @param container 容器的常量指针
@@ -38,7 +75,6 @@ typedef struct {
      */
     bool (*is_full)(dsa_const_container_pt container);
 
-    // 容器清理操作
     /**
      * @brief 清空容器中的所有元素但不释放它们的内存
      * @param container 容器指针
@@ -53,7 +89,6 @@ typedef struct {
      */
     void (*clear_with_free)(dsa_container_pt container);
 
-    // 内存管理操作
     /**
      * @brief 销毁容器并释放相关资源
      * @param container 要销毁的容器指针
@@ -69,9 +104,20 @@ typedef struct {
     void (*destroy_with_free)(dsa_container_pt container);
 } container_basic_interface_t;
 
-// 线性容器前端操作接口
+/** @} */ // BasicInterface
+
+/**
+ * @defgroup LinearInterface 线性容器接口
+ * @brief 线性容器的前端和后端操作接口
+ * @{
+ */
+
+/**
+ * @struct container_front_interface_t
+ * @brief 线性容器前端操作接口
+ * @details 定义了支持前端操作的线性容器（如双端队列、列表）应实现的接口
+ */
 typedef struct {
-    // 前端元素操作
     /**
      * @brief 在容器前端添加元素
      * @param container 容器指针
@@ -90,9 +136,12 @@ typedef struct {
     dsa_element_pt (*pop_front)(dsa_container_pt container);
 } container_front_interface_t;
 
-// 线性容器后端操作接口
+/**
+ * @struct container_back_interface_t
+ * @brief 线性容器后端操作接口
+ * @details 定义了支持后端操作的线性容器（如向量、双端队列、列表）应实现的接口
+ */
 typedef struct {
-    // 后端元素操作
     /**
      * @brief 在容器后端添加元素
      * @param container 容器指针
@@ -111,9 +160,20 @@ typedef struct {
     dsa_element_pt (*pop_back)(dsa_container_pt container);
 } container_back_interface_t;
 
-// 随机访问容器操作接口
+/** @} */ // LinearInterface
+
+/**
+ * @defgroup RandomAccessInterface 随机访问接口
+ * @brief 支持随机访问的容器操作接口
+ * @{
+ */
+
+/**
+ * @struct container_random_access_interface_t
+ * @brief 随机访问容器操作接口
+ * @details 定义了支持通过索引随机访问的容器（如向量、数组）应实现的接口
+ */
 typedef struct {
-    // 随机访问操作
     /**
      * @brief 获取指定索引位置的元素
      * @param container 容器的常量指针
@@ -133,7 +193,6 @@ typedef struct {
      */
     dsa_result_t (*set_at)(dsa_container_pt container, size_t index, dsa_element_pt element);
 
-    // 任意位置插入删除操作
     /**
      * @brief 在指定索引位置插入元素
      * @param container 容器指针
@@ -154,9 +213,20 @@ typedef struct {
     dsa_element_pt (*remove_at)(dsa_container_pt container, size_t index);
 } container_random_access_interface_t;
 
-// 容器查找操作接口
+/** @} */ // RandomAccessInterface
+
+/**
+ * @defgroup SearchInterface 容器查找接口
+ * @brief 容器元素查找操作接口
+ * @{
+ */
+
+/**
+ * @struct container_search_interface_t
+ * @brief 容器查找操作接口
+ * @details 定义了容器中查找元素的各种操作
+ */
 typedef struct {
-    // 查找操作
     /**
      * @brief 在容器中查找匹配的元素
      * @param container 容器的常量指针
@@ -200,9 +270,20 @@ typedef struct {
                     int (*compare)(const void *a, const void *b));
 } container_search_interface_t;
 
-// 容器迭代器接口
+/** @} */ // SearchInterface
+
+/**
+ * @defgroup IteratorInterface 迭代器接口
+ * @brief 容器迭代器操作接口
+ * @{
+ */
+
+/**
+ * @struct container_iterator_interface_t
+ * @brief 容器迭代器接口
+ * @details 定义了容器迭代访问的标准接口，支持双向迭代
+ */
 typedef struct {
-    // 迭代器操作
     /**
      * @brief 获取指向容器第一个元素的迭代器
      * @param container 容器的常量指针
@@ -246,9 +327,20 @@ typedef struct {
     bool (*is_valid)(void *iterator);
 } container_iterator_interface_t;
 
-// 容器批量操作接口
+/** @} */ // IteratorInterface
+
+/**
+ * @defgroup BatchInterface 批量操作接口
+ * @brief 容器批量操作接口
+ * @{
+ */
+
+/**
+ * @struct container_batch_interface_t
+ * @brief 容器批量操作接口
+ * @details 定义了容器的批量操作，如批量插入、删除、复制等
+ */
 typedef struct {
-    // 批量操作
     /**
      * @brief 在指定位置插入一组元素
      * @param container 容器指针
@@ -293,9 +385,20 @@ typedef struct {
                                       dsa_element_pt *array, size_t count);
 } container_batch_interface_t;
 
-// 容器排序和变换接口
+/** @} */ // BatchInterface
+
+/**
+ * @defgroup TransformInterface 排序和变换接口
+ * @brief 容器排序和变换操作接口
+ * @{
+ */
+
+/**
+ * @struct container_transform_interface_t
+ * @brief 容器排序和变换接口
+ * @details 定义了容器的排序、反转、打乱以及函数式编程风格的操作
+ */
 typedef struct {
-    // 排序操作
     /**
      * @brief 对容器元素进行排序
      * @param container 容器指针
@@ -316,7 +419,6 @@ typedef struct {
      */
     void (*shuffle)(dsa_container_pt container);
 
-    // 函数式操作
     /**
      * @brief 对容器中的每个元素执行指定函数
      * @param container 容器的常量指针
@@ -345,9 +447,20 @@ typedef struct {
                             dsa_element_pt (*transform)(dsa_element_pt element));
 } container_transform_interface_t;
 
-// 容器比较和复制接口
+/** @} */ // TransformInterface
+
+/**
+ * @defgroup UtilityInterface 容器工具接口
+ * @brief 容器比较和复制操作接口
+ * @{
+ */
+
+/**
+ * @struct container_utility_interface_t
+ * @brief 容器比较和复制接口
+ * @details 定义了容器间的比较、相等性检查和复制操作
+ */
 typedef struct {
-    // 比较操作
     /**
      * @brief 比较两个容器是否相等
      * @param container1 第一个容器的常量指针
@@ -370,7 +483,6 @@ typedef struct {
                               dsa_const_container_pt container2,
                               int (*compare)(const void *a, const void *b));
 
-    // 复制操作
     /**
      * @brief 创建容器的完整副本
      * @param container 要复制的容器的常量指针
@@ -389,9 +501,20 @@ typedef struct {
     dsa_result_t (*copy_from)(dsa_container_pt dest, dsa_const_container_pt src);
 } container_utility_interface_t;
 
-// 栈/队列特定接口
+/** @} */ // UtilityInterface
+
+/**
+ * @defgroup StackQueueInterface 栈和队列接口
+ * @brief 栈和队列特定操作接口
+ * @{
+ */
+
+/**
+ * @struct container_stack_interface_t
+ * @brief 栈容器特定接口
+ * @details 定义了栈数据结构的LIFO（后进先出）操作
+ */
 typedef struct {
-    // 栈操作
     /**
      * @brief 将元素压入栈顶
      * @param container 栈容器指针
@@ -416,8 +539,12 @@ typedef struct {
     dsa_element_pt (*peek)(dsa_const_container_pt container);
 } container_stack_interface_t;
 
+/**
+ * @struct container_queue_interface_t
+ * @brief 队列容器特定接口
+ * @details 定义了队列数据结构的FIFO（先进先出）操作
+ */
 typedef struct {
-    // 队列操作
     /**
      * @brief 将元素加入队列尾部
      * @param container 队列容器指针
@@ -449,9 +576,20 @@ typedef struct {
     dsa_element_pt (*rear)(dsa_const_container_pt container);
 } container_queue_interface_t;
 
-// 优先队列接口
+/** @} */ // StackQueueInterface
+
+/**
+ * @defgroup PriorityQueueInterface 优先队列接口
+ * @brief 优先队列特定操作接口
+ * @{
+ */
+
+/**
+ * @struct container_priority_queue_interface_t
+ * @brief 优先队列接口
+ * @details 定义了优先队列数据结构的基于优先级的操作
+ */
 typedef struct {
-    // 优先队列操作
     /**
      * @brief 以指定优先级插入元素
      * @param container 优先队列容器指针
@@ -500,9 +638,20 @@ typedef struct {
     void (*change_priority)(dsa_container_pt container, dsa_element_pt element, int new_priority);
 } container_priority_queue_interface_t;
 
-// 集合特定接口
+/** @} */ // PriorityQueueInterface
+
+/**
+ * @defgroup SetInterface 集合接口
+ * @brief 集合特定操作接口
+ * @{
+ */
+
+/**
+ * @struct container_set_interface_t
+ * @brief 集合特定接口
+ * @details 定义了集合数据结构的操作，包括基本的集合运算
+ */
 typedef struct {
-    // 集合操作
     /**
      * @brief 向集合中添加元素（如果不存在）
      * @param container 集合容器指针
@@ -557,9 +706,20 @@ typedef struct {
     bool (*is_subset)(dsa_const_container_pt subset, dsa_const_container_pt superset);
 } container_set_interface_t;
 
-// 映射/字典特定接口
+/** @} */ // SetInterface
+
+/**
+ * @defgroup MapInterface 映射接口
+ * @brief 映射/字典特定操作接口
+ * @{
+ */
+
+/**
+ * @struct container_map_interface_t
+ * @brief 映射/字典特定接口
+ * @details 定义了键值对映射数据结构的操作
+ */
 typedef struct {
-    // 键值对操作
     /**
      * @brief 在映射中添加或更新键值对
      * @param container 映射容器指针
@@ -619,5 +779,7 @@ typedef struct {
      */
     dsa_container_pt (*get_values)(dsa_const_container_pt container);
 } container_map_interface_t;
+
+/** @} */ // MapInterface
 
 #endif // DSA_TRAITS_H

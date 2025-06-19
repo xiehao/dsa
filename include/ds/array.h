@@ -2,7 +2,6 @@
 #define DSA_ARRAY_H
 
 #include <stddef.h>
-#include <stdbool.h>
 #include <common.h>
 
 /**
@@ -60,8 +59,8 @@ typedef struct array_t dsa_array_t;
  * 定义支持的数组类型，用于区分静态数组和动态数组的行为。
  */
 typedef enum {
-    ARRAY_TYPE_STATIC,              ///< 静态数组：使用预分配的固定大小缓冲区
-    ARRAY_TYPE_DYNAMIC              ///< 动态数组：可自动扩容的数组
+    ARRAY_TYPE_STATIC, ///< 静态数组：使用预分配的固定大小缓冲区
+    ARRAY_TYPE_DYNAMIC ///< 动态数组：可自动扩容的数组
 } dsa_array_type_t;
 
 /**
@@ -91,7 +90,7 @@ typedef enum {
  * @see array_destroy()
  * @since 1.0
  */
-dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_size);
+dsa_array_t *array_create_static(void *buffer, size_t capacity, size_t element_size);
 
 /**
  * @brief 创建动态数组
@@ -111,7 +110,7 @@ dsa_array_t* array_create_static(void* buffer, size_t capacity, size_t element_s
  * @see array_destroy_with_free()
  * @since 1.0
  */
-dsa_array_t* array_create_dynamic(size_t initial_capacity);
+dsa_array_t *array_create_dynamic(size_t initial_capacity);
 
 /**
  * @brief 销毁数组
@@ -127,7 +126,7 @@ dsa_array_t* array_create_dynamic(size_t initial_capacity);
  * @see array_destroy_with_free()
  * @since 1.0
  */
-void array_destroy(dsa_array_t* array);
+void array_destroy(dsa_array_t *array);
 
 /**
  * @brief 销毁动态数组并释放所有元素
@@ -147,7 +146,7 @@ void array_destroy(dsa_array_t* array);
  * @see array_destroy()
  * @since 1.0
  */
-void array_destroy_with_free(dsa_array_t* array);
+void array_destroy_with_free(dsa_array_t *array);
 
 /** @} */ // end of creation_destruction
 
@@ -177,7 +176,7 @@ void array_destroy_with_free(dsa_array_t* array);
  * @see array_set()
  * @since 1.0
  */
-dsa_element_pt array_get(const dsa_array_t* array, size_t index);
+dsa_element_pt array_get(const dsa_array_t *array, size_t index);
 
 /**
  * @brief 设置指定索引处的元素
@@ -201,7 +200,7 @@ dsa_element_pt array_get(const dsa_array_t* array, size_t index);
  * @see array_get()
  * @since 1.0
  */
-dsa_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element);
+dsa_result_t array_set(dsa_array_t *array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 在数组末尾添加元素
@@ -226,7 +225,7 @@ dsa_result_t array_set(dsa_array_t* array, size_t index, dsa_element_pt element)
  * @see array_insert()
  * @since 1.0
  */
-dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
+dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element);
 
 /**
  * @brief 移除并返回数组末尾的元素
@@ -248,7 +247,7 @@ dsa_result_t array_push_back(dsa_array_t* array, dsa_element_pt element);
  * @see array_remove()
  * @since 1.0
  */
-dsa_element_pt array_pop_back(dsa_array_t* array);
+dsa_element_pt array_pop_back(dsa_array_t *array);
 
 /**
  * @brief 在指定索引处插入元素
@@ -275,7 +274,7 @@ dsa_element_pt array_pop_back(dsa_array_t* array);
  * @see array_push_back()
  * @since 1.0
  */
-dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt element);
+dsa_result_t array_insert(dsa_array_t *array, size_t index, dsa_element_pt element);
 
 /**
  * @brief 移除指定索引处的元素
@@ -298,7 +297,7 @@ dsa_result_t array_insert(dsa_array_t* array, size_t index, dsa_element_pt eleme
  * @see array_pop_back()
  * @since 1.0
  */
-dsa_element_pt array_remove(dsa_array_t* array, size_t index);
+dsa_element_pt array_remove(dsa_array_t *array, size_t index);
 
 /** @} */ // end of basic_operations
 
@@ -325,7 +324,7 @@ dsa_element_pt array_remove(dsa_array_t* array, size_t index);
  * @see array_is_empty()
  * @since 1.0
  */
-size_t array_size(const dsa_array_t* array);
+size_t array_size(const dsa_array_t *array);
 
 /**
  * @brief 获取数组容量
@@ -345,7 +344,7 @@ size_t array_size(const dsa_array_t* array);
  * @see array_is_full()
  * @since 1.0
  */
-size_t array_capacity(const dsa_array_t* array);
+size_t array_capacity(const dsa_array_t *array);
 
 /**
  * @brief 检查数组是否为空
@@ -365,7 +364,7 @@ size_t array_capacity(const dsa_array_t* array);
  * @see array_is_full()
  * @since 1.0
  */
-bool array_is_empty(const dsa_array_t* array);
+bool array_is_empty(const dsa_array_t *array);
 
 /**
  * @brief 检查数组是否已满
@@ -390,7 +389,7 @@ bool array_is_empty(const dsa_array_t* array);
  * @see array_is_empty()
  * @since 1.0
  */
-bool array_is_full(const dsa_array_t* array);
+bool array_is_full(const dsa_array_t *array);
 
 /**
  * @brief 获取数组类型
@@ -409,7 +408,7 @@ bool array_is_full(const dsa_array_t* array);
  * @see array_get_type_name()
  * @since 1.0
  */
-dsa_array_type_t array_get_type(const dsa_array_t* array);
+dsa_array_type_t array_get_type(const dsa_array_t *array);
 
 /**
  * @brief 获取数组类型名称字符串
@@ -430,7 +429,7 @@ dsa_array_type_t array_get_type(const dsa_array_t* array);
  * @see array_get_type()
  * @since 1.0
  */
-const char* array_get_type_name(const dsa_array_t* array);
+const char *array_get_type_name(const dsa_array_t *array);
 
 /** @} */ // end of query_functions
 
@@ -454,7 +453,7 @@ const char* array_get_type_name(const dsa_array_t* array);
  * @see array_clear_with_free()
  * @since 1.0
  */
-void array_clear(dsa_array_t* array);
+void array_clear(dsa_array_t *array);
 
 /**
  * @brief 清空数组并释放元素内存
@@ -471,7 +470,7 @@ void array_clear(dsa_array_t* array);
  * @see array_clear()
  * @since 1.0
  */
-void array_clear_with_free(dsa_array_t* array);
+void array_clear_with_free(dsa_array_t *array);
 
 /**
  * @brief 打印数组信息（用于调试）
@@ -486,7 +485,7 @@ void array_clear_with_free(dsa_array_t* array);
  *
  * @since 1.0
  */
-void array_print_info(const dsa_array_t* array);
+void array_print_info(const dsa_array_t *array);
 
 /** @} */ // end of utility_functions
 

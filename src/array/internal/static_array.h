@@ -10,7 +10,7 @@
 #define DSA_STATIC_ARRAY_H
 
 #include <stddef.h>
-#include <ds/array.h>
+#include <ds/array_list.h>
 
 /**
  * @brief 创建一个静态数组
@@ -44,6 +44,6 @@
  * }
  * @endcode
  */
-dsa_array_t *static_array_create(void *data_buffer, size_t capacity, size_t element_size);
+dsa_array_list_t *static_array_create(void *data_buffer, size_t capacity, size_t element_size);
 
 #endif // DSA_STATIC_ARRAY_H

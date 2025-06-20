@@ -10,7 +10,7 @@
 #define DSA_DYNAMIC_ARRAY_H
 
 #include <stddef.h>
-#include <ds/array.h>
+#include <ds/array_list.h>
 
 /**
  * @defgroup DynamicArray 动态数组
@@ -33,7 +33,7 @@
  * @see dynamic_array_destroy()
  * @since 1.0
  */
-dsa_array_t *dynamic_array_create(size_t initial_capacity);
+dsa_array_list_t *dynamic_array_create(size_t initial_capacity);
 
 /**
  * @}

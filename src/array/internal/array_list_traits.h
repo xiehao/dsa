@@ -1,5 +1,5 @@
 /**
- * @file array_traits.h
+ * @file array_list_traits.h
  * @brief 数组特征和接口定义
  * @details 定义了数组相关的类型特征和操作接口，用于实现数组的多态性和类型安全
  * @author DSA项目组
@@ -11,7 +11,7 @@
 #define DSA_ARRAY_TRAITS_H
 
 #include <traits.h>
-#include <ds/array.h>
+#include <ds/array_list.h>
 
 /**
  * @brief 数组基类操作函数表
@@ -22,7 +22,7 @@
  * - 获取数组类型的字符串表示
  * 
  * @note 这是一种面向对象的设计模式在C语言中的实现
- * @see dsa_array_type_t
+ * @see dsa_array_list_type_t
  */
 typedef struct {
     /**
@@ -31,7 +31,7 @@ typedef struct {
      * @return dsa_array_type_t 数组类型枚举值
      * @retval 具体的数组类型值，如动态数组、静态数组等
      */
-    dsa_array_type_t (*get_type)();
+    dsa_array_list_type_t (*get_type)();
     
     /**
      * @brief 获取数组类型名称
@@ -41,6 +41,6 @@ typedef struct {
      * @warning 返回的字符串不应被修改，且其生命周期由实现者管理
      */
     char const *(*get_type_name)();
-} array_interface_t;
+} array_list_interface_t;
 
 #endif // DSA_ARRAY_TRAITS_H

@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <internal/array_traits.h>
+#include <internal/array_list_traits.h>
 
 /// 默认初始容量
 #define DEFAULT_CAPACITY 10
@@ -24,7 +24,7 @@ typedef struct {
     container_basic_interface_t const *basic;           ///< 基本容器接口
     container_random_access_interface_t const *random_access; ///< 随机访问接口
     container_back_interface_t const *back;             ///< 尾部操作接口
-    array_interface_t const *array;                     ///< 数组接口
+    array_list_interface_t const *array;                ///< 数组接口
     dsa_element_pt *data;                               ///< 指向元素指针数组的指针
     size_t size;                                        ///< 当前元素数量
     size_t capacity;                                    ///< 当前分配的容量
@@ -414,8 +414,8 @@ static container_back_interface_t const back_trait = {
  * @param array 指向动态数组的指针
  * @return 数组类型枚举值
  */
-static dsa_array_type_t dynamic_array_get_type() {
-    return ARRAY_TYPE_DYNAMIC;
+static dsa_array_list_type_t dynamic_array_get_type() {
+    return ARRAY_LIST_TYPE_DYNAMIC;
 }
 
 /**
@@ -428,7 +428,7 @@ static char const *dynamic_array_get_type_name() {
 }
 
 /// 数组接口实现
-static array_interface_t const array_trait = {
+static array_list_interface_t const array_trait = {
     .get_type = dynamic_array_get_type,
     .get_type_name = dynamic_array_get_type_name,
 };
@@ -443,7 +443,7 @@ static array_interface_t const array_trait = {
  * @see dynamic_array_destroy
  * @see dynamic_array_destroy_with_free
  */
-dsa_array_t *dynamic_array_create(size_t initial_capacity) {
+dsa_array_list_t *dynamic_array_create(size_t initial_capacity) {
     dynamic_array_t *array = malloc(sizeof(dynamic_array_t));
     if (!array) {
         perror("为 dynamic_array_t 结构分配内存失败");
@@ -461,5 +461,5 @@ dsa_array_t *dynamic_array_create(size_t initial_capacity) {
         free(array); // 清理结构分配
         return NULL;
     }
-    return (dsa_array_t *) array;
+    return (dsa_array_list_t *) array;
 }

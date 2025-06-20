@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <internal/array_traits.h>
+#include <internal/array_list_traits.h>
 
 /**
  * @struct static_array_t
@@ -23,7 +23,7 @@ typedef struct {
     container_basic_interface_t const *basic_trait; ///< 基本容器接口
     container_random_access_interface_t const *random_access_trait; ///< 随机访问接口
     container_back_interface_t const *back_trait; ///< 尾部操作接口
-    array_interface_t const *array_trait; ///< 数组接口
+    array_list_interface_t const *array_trait; ///< 数组接口
     dsa_element_pt data; ///< 指向实际数据存储的指针 (通常是 VLA)
     size_t size; ///< 当前元素数量
     size_t capacity; ///< 数组的总容量 (固定)
@@ -296,8 +296,8 @@ static container_back_interface_t const back_trait = {
  * @brief 获取数组类型
  * @return 数组类型枚举值
  */
-static dsa_array_type_t static_array_get_type() {
-    return ARRAY_TYPE_STATIC;
+static dsa_array_list_type_t static_array_get_type() {
+    return ARRAY_LIST_TYPE_STATIC;
 }
 
 /**
@@ -311,7 +311,7 @@ static char const *static_array_get_type_name() {
 /**
  * @brief 数组接口实现
  */
-static array_interface_t const array_trait = {
+static array_list_interface_t const array_trait = {
     .get_type = static_array_get_type,
     .get_type_name = static_array_get_type_name,
 };
@@ -325,7 +325,7 @@ static array_interface_t const array_trait = {
  * @details 创建基于外部缓冲区的静态数组实例。缓冲区生命周期由调用者管理。
  * @note 数组结构体本身需要通过malloc分配，但数据缓冲区由外部提供
  */
-dsa_array_t *static_array_create(void *data_buffer, size_t capacity, size_t element_size) {
+dsa_array_list_t *static_array_create(void *data_buffer, size_t capacity, size_t element_size) {
     if (!data_buffer || capacity == 0 || element_size == 0) {
         return NULL;
     }
@@ -341,5 +341,5 @@ dsa_array_t *static_array_create(void *data_buffer, size_t capacity, size_t elem
     array->size = 0;
     array->capacity = capacity;
     array->element_size = element_size;
-    return (dsa_array_t *) array;
+    return (dsa_array_list_t *) array;
 }

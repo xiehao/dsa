@@ -1,11 +1,11 @@
-#ifndef DSA_ARRAY_H
-#define DSA_ARRAY_H
+#ifndef DSA_ARRAY_LIST_H
+#define DSA_ARRAY_LIST_H
 
 #include <stddef.h>
 #include <common.h>
 
 /**
- * @file array.h
+ * @file array_list.h
  * @brief 统一的数组接口，支持静态数组和动态数组
  * @author DSA Team
  * @version 1.0
@@ -18,21 +18,21 @@
  * @code{.c}
  * // 创建静态数组
  * int buffer[10];
- * dsa_array_t* static_arr = array_create_static(buffer, 10, sizeof(int));
+ * dsa_array_list_t* static_arr = array_list_create_static(buffer, 10, sizeof(int));
  *
  * // 创建动态数组
- * dsa_array_t* dynamic_arr = array_create_dynamic(10);
+ * dsa_array_list_t* dynamic_arr = array_list_create_dynamic(10);
  *
  * // 添加元素
  * int value = 42;
- * array_push_back(static_arr, &value);
+ * array_list_push_back(static_arr, &value);
  *
  * // 获取元素
- * int* ptr = (int*)array_get(static_arr, 0);
+ * int* ptr = (int*)array_list_get(static_arr, 0);
  *
  * // 清理资源
- * array_destroy(static_arr);
- * array_destroy(dynamic_arr);
+ * array_list_destroy(static_arr);
+ * array_list_destroy(dynamic_arr);
  * @endcode
  *
  * @note 所有函数都会进行参数有效性检查
@@ -40,7 +40,7 @@
  */
 
 /**
- * @defgroup DSA_Array 数组模块
+ * @defgroup DSA_ArrayList 数组模块
  * @brief 统一的数组接口实现
  * @{
  */
@@ -51,7 +51,7 @@
  * 隐藏内部实现细节，提供不透明的数组类型。
  * 用户只能通过提供的API函数操作数组。
  */
-typedef struct array_t dsa_array_t;
+typedef struct array_list_t dsa_array_list_t;
 
 /**
  * @brief 数组类型枚举
@@ -59,9 +59,9 @@ typedef struct array_t dsa_array_t;
  * 定义支持的数组类型，用于区分静态数组和动态数组的行为。
  */
 typedef enum {
-    ARRAY_TYPE_STATIC, ///< 静态数组：使用预分配的固定大小缓冲区
-    ARRAY_TYPE_DYNAMIC ///< 动态数组：可自动扩容的数组
-} dsa_array_type_t;
+    ARRAY_LIST_TYPE_STATIC, ///< 静态数组：使用预分配的固定大小缓冲区
+    ARRAY_LIST_TYPE_DYNAMIC ///< 动态数组：可自动扩容的数组
+} dsa_array_list_type_t;
 
 /**
  * @defgroup creation_destruction 创建和销毁函数
@@ -79,7 +79,7 @@ typedef enum {
  * @param[in] capacity 数组容量（元素个数），必须大于0
  * @param[in] element_size 单个元素的大小（字节），必须大于0
  *
- * @return dsa_array_t* 成功返回数组指针，失败返回NULL
+ * @return dsa_array_list_t* 成功返回数组指针，失败返回NULL
  *
  * @retval NULL 参数无效（buffer为NULL、capacity为0或element_size为0）
  * @retval NULL 内存分配失败
@@ -87,10 +87,10 @@ typedef enum {
  * @note 调用者负责管理buffer的生命周期
  * @note 数组销毁时不会释放buffer
  *
- * @see array_destroy()
+ * @see array_list_destroy()
  * @since 1.0
  */
-dsa_array_t *array_create_static(void *buffer, size_t capacity, size_t element_size);
+dsa_array_list_t *array_list_create_static(void *buffer, size_t capacity, size_t element_size);
 
 /**
  * @brief 创建动态数组
@@ -99,18 +99,18 @@ dsa_array_t *array_create_static(void *buffer, size_t capacity, size_t element_s
  *
  * @param[in] initial_capacity 初始容量，0表示使用默认容量
  *
- * @return dsa_array_t* 成功返回数组指针，失败返回NULL
+ * @return dsa_array_list_t* 成功返回数组指针，失败返回NULL
  *
  * @retval NULL 内存分配失败
  *
  * @note 动态数组的元素大小在编译时确定
  * @note 数组销毁时会自动释放所有分配的内存
  *
- * @see array_destroy()
- * @see array_destroy_with_free()
+ * @see array_list_destroy()
+ * @see array_list_destroy_with_free()
  * @since 1.0
  */
-dsa_array_t *array_create_dynamic(size_t initial_capacity);
+dsa_array_list_t *array_list_create_dynamic(size_t initial_capacity);
 
 /**
  * @brief 销毁数组
@@ -118,15 +118,15 @@ dsa_array_t *array_create_dynamic(size_t initial_capacity);
  * 释放数组结构体占用的内存。对于静态数组，不会释放用户提供的buffer；
  * 对于动态数组，会释放内部分配的存储空间，但不会释放元素指向的内存。
  *
- * @param[in] array 要销毁的数组指针，可以为NULL
+ * @param[in] array_list 要销毁的数组指针，可以为NULL
  *
  * @note 函数对NULL指针安全
- * @note 如果需要释放元素指向的内存，请使用 array_destroy_with_free()
+ * @note 如果需要释放元素指向的内存，请使用 array_list_destroy_with_free()
  *
- * @see array_destroy_with_free()
+ * @see array_list_destroy_with_free()
  * @since 1.0
  */
-void array_destroy(dsa_array_t *array);
+void array_list_destroy(dsa_array_list_t *array_list);
 
 /**
  * @brief 销毁动态数组并释放所有元素
@@ -134,19 +134,19 @@ void array_destroy(dsa_array_t *array);
  * 销毁数组并释放数组中每个元素指向的内存。
  * 仅适用于存储指针类型元素的动态数组。
  *
- * @param[in] array 要销毁的数组指针，可以为NULL
+ * @param[in] array_list 要销毁的数组指针，可以为NULL
  *
  * @warning 仅适用于动态数组
  * @warning 仅适用于元素为指针类型的数组
  * @warning 元素指向的内存必须是通过malloc分配的
  *
  * @note 函数对NULL指针安全
- * @note 对静态数组调用此函数等同于调用 array_destroy()
+ * @note 对静态数组调用此函数等同于调用 array_list_destroy()
  *
- * @see array_destroy()
+ * @see array_list_destroy()
  * @since 1.0
  */
-void array_destroy_with_free(dsa_array_t *array);
+void array_list_destroy_with_free(dsa_array_list_t *array_list);
 
 /** @} */ // end of creation_destruction
 
@@ -162,21 +162,21 @@ void array_destroy_with_free(dsa_array_t *array);
  * 返回指向指定索引处元素的指针。返回的指针指向数组内部存储，
  * 用户可以直接修改其内容。
  *
- * @param[in] array 数组指针，不能为NULL
+ * @param[in] array_list 数组指针，不能为NULL
  * @param[in] index 元素索引，必须小于数组大小
  *
  * @return dsa_element_pt 成功返回元素指针，失败返回NULL
  *
- * @retval NULL array为NULL
+ * @retval NULL array_list为NULL
  * @retval NULL index超出数组范围
  *
  * @note 返回的指针在数组结构发生变化时可能失效
  * @note 对于动态数组，插入操作可能导致内存重新分配
  *
- * @see array_set()
+ * @see array_list_set()
  * @since 1.0
  */
-dsa_element_pt array_get(const dsa_array_t *array, size_t index);
+dsa_element_pt array_list_get(const dsa_array_list_t *array_list, size_t index);
 
 /**
  * @brief 设置指定索引处的元素
@@ -184,23 +184,23 @@ dsa_element_pt array_get(const dsa_array_t *array, size_t index);
  * 将指定索引处的元素设置为新值。会将element指向的数据
  * 复制到数组的内部存储中。
  *
- * @param[in,out] array 数组指针，不能为NULL
+ * @param[in,out] array_list 数组指针，不能为NULL
  * @param[in] index 元素索引，必须小于数组大小
  * @param[in] element 要设置的元素指针，不能为NULL
  *
  * @return dsa_result_t 操作结果
  *
  * @retval DSA_SUCCESS 操作成功
- * @retval DSA_ERROR_NULL_POINTER array或element为NULL
+ * @retval DSA_ERROR_NULL_POINTER array_list或element为NULL
  * @retval DSA_ERROR_OUT_OF_BOUNDS index超出数组范围
  *
  * @note 此函数会复制element指向的数据
  * @note 索引必须在有效范围内（小于数组大小）
  *
- * @see array_get()
+ * @see array_list_get()
  * @since 1.0
  */
-dsa_result_t array_set(dsa_array_t *array, size_t index, dsa_element_pt element);
+dsa_result_t array_list_set(dsa_array_list_t *array_list, size_t index, dsa_element_pt element);
 
 /**
  * @brief 在数组末尾添加元素
@@ -208,24 +208,24 @@ dsa_result_t array_set(dsa_array_t *array, size_t index, dsa_element_pt element)
  * 在数组末尾添加新元素。对于动态数组，如果容量不足会自动扩容；
  * 对于静态数组，如果容量不足操作会失败。
  *
- * @param[in,out] array 数组指针，不能为NULL
+ * @param[in,out] array_list 数组指针，不能为NULL
  * @param[in] element 要添加的元素指针，不能为NULL
  *
  * @return dsa_result_t 操作结果
  *
  * @retval DSA_SUCCESS 操作成功
- * @retval DSA_ERROR_NULL_POINTER array或element为NULL
+ * @retval DSA_ERROR_NULL_POINTER array_list或element为NULL
  * @retval DSA_ERROR_MEMORY_ALLOCATION 动态数组扩容失败
  * @retval DSA_ERROR_OUT_OF_BOUNDS 静态数组容量不足
  *
  * @note 此函数会复制element指向的数据
  * @note 动态数组会根据需要自动扩容
  *
- * @see array_pop_back()
- * @see array_insert()
+ * @see array_list_pop_back()
+ * @see array_list_insert()
  * @since 1.0
  */
-dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element);
+dsa_result_t array_list_push_back(dsa_array_list_t *array_list, dsa_element_pt element);
 
 /**
  * @brief 移除并返回数组末尾的元素
@@ -233,21 +233,21 @@ dsa_result_t array_push_back(dsa_array_t *array, dsa_element_pt element);
  * 移除数组末尾的元素并返回其指针。返回的指针指向临时存储，
  * 用户应立即处理或复制数据。
  *
- * @param[in,out] array 数组指针，不能为NULL
+ * @param[in,out] array_list 数组指针，不能为NULL
  *
  * @return dsa_element_pt 成功返回被移除的元素指针，失败返回NULL
  *
- * @retval NULL array为NULL
+ * @retval NULL array_list为NULL
  * @retval NULL 数组为空
  *
  * @note 返回的指针可能在后续操作中失效
  * @note 用户应立即处理返回的数据
  *
- * @see array_push_back()
- * @see array_remove()
+ * @see array_list_push_back()
+ * @see array_list_remove()
  * @since 1.0
  */
-dsa_element_pt array_pop_back(dsa_array_t *array);
+dsa_element_pt array_list_pop_back(dsa_array_list_t *array_list);
 
 /**
  * @brief 在指定索引处插入元素
@@ -255,14 +255,14 @@ dsa_element_pt array_pop_back(dsa_array_t *array);
  * 在指定位置插入新元素，原有元素向后移动。对于动态数组，
  * 如果容量不足会自动扩容。
  *
- * @param[in,out] array 数组指针，不能为NULL
+ * @param[in,out] array_list 数组指针，不能为NULL
  * @param[in] index 插入位置的索引，可以等于数组大小（尾部插入）
  * @param[in] element 要插入的元素指针，不能为NULL
  *
  * @return dsa_result_t 操作结果
  *
  * @retval DSA_SUCCESS 操作成功
- * @retval DSA_ERROR_NULL_POINTER array或element为NULL
+ * @retval DSA_ERROR_NULL_POINTER array_list或element为NULL
  * @retval DSA_ERROR_OUT_OF_BOUNDS index超出有效范围
  * @retval DSA_ERROR_MEMORY_ALLOCATION 动态数组扩容失败
  *
@@ -270,34 +270,34 @@ dsa_element_pt array_pop_back(dsa_array_t *array);
  * @note 此函数会复制element指向的数据
  * @note 插入操作的时间复杂度为O(n)
  *
- * @see array_remove()
- * @see array_push_back()
+ * @see array_list_remove()
+ * @see array_list_push_back()
  * @since 1.0
  */
-dsa_result_t array_insert(dsa_array_t *array, size_t index, dsa_element_pt element);
+dsa_result_t array_list_insert(dsa_array_list_t *array_list, size_t index, dsa_element_pt element);
 
 /**
  * @brief 移除指定索引处的元素
  *
  * 移除指定位置的元素，后续元素向前移动。返回被移除元素的指针。
  *
- * @param[in,out] array 数组指针，不能为NULL
+ * @param[in,out] array_list 数组指针，不能为NULL
  * @param[in] index 要移除元素的索引，必须小于数组大小
  *
  * @return dsa_element_pt 成功返回被移除的元素指针，失败返回NULL
  *
- * @retval NULL array为NULL
+ * @retval NULL array_list为NULL
  * @retval NULL index超出数组范围
  * @retval NULL 数组为空
  *
  * @note 返回的指针可能在后续操作中失效
  * @note 移除操作的时间复杂度为O(n)
  *
- * @see array_insert()
- * @see array_pop_back()
+ * @see array_list_insert()
+ * @see array_list_pop_back()
  * @since 1.0
  */
-dsa_element_pt array_remove(dsa_array_t *array, size_t index);
+dsa_element_pt array_list_remove(dsa_array_list_t *array_list, size_t index);
 
 /** @} */ // end of basic_operations
 
@@ -312,59 +312,59 @@ dsa_element_pt array_remove(dsa_array_t *array, size_t index);
  *
  * 返回数组中当前存储的元素个数。
  *
- * @param[in] array 数组指针
+ * @param[in] array_list 数组指针
  *
  * @return size_t 数组大小
  *
- * @retval 0 array为NULL或数组为空
+ * @retval 0 array_list为NULL或数组为空
  *
  * @note 函数对NULL指针安全
  *
- * @see array_capacity()
- * @see array_is_empty()
+ * @see array_list_capacity()
+ * @see array_list_is_empty()
  * @since 1.0
  */
-size_t array_size(const dsa_array_t *array);
+size_t array_list_size(const dsa_array_list_t *array_list);
 
 /**
  * @brief 获取数组容量
  *
  * 返回数组的最大容量（不触发扩容的情况下能存储的最大元素个数）。
  *
- * @param[in] array 数组指针
+ * @param[in] array_list 数组指针
  *
  * @return size_t 数组容量
  *
- * @retval 0 array为NULL
+ * @retval 0 array_list为NULL
  *
  * @note 函数对NULL指针安全
  * @note 对于动态数组，容量可能在插入操作时自动增长
  *
- * @see array_size()
- * @see array_is_full()
+ * @see array_list_size()
+ * @see array_list_is_full()
  * @since 1.0
  */
-size_t array_capacity(const dsa_array_t *array);
+size_t array_list_capacity(const dsa_array_list_t *array_list);
 
 /**
  * @brief 检查数组是否为空
  *
  * 检查数组中是否包含任何元素。
  *
- * @param[in] array 数组指针
+ * @param[in] array_list 数组指针
  *
  * @return bool 空返回true，否则返回false
  *
- * @retval true array为NULL或数组为空
+ * @retval true array_list为NULL或数组为空
  * @retval false 数组包含至少一个元素
  *
  * @note 函数对NULL指针安全
  *
- * @see array_size()
- * @see array_is_full()
+ * @see array_list_size()
+ * @see array_list_is_full()
  * @since 1.0
  */
-bool array_is_empty(const dsa_array_t *array);
+bool array_list_is_empty(const dsa_array_list_t *array_list);
 
 /**
  * @brief 检查数组是否已满
@@ -372,11 +372,11 @@ bool array_is_empty(const dsa_array_t *array);
  * 检查数组是否已达到容量上限。对于动态数组，总是返回false
  * （因为可以自动扩容）。
  *
- * @param[in] array 数组指针
+ * @param[in] array_list 数组指针
  *
  * @return bool 满返回true，否则返回false
  *
- * @retval false array为NULL
+ * @retval false array_list为NULL
  * @retval false 动态数组（总是可以扩容）
  * @retval true 静态数组且大小等于容量
  * @retval false 静态数组且大小小于容量
@@ -384,52 +384,52 @@ bool array_is_empty(const dsa_array_t *array);
  * @note 函数对NULL指针安全
  * @note 动态数组总是返回false
  *
- * @see array_size()
- * @see array_capacity()
- * @see array_is_empty()
+ * @see array_list_size()
+ * @see array_list_capacity()
+ * @see array_list_is_empty()
  * @since 1.0
  */
-bool array_is_full(const dsa_array_t *array);
+bool array_list_is_full(const dsa_array_list_t *array_list);
 
 /**
  * @brief 获取数组类型
  *
  * 返回数组的类型（静态或动态）。
  *
- * @param[in] array 数组指针，不能为NULL
+ * @param[in] array_list 数组指针，不能为NULL
  *
- * @return dsa_array_type_t 数组类型
+ * @return dsa_array_list_type_t 数组类型
  *
- * @retval ARRAY_TYPE_STATIC 静态数组
- * @retval ARRAY_TYPE_DYNAMIC 动态数组
+ * @retval ARRAY_LIST_TYPE_STATIC 静态数组
+ * @retval ARRAY_LIST_TYPE_DYNAMIC 动态数组
  *
- * @warning array不能为NULL
+ * @warning array_list不能为NULL
  *
- * @see array_get_type_name()
+ * @see array_list_get_type_name()
  * @since 1.0
  */
-dsa_array_type_t array_get_type(const dsa_array_t *array);
+dsa_array_list_type_t array_list_get_type(const dsa_array_list_t *array_list);
 
 /**
  * @brief 获取数组类型名称字符串
  *
  * 返回描述数组类型的字符串，用于调试和日志输出。
  *
- * @param[in] array 数组指针
+ * @param[in] array_list 数组指针
  *
  * @return const char* 类型名称字符串
  *
  * @retval "static" 静态数组
  * @retval "dynamic" 动态数组
- * @retval "unknown" array为NULL或类型未知
+ * @retval "unknown" array_list为NULL或类型未知
  *
  * @note 函数对NULL指针安全
  * @note 返回的字符串是常量，不需要释放
  *
- * @see array_get_type()
+ * @see array_list_get_type()
  * @since 1.0
  */
-const char *array_get_type_name(const dsa_array_t *array);
+const char *array_list_get_type_name(const dsa_array_list_t *array_list);
 
 /** @} */ // end of query_functions
 
@@ -444,40 +444,40 @@ const char *array_get_type_name(const dsa_array_t *array);
  *
  * 移除数组中的所有元素，但不释放元素指向的内存。数组容量保持不变。
  *
- * @param[in,out] array 数组指针，可以为NULL
+ * @param[in,out] array_list 数组指针，可以为NULL
  *
  * @note 函数对NULL指针安全
  * @note 不会释放元素指向的内存
- * @note 如需释放元素内存，请使用 array_clear_with_free()
+ * @note 如需释放元素内存，请使用 array_list_clear_with_free()
  *
- * @see array_clear_with_free()
+ * @see array_list_clear_with_free()
  * @since 1.0
  */
-void array_clear(dsa_array_t *array);
+void array_list_clear(dsa_array_list_t *array_list);
 
 /**
  * @brief 清空数组并释放元素内存
  *
  * 移除数组中的所有元素，并释放每个元素指向的内存。
  *
- * @param[in,out] array 数组指针，可以为NULL
+ * @param[in,out] array_list 数组指针，可以为NULL
  *
  * @note 函数对NULL指针安全
  * @note 对于动态数组：释放所有元素指向的内存，然后清空数组
  * @note 对于静态数组：只清空数组，不释放元素内存（静默降级为普通clear）
  * @warning 仅适用于元素为指针类型且指向malloc分配内存的情况
  *
- * @see array_clear()
+ * @see array_list_clear()
  * @since 1.0
  */
-void array_clear_with_free(dsa_array_t *array);
+void array_list_clear_with_free(dsa_array_list_t *array_list);
 
 /**
  * @brief 打印数组信息（用于调试）
  *
  * 打印数组的基本信息，包括类型、大小、容量等，用于调试目的。
  *
- * @param[in] array 数组指针，可以为NULL
+ * @param[in] array_list 数组指针，可以为NULL
  *
  * @note 函数对NULL指针安全
  * @note 输出格式可能在不同版本间发生变化
@@ -485,7 +485,7 @@ void array_clear_with_free(dsa_array_t *array);
  *
  * @since 1.0
  */
-void array_print_info(const dsa_array_t *array);
+void array_list_print_info(const dsa_array_list_t *array_list);
 
 /** @} */ // end of utility_functions
 
@@ -516,11 +516,11 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为int类型创建的
 //  *
-//  * @see array_push_back()
+//  * @see array_list_push_back()
 //  * @see array_get_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_push_back_int(dsa_array_t* array, int value);
+// dsa_result_t array_push_back_int(dsa_array_list_t* array, int value);
 //
 // /**
 //  * @brief 从整型数组获取元素
@@ -539,11 +539,11 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为int类型创建的
 //  *
-//  * @see array_get()
+//  * @see array_list_get()
 //  * @see array_set_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_get_int(const dsa_array_t* array, size_t index, int* value);
+// dsa_result_t array_get_int(const dsa_array_list_t* array, size_t index, int* value);
 //
 // /**
 //  * @brief 向整型数组设置元素
@@ -562,11 +562,11 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为int类型创建的
 //  *
-//  * @see array_set()
+//  * @see array_list_set()
 //  * @see array_get_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_set_int(dsa_array_t* array, size_t index, int value);
+// dsa_result_t array_set_int(dsa_array_list_t* array, size_t index, int value);
 //
 // /**
 //  * @brief 向双精度浮点数组添加元素
@@ -585,11 +585,11 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为double类型创建的
 //  *
-//  * @see array_push_back()
+//  * @see array_list_push_back()
 //  * @see array_get_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_push_back_double(dsa_array_t* array, double value);
+// dsa_result_t array_push_back_double(dsa_array_list_t* array, double value);
 //
 // /**
 //  * @brief 从双精度浮点数组获取元素
@@ -608,11 +608,11 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为double类型创建的
 //  *
-//  * @see array_get()
+//  * @see array_list_get()
 //  * @see array_set_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_get_double(const dsa_array_t* array, size_t index, double* value);
+// dsa_result_t array_get_double(const dsa_array_list_t* array, size_t index, double* value);
 //
 // /**
 //  * @brief 向双精度浮点数组设置元素
@@ -631,14 +631,14 @@ void array_print_info(const dsa_array_t *array);
 //  *
 //  * @note 数组必须是为double类型创建的
 //  *
-//  * @see array_set()
+//  * @see array_list_set()
 //  * @see array_get_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_set_double(dsa_array_t* array, size_t index, double value);
+// dsa_result_t array_set_double(dsa_array_list_t* array, size_t index, double value);
 
 /** @} */ // end of type_safe_functions
 
 /** @} */ // end of DSA_Array
 
-#endif // DSA_ARRAY_H
+#endif // DSA_ARRAY_LIST_H

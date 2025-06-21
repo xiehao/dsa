@@ -20,14 +20,11 @@
  * @details 基于预分配缓冲区的静态数组容器，容量固定不可变
  */
 typedef struct {
-    trait_basic_t const *basic_trait;                 ///< 基本容器接口
-    trait_random_access_t const *random_access_trait; ///< 随机访问接口
-    trait_linear_t const *linear_trait;               ///< 尾部操作接口
-    trait_array_list_t const *array_list_trait;       ///< 数组接口
-    dsa_element_pt data;                              ///< 指向实际数据存储的指针 (通常是 VLA)
-    size_t size;                                      ///< 当前元素数量
-    size_t capacity;                                  ///< 数组的总容量 (固定)
-    size_t element_size;                              ///< 单个元素的大小（字节）
+    trait_array_list_t const *trait;       ///< 数组接口
+    dsa_element_pt data;                   ///< 指向实际数据存储的指针 (通常是 VLA)
+    size_t size;                           ///< 当前元素数量
+    size_t capacity;                       ///< 数组的总容量 (固定)
+    size_t element_size;                   ///< 单个元素的大小（字节）
 } static_array_t;
 
 /**
@@ -312,6 +309,9 @@ static char const *static_array_get_type_name() {
  * @brief 数组接口实现
  */
 static trait_array_list_t const array_trait = {
+    .basic = &basic_trait,
+    .random_access = &random_access_trait,
+    .linear = &linear_trait,
     .get_type = static_array_get_type,
     .get_type_name = static_array_get_type_name,
 };
@@ -333,10 +333,7 @@ dsa_array_list_t *static_array_create(void *data_buffer, size_t capacity, size_t
     if (!array) {
         return NULL;
     }
-    array->basic_trait = &basic_trait;
-    array->random_access_trait = &random_access_trait;
-    array->linear_trait = &linear_trait;
-    array->array_list_trait = &array_trait;
+    array->trait = &array_trait;
     array->data = data_buffer;
     array->size = 0;
     array->capacity = capacity;

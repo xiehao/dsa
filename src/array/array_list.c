@@ -22,10 +22,7 @@
  * @details 包含各种接口指针，用于实现数组的多态行为
  */
 struct array_list_t {
-    trait_basic_t const *basic;                 /**< 基本容器接口 */
-    trait_random_access_t const *random_access; /**< 随机访问接口 */
-    trait_linear_t const *linear;               /**< 后端操作接口 */
-    trait_array_list_t const *array_list;       /**< 数组专用接口 */
+    trait_array_list_t const *trait;       /**< 数组专用接口 */
 };
 
 // ============================================================================
@@ -102,19 +99,19 @@ void array_list_destroy(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return;
     }
-    array_list->basic->destroy(array_list);
+    array_list->trait->basic->destroy(array_list);
 }
 
 /**
  * @brief 销毁数组并释放所有内存
- * @param array 要销毁的数组
+ * @param array_list 要销毁的数组
  * @note 释放数组结构体和所有元素占用的内存
  */
-void array_list_destroy_with_free(dsa_array_list_t *array) {
-    if (!is_valid_array(array)) {
+void array_list_destroy_with_free(dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
         return;
     }
-    array->basic->destroy_with_free(array);
+    array_list->trait->basic->destroy_with_free(array_list);
 }
 
 // ============================================================================
@@ -132,7 +129,7 @@ dsa_element_pt array_list_get(const dsa_array_list_t *array_list, size_t index) 
     if (!is_valid_array(array_list)) {
         return NULL;
     }
-    return array_list->random_access->get_at(array_list, index);
+    return array_list->trait->random_access->get_at(array_list, index);
 }
 
 /**
@@ -149,7 +146,7 @@ dsa_result_t array_list_set(dsa_array_list_t *array_list, size_t index, dsa_elem
     if (!is_valid_array(array_list)) {
         return DSA_ERROR_NULL_POINTER;
     }
-    return array_list->random_access->set_at(array_list, index, element);
+    return array_list->trait->random_access->set_at(array_list, index, element);
 }
 
 /**
@@ -165,7 +162,7 @@ dsa_result_t array_list_push_back(dsa_array_list_t *array_list, dsa_element_pt e
     if (!is_valid_array(array_list)) {
         return DSA_ERROR_NULL_POINTER;
     }
-    return array_list->linear->push_back(array_list, element);
+    return array_list->trait->linear->push_back(array_list, element);
 }
 
 /**
@@ -178,7 +175,7 @@ dsa_element_pt array_list_pop_back(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return NULL;
     }
-    return array_list->linear->pop_back(array_list);
+    return array_list->trait->linear->pop_back(array_list);
 }
 
 /**
@@ -196,7 +193,7 @@ dsa_result_t array_list_insert(dsa_array_list_t *array_list, size_t index, dsa_e
     if (!is_valid_array(array_list)) {
         return DSA_ERROR_NULL_POINTER;
     }
-    return array_list->random_access->insert_at(array_list, index, element);
+    return array_list->trait->random_access->insert_at(array_list, index, element);
 }
 
 /**
@@ -210,7 +207,7 @@ dsa_element_pt array_list_remove(dsa_array_list_t *array_list, size_t index) {
     if (!is_valid_array(array_list)) {
         return NULL;
     }
-    return array_list->random_access->remove_at(array_list, index);
+    return array_list->trait->random_access->remove_at(array_list, index);
 }
 
 // ============================================================================
@@ -227,7 +224,7 @@ size_t array_list_size(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return 0;
     }
-    return array_list->basic->get_size(array_list);
+    return array_list->trait->basic->get_size(array_list);
 }
 
 /**
@@ -240,7 +237,7 @@ size_t array_list_capacity(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return 0;
     }
-    return array_list->basic->get_capacity(array_list);
+    return array_list->trait->basic->get_capacity(array_list);
 }
 
 /**
@@ -253,7 +250,7 @@ bool array_list_is_empty(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return true;
     }
-    return array_list->basic->is_empty(array_list);
+    return array_list->trait->basic->is_empty(array_list);
 }
 
 /**
@@ -266,7 +263,7 @@ bool array_list_is_full(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return false;
     }
-    return array_list->basic->is_full(array_list);
+    return array_list->trait->basic->is_full(array_list);
 }
 
 /**
@@ -279,7 +276,7 @@ dsa_array_list_type_t array_list_get_type(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return ARRAY_LIST_TYPE_STATIC; // 默认返回静态类型
     }
-    return array_list->array_list->get_type();
+    return array_list->trait->get_type();
 }
 
 /**
@@ -292,7 +289,7 @@ const char *array_list_get_type_name(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return "无效数组";
     }
-    return array_list->array_list->get_type_name();
+    return array_list->trait->get_type_name();
 }
 
 // ============================================================================
@@ -308,7 +305,7 @@ void array_list_clear(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return;
     }
-    return array_list->basic->clear(array_list);
+    return array_list->trait->basic->clear(array_list);
 }
 
 /**
@@ -320,7 +317,7 @@ void array_list_clear_with_free(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return;
     }
-    return array_list->basic->clear_with_free(array_list);
+    return array_list->trait->basic->clear_with_free(array_list);
 }
 
 /**
@@ -341,8 +338,8 @@ void array_list_print_info(const dsa_array_list_t *array_list) {
     printf("  是否为空: %s\n", array_list_is_empty(array_list) ? "是" : "否");
     printf("  是否已满: %s\n", array_list_is_full(array_list) ? "是" : "否");
 
-    // if (array_list->type == ARRAY_LIST_TYPE_STATIC) {
-    //     printf("  元素大小: %zu 字节\n", array_list->impl.static_array.element_size);
+    // if (trait->type == ARRAY_LIST_TYPE_STATIC) {
+    //     printf("  元素大小: %zu 字节\n", trait->impl.static_array.element_size);
     // }
 }
 

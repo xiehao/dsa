@@ -21,13 +21,10 @@
  * 使用组合模式来实现多种容器接口。
  */
 typedef struct {
-    trait_basic_t const *basic;                 ///< 基本容器接口
-    trait_random_access_t const *random_access; ///< 随机访问接口
-    trait_linear_t const *linear;               ///< 尾部操作接口
-    trait_array_list_t const *array_list;       ///< 数组接口
-    dsa_element_pt *data;                       ///< 指向元素指针数组的指针
-    size_t size;                                ///< 当前元素数量
-    size_t capacity;                            ///< 当前分配的容量
+    trait_array_list_t const *trait;       ///< 数组接口
+    dsa_element_pt *data;                  ///< 指向元素指针数组的指针
+    size_t size;                           ///< 当前元素数量
+    size_t capacity;                       ///< 当前分配的容量
 } dynamic_array_t;
 
 /**
@@ -428,6 +425,9 @@ static char const *dynamic_array_get_type_name() {
 
 /// 数组接口实现
 static trait_array_list_t const array_trait = {
+    .basic = &basic_trait,
+    .random_access = &random_access_trait,
+    .linear = &linear_trait,
     .get_type = dynamic_array_get_type,
     .get_type_name = dynamic_array_get_type_name,
 };
@@ -448,10 +448,7 @@ dsa_array_list_t *dynamic_array_create(size_t initial_capacity) {
         perror("为 dynamic_array_t 结构分配内存失败");
         return NULL;
     }
-    array->basic = &basic_trait;
-    array->random_access = &random_access_trait;
-    array->linear = &linear_trait;
-    array->array_list = &array_trait;
+    array->trait = &array_trait;
     array->size = 0;
     array->capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
     array->data = (dsa_element_pt *) malloc(array->capacity * sizeof(dsa_element_pt));

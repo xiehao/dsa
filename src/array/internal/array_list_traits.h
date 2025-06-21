@@ -25,6 +25,9 @@
  * @see dsa_array_list_type_t
  */
 typedef struct {
+    trait_basic_t const *basic;                 ///< 基本容器接口
+    trait_random_access_t const *random_access; ///< 随机访问接口
+    trait_linear_t const *linear;               ///< 尾部操作接口
     /**
      * @brief 获取数组类型
      * @details 返回当前数组实例的具体类型标识

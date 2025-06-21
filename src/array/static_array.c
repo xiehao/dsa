@@ -20,8 +20,8 @@
  * @details 基于预分配缓冲区的静态数组容器，容量固定不可变
  */
 typedef struct {
-    container_basic_interface_t const *basic_trait; ///< 基本容器接口
-    container_random_access_interface_t const *random_access_trait; ///< 随机访问接口
+    trait_basic_t const *basic_trait; ///< 基本容器接口
+    trait_random_access_t const *random_access_trait; ///< 随机访问接口
     container_back_interface_t const *back_trait; ///< 尾部操作接口
     array_list_interface_t const *array_trait; ///< 数组接口
     dsa_element_pt data; ///< 指向实际数据存储的指针 (通常是 VLA)
@@ -133,7 +133,7 @@ static void static_array_destroy(dsa_container_pt array) {
 /**
  * @brief 基本容器接口实现
  */
-static container_basic_interface_t const basic_trait = {
+static trait_basic_t const basic_trait = {
     .get_size = static_array_size,
     .get_capacity = static_array_capacity,
     .is_empty = static_array_is_empty,
@@ -254,7 +254,7 @@ static dsa_element_pt static_array_remove(dsa_container_pt array, size_t index) 
 /**
  * @brief 随机访问接口实现
  */
-static container_random_access_interface_t const random_access_trait = {
+static trait_random_access_t const random_access_trait = {
     .get_at = static_array_get,
     .set_at = static_array_set,
     .insert_at = static_array_insert,

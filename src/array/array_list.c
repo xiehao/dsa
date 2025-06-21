@@ -22,8 +22,8 @@
  * @details 包含各种接口指针，用于实现数组的多态行为
  */
 struct array_list_t {
-    container_basic_interface_t const *basic;           /**< 基本容器接口 */
-    container_random_access_interface_t const *random_access; /**< 随机访问接口 */
+    trait_basic_t const *basic;           /**< 基本容器接口 */
+    trait_random_access_t const *random_access; /**< 随机访问接口 */
     container_back_interface_t const *back;             /**< 后端操作接口 */
     array_list_interface_t const *array;                     /**< 数组专用接口 */
 };

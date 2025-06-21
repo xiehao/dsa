@@ -1,5 +1,5 @@
 /**
- * @file dsa_traits.h
+ * @file traits.h
  * @brief 数据结构算法库（DSA）容器特性定义
  * @details 定义了各种容器类型的通用接口，提供统一的容器操作抽象层。
  *          包括基础操作、随机访问、迭代器、批量操作、排序变换等接口。
@@ -11,6 +11,8 @@
 #ifndef DSA_TRAITS_H
 #define DSA_TRAITS_H
 
+#include <stddef.h>  // for size_t
+#include <stdbool.h> // for bool (if using C)
 #include <common.h>
 
 /**
@@ -42,7 +44,7 @@ typedef const void *dsa_const_container_pt;
  */
 
 /**
- * @struct container_basic_interface_t
+ * @struct trait_basic_t
  * @brief 基础容器操作接口
  * @details 定义了所有容器类型都应该实现的基础操作，包括状态查询、清理和内存管理操作
  */
@@ -102,7 +104,7 @@ typedef struct {
      * @note 此函数会先释放容器中所有元素的内存，然后释放容器结构的内存
      */
     void (*destroy_with_free)(dsa_container_pt container);
-} container_basic_interface_t;
+} trait_basic_t;
 
 /** @} */ // BasicInterface
 
@@ -169,7 +171,7 @@ typedef struct {
  */
 
 /**
- * @struct container_random_access_interface_t
+ * @struct trait_random_access_t
  * @brief 随机访问容器操作接口
  * @details 定义了支持通过索引随机访问的容器（如向量、数组）应实现的接口
  */
@@ -211,7 +213,7 @@ typedef struct {
      * @note 调用者负责释放返回元素的内存；移除后，后续元素将前移一个位置
      */
     dsa_element_pt (*remove_at)(dsa_container_pt container, size_t index);
-} container_random_access_interface_t;
+} trait_random_access_t;
 
 /** @} */ // RandomAccessInterface
 
@@ -222,7 +224,7 @@ typedef struct {
  */
 
 /**
- * @struct container_search_interface_t
+ * @struct trait_search_t
  * @brief 容器查找操作接口
  * @details 定义了容器中查找元素的各种操作
  */
@@ -268,18 +270,78 @@ typedef struct {
      */
     size_t (*count)(dsa_const_container_pt container, dsa_element_pt element,
                     int (*compare)(const void *a, const void *b));
-} container_search_interface_t;
+} trait_search_t;
 
 /** @} */ // SearchInterface
 
 /**
  * @defgroup IteratorInterface 迭代器接口
  * @brief 容器迭代器操作接口
+ * 
+ * 本模块定义了数据结构算法库中迭代器的基本类型和接口。
+ * 迭代器提供了统一的容器元素访问方式，支持顺序遍历和随机访问等操作。
+ * 
+ * @details
+ * 迭代器接口包含以下主要功能：
+ * - 元素访问和修改
+ * - 位置移动（前进、后退）
+ * - 迭代器比较
+ * - 距离计算
+ * 
+ * @note 所有迭代器操作都应该通过相应的trait接口进行，以确保类型安全
+ * 
+ * @see trait_iterator_t
+ * @since 1.0
+ * @author DSA Library Team
+ * 
  * @{
  */
 
 /**
- * @struct container_iterator_interface_t
+ * @typedef dsa_iterator_pt
+ * @brief 可变迭代器指针类型
+ * 
+ * 指向dsa_iterator_t结构体的指针，用于表示可变迭代器。
+ * 通过此类型的迭代器可以读取和修改容器中的元素。
+ * 
+ * @details
+ * 可变迭代器支持以下操作：
+ * - 读取当前位置的元素值
+ * - 修改当前位置的元素值
+ * - 移动到下一个或上一个位置
+ * - 与其他迭代器进行比较
+ * 
+ * @note 使用前需要确保迭代器已正确初始化且指向有效位置
+ * 
+ * @see dsa_const_iterator_pt
+ * @see trait_iterator_t
+ */
+typedef struct dsa_iterator_t* dsa_iterator_pt;
+
+/**
+ * @typedef dsa_const_iterator_pt
+ * @brief 常量迭代器指针类型
+ * 
+ * 指向dsa_iterator_t结构体的常量指针，用于表示只读迭代器。
+ * 通过此类型的迭代器只能读取容器中的元素，不能修改。
+ * 
+ * @details
+ * 常量迭代器支持以下操作：
+ * - 读取当前位置的元素值（只读）
+ * - 移动到下一个或上一个位置
+ * - 与其他迭代器进行比较
+ * 
+ * @note 
+ * - 常量迭代器不支持元素修改操作
+ * - 使用前需要确保迭代器已正确初始化且指向有效位置
+ * 
+ * @see dsa_iterator_pt
+ * @see trait_iterator_t
+ */
+typedef const struct dsa_iterator_t* dsa_const_iterator_pt;
+
+/**
+ * @struct trait_iterator_t
  * @brief 容器迭代器接口
  * @details 定义了容器迭代访问的标准接口，支持双向迭代
  */
@@ -325,7 +387,7 @@ typedef struct {
      * @return 如果迭代器有效返回true，否则返回false
      */
     bool (*is_valid)(void *iterator);
-} container_iterator_interface_t;
+} trait_iterator_t;
 
 /** @} */ // IteratorInterface
 
@@ -336,7 +398,7 @@ typedef struct {
  */
 
 /**
- * @struct container_batch_interface_t
+ * @struct trait_batch_t
  * @brief 容器批量操作接口
  * @details 定义了容器的批量操作，如批量插入、删除、复制等
  */
@@ -352,7 +414,7 @@ typedef struct {
      */
     dsa_result_t (*insert_range)(dsa_container_pt container, size_t index,
                                  dsa_element_pt *elements, size_t count);
-
+    
     /**
      * @brief 移除一段连续的元素
      * @param container 容器指针
@@ -362,28 +424,69 @@ typedef struct {
      * @note 此函数不负责释放被移除元素的内存，调用者需要事先保存并管理这些元素
      */
     dsa_result_t (*remove_range)(dsa_container_pt container, size_t start_index, size_t count);
-
+    
     /**
-     * @brief 将容器元素复制到外部数组
+     * @brief 复制容器中一段连续的元素到目标数组
      * @param container 容器的常量指针
-     * @param array 目标数组
-     * @param array_size 目标数组的大小
+     * @param start_index 要复制的起始索引
+     * @param count 要复制的元素数量
+     * @param dest 目标数组，用于存储复制的元素指针
+     * @param dest_size 目标数组的大小
      * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
-     * @note 如果容器元素数量大于array_size，只复制array_size个元素
+     * @note 调用者需要确保dest数组有足够的空间存储count个元素指针
      */
-    dsa_result_t (*copy_to_array)(dsa_const_container_pt container,
-                                  dsa_element_pt *array, size_t array_size);
-
+    dsa_result_t (*copy_range)(dsa_const_container_pt container, size_t start_index,
+                               size_t count, dsa_element_pt *dest, size_t dest_size);
+    
     /**
-     * @brief 将外部数组中的元素追加到容器末尾
-     * @param container 容器指针
-     * @param array 源数组
-     * @param count 要追加的元素数量
+     * @brief 将另一个容器的所有元素追加到当前容器末尾
+     * @param container 目标容器指针
+     * @param source 源容器的常量指针
      * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
+     * @note 此操作只复制元素指针，不会复制元素内容，两个容器将共享相同的元素
      */
-    dsa_result_t (*append_from_array)(dsa_container_pt container,
-                                      dsa_element_pt *array, size_t count);
-} container_batch_interface_t;
+    dsa_result_t (*append_all)(dsa_container_pt container, dsa_const_container_pt source);
+    
+    /**
+     * @brief 从容器中移除所有匹配的元素
+     * @param container 容器指针
+     * @param element 要移除的元素指针
+     * @param compare 比较函数，签名为int (*)(const void*, const void*)
+     * @return 被移除的元素数量
+     * @note 此函数不负责释放被移除元素的内存，调用者需要管理这些元素
+     */
+    size_t (*remove_all)(dsa_container_pt container, dsa_element_pt element,
+                         int (*compare)(const void *a, const void *b));
+    
+    /**
+     * @brief 保留所有匹配的元素，移除其他元素
+     * @param container 容器指针
+     * @param element 要保留的元素指针
+     * @param compare 比较函数，签名为int (*)(const void*, const void*)
+     * @return 被移除的元素数量
+     * @note 此函数不负责释放被移除元素的内存，调用者需要管理这些元素
+     */
+    size_t (*retain_all)(dsa_container_pt container, dsa_element_pt element,
+                         int (*compare)(const void *a, const void *b));
+    
+    /**
+     * @brief 调整容器的容量
+     * @param container 容器指针
+     * @param new_capacity 新的容量大小
+     * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
+     * @note 如果新容量小于当前元素数量，可能会导致数据丢失
+     */
+    dsa_result_t (*resize)(dsa_container_pt container, size_t new_capacity);
+    
+    /**
+     * @brief 预留容器空间以避免频繁重新分配
+     * @param container 容器指针
+     * @param min_capacity 最小所需容量
+     * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
+     * @note 此操作只增加容量，不会减少现有容量
+     */
+    dsa_result_t (*reserve)(dsa_container_pt container, size_t min_capacity);
+} trait_batch_t;
 
 /** @} */ // BatchInterface
 
@@ -394,7 +497,7 @@ typedef struct {
  */
 
 /**
- * @struct container_transform_interface_t
+ * @struct trait_transform_t
  * @brief 容器排序和变换接口
  * @details 定义了容器的排序、反转、打乱以及函数式编程风格的操作
  */
@@ -405,7 +508,7 @@ typedef struct {
      * @param compare 比较函数，签名为int (*)(const void*, const void*)，
      *               小于返回负值，等于返回0，大于返回正值
      */
-    void (*sort)(dsa_container_pt container, int (*compare)(const void *a, const void *b));
+    void (*sort)(dsa_container_pt container, int (*compare)(const void *lhs, const void *rhs));
 
     /**
      * @brief 反转容器中元素的顺序
@@ -445,7 +548,7 @@ typedef struct {
      */
     dsa_container_pt (*map)(dsa_const_container_pt container,
                             dsa_element_pt (*transform)(dsa_element_pt element));
-} container_transform_interface_t;
+} trait_transform_t;
 
 /** @} */ // TransformInterface
 
@@ -456,7 +559,7 @@ typedef struct {
  */
 
 /**
- * @struct container_utility_interface_t
+ * @struct trait_utility_t
  * @brief 容器比较和复制接口
  * @details 定义了容器间的比较、相等性检查和复制操作
  */
@@ -499,7 +602,7 @@ typedef struct {
      * @note 目标容器会先被清空，然后添加源容器的所有元素
      */
     dsa_result_t (*copy_from)(dsa_container_pt dest, dsa_const_container_pt src);
-} container_utility_interface_t;
+} trait_utility_t;
 
 /** @} */ // UtilityInterface
 
@@ -510,7 +613,7 @@ typedef struct {
  */
 
 /**
- * @struct container_stack_interface_t
+ * @struct trait_stack_t
  * @brief 栈容器特定接口
  * @details 定义了栈数据结构的LIFO（后进先出）操作
  */
@@ -537,10 +640,10 @@ typedef struct {
      * @return 栈顶元素指针，如果栈为空则返回NULL
      */
     dsa_element_pt (*peek)(dsa_const_container_pt container);
-} container_stack_interface_t;
+} trait_stack_t;
 
 /**
- * @struct container_queue_interface_t
+ * @struct trait_queue_t
  * @brief 队列容器特定接口
  * @details 定义了队列数据结构的FIFO（先进先出）操作
  */
@@ -574,7 +677,7 @@ typedef struct {
      * @return 队列尾部元素指针，如果队列为空则返回NULL
      */
     dsa_element_pt (*rear)(dsa_const_container_pt container);
-} container_queue_interface_t;
+} trait_queue_t;
 
 /** @} */ // StackQueueInterface
 
@@ -585,7 +688,7 @@ typedef struct {
  */
 
 /**
- * @struct container_priority_queue_interface_t
+ * @struct trait_priority_queue_t
  * @brief 优先队列接口
  * @details 定义了优先队列数据结构的基于优先级的操作
  */
@@ -636,7 +739,7 @@ typedef struct {
      * @note 更改优先级后，队列会重新调整以维持优先级顺序
      */
     void (*change_priority)(dsa_container_pt container, dsa_element_pt element, int new_priority);
-} container_priority_queue_interface_t;
+} trait_priority_queue_t;
 
 /** @} */ // PriorityQueueInterface
 
@@ -647,7 +750,7 @@ typedef struct {
  */
 
 /**
- * @struct container_set_interface_t
+ * @struct trait_set_t
  * @brief 集合特定接口
  * @details 定义了集合数据结构的操作，包括基本的集合运算
  */
@@ -704,7 +807,7 @@ typedef struct {
      * @return 如果subset是superset的子集则返回true，否则返回false
      */
     bool (*is_subset)(dsa_const_container_pt subset, dsa_const_container_pt superset);
-} container_set_interface_t;
+} trait_set_t;
 
 /** @} */ // SetInterface
 
@@ -715,7 +818,7 @@ typedef struct {
  */
 
 /**
- * @struct container_map_interface_t
+ * @struct trait_map_t
  * @brief 映射/字典特定接口
  * @details 定义了键值对映射数据结构的操作
  */
@@ -778,7 +881,7 @@ typedef struct {
      * @note 返回的新容器需要由调用者负责销毁
      */
     dsa_container_pt (*get_values)(dsa_const_container_pt container);
-} container_map_interface_t;
+} trait_map_t;
 
 /** @} */ // MapInterface
 

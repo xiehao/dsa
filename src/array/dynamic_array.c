@@ -21,8 +21,8 @@
  * 使用组合模式来实现多种容器接口。
  */
 typedef struct {
-    container_basic_interface_t const *basic;           ///< 基本容器接口
-    container_random_access_interface_t const *random_access; ///< 随机访问接口
+    trait_basic_t const *basic;           ///< 基本容器接口
+    trait_random_access_t const *random_access; ///< 随机访问接口
     container_back_interface_t const *back;             ///< 尾部操作接口
     array_list_interface_t const *array;                ///< 数组接口
     dsa_element_pt *data;                               ///< 指向元素指针数组的指针
@@ -234,7 +234,7 @@ static void dynamic_array_destroy_with_free(dsa_container_pt array) {
 }
 
 /// 基本容器接口实现
-static container_basic_interface_t const basic_trait = {
+static trait_basic_t const basic_trait = {
     .get_size = dynamic_array_size,
     .get_capacity = dynamic_array_capacity,
     .is_empty = dynamic_array_is_empty,
@@ -370,7 +370,7 @@ static dsa_element_pt dynamic_array_remove(dsa_container_pt array, size_t index)
 }
 
 /// 随机访问接口实现
-static container_random_access_interface_t const random_access_trait = {
+static trait_random_access_t const random_access_trait = {
     .get_at = dynamic_array_get,
     .set_at = dynamic_array_set,
     .insert_at = dynamic_array_insert,

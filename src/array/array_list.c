@@ -22,10 +22,10 @@
  * @details 包含各种接口指针，用于实现数组的多态行为
  */
 struct array_list_t {
-    trait_basic_t const *basic;           /**< 基本容器接口 */
+    trait_basic_t const *basic;                 /**< 基本容器接口 */
     trait_random_access_t const *random_access; /**< 随机访问接口 */
-    container_back_interface_t const *back;             /**< 后端操作接口 */
-    array_list_interface_t const *array;                     /**< 数组专用接口 */
+    trait_linear_t const *linear;               /**< 后端操作接口 */
+    trait_array_list_t const *array_list;       /**< 数组专用接口 */
 };
 
 // ============================================================================
@@ -165,7 +165,7 @@ dsa_result_t array_list_push_back(dsa_array_list_t *array_list, dsa_element_pt e
     if (!is_valid_array(array_list)) {
         return DSA_ERROR_NULL_POINTER;
     }
-    return array_list->back->push_back(array_list, element);
+    return array_list->linear->push_back(array_list, element);
 }
 
 /**
@@ -178,7 +178,7 @@ dsa_element_pt array_list_pop_back(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return NULL;
     }
-    return array_list->back->pop_back(array_list);
+    return array_list->linear->pop_back(array_list);
 }
 
 /**
@@ -279,7 +279,7 @@ dsa_array_list_type_t array_list_get_type(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return ARRAY_LIST_TYPE_STATIC; // 默认返回静态类型
     }
-    return array_list->array->get_type();
+    return array_list->array_list->get_type();
 }
 
 /**
@@ -292,7 +292,7 @@ const char *array_list_get_type_name(const dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
         return "无效数组";
     }
-    return array_list->array->get_type_name();
+    return array_list->array_list->get_type_name();
 }
 
 // ============================================================================

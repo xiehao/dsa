@@ -115,52 +115,53 @@ typedef struct {
  */
 
 /**
- * @struct container_front_interface_t
+ * @struct trait_linear_t
  * @brief 线性容器前端操作接口
  * @details 定义了支持前端操作的线性容器（如双端队列、列表）应实现的接口
  */
 typedef struct {
     /**
      * @brief 在容器前端添加元素
-     * @param container 容器指针
+     * @param container 目标容器指针
      * @param element 要添加的元素指针
-     * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
-     * @note 元素内存由调用者管理，容器仅存储元素指针
+     * @return dsa_result_t 操作结果状态码
+     * @retval DSA_SUCCESS 成功添加元素
+     * @retval DSA_ERROR_INVALID_PARAM 参数无效
+     * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+     * @note 该操作会在容器的开头位置插入新元素
      */
     dsa_result_t (*push_front)(dsa_container_pt container, dsa_element_pt element);
 
     /**
-     * @brief 移除并返回容器前端的元素
-     * @param container 容器指针
-     * @return 被移除元素的指针，如果容器为空则返回NULL
-     * @note 调用者负责释放返回元素的内存（如果需要）
+     * @brief 从容器前端移除并返回元素
+     * @param container 目标容器指针
+     * @return dsa_element_pt 被移除的元素指针，如果容器为空则返回NULL
+     * @note 调用者负责释放返回元素的内存
+     * @warning 在空容器上调用此函数会返回NULL
      */
     dsa_element_pt (*pop_front)(dsa_container_pt container);
-} container_front_interface_t;
 
-/**
- * @struct container_back_interface_t
- * @brief 线性容器后端操作接口
- * @details 定义了支持后端操作的线性容器（如向量、双端队列、列表）应实现的接口
- */
-typedef struct {
     /**
      * @brief 在容器后端添加元素
-     * @param container 容器指针
+     * @param container 目标容器指针
      * @param element 要添加的元素指针
-     * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
-     * @note 元素内存由调用者管理，容器仅存储元素指针
+     * @return dsa_result_t 操作结果状态码
+     * @retval DSA_SUCCESS 成功添加元素
+     * @retval DSA_ERROR_INVALID_PARAM 参数无效
+     * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+     * @note 该操作会在容器的末尾位置插入新元素
      */
     dsa_result_t (*push_back)(dsa_container_pt container, dsa_element_pt element);
 
     /**
-     * @brief 移除并返回容器后端的元素
-     * @param container 容器指针
-     * @return 被移除元素的指针，如果容器为空则返回NULL
-     * @note 调用者负责释放返回元素的内存（如果需要）
+     * @brief 从容器后端移除并返回元素
+     * @param container 目标容器指针
+     * @return dsa_element_pt 被移除的元素指针，如果容器为空则返回NULL
+     * @note 调用者负责释放返回元素的内存
+     * @warning 在空容器上调用此函数会返回NULL
      */
     dsa_element_pt (*pop_back)(dsa_container_pt container);
-} container_back_interface_t;
+} trait_linear_t;
 
 /** @} */ // LinearInterface
 
@@ -277,42 +278,42 @@ typedef struct {
 /**
  * @defgroup IteratorInterface 迭代器接口
  * @brief 容器迭代器操作接口
- * 
+ *
  * 本模块定义了数据结构算法库中迭代器的基本类型和接口。
  * 迭代器提供了统一的容器元素访问方式，支持顺序遍历和随机访问等操作。
- * 
+ *
  * @details
  * 迭代器接口包含以下主要功能：
  * - 元素访问和修改
  * - 位置移动（前进、后退）
  * - 迭代器比较
  * - 距离计算
- * 
+ *
  * @note 所有迭代器操作都应该通过相应的trait接口进行，以确保类型安全
- * 
+ *
  * @see trait_iterator_t
  * @since 1.0
  * @author DSA Library Team
- * 
+ *
  * @{
  */
 
 /**
  * @typedef dsa_iterator_pt
  * @brief 可变迭代器指针类型
- * 
+ *
  * 指向dsa_iterator_t结构体的指针，用于表示可变迭代器。
  * 通过此类型的迭代器可以读取和修改容器中的元素。
- * 
+ *
  * @details
  * 可变迭代器支持以下操作：
  * - 读取当前位置的元素值
  * - 修改当前位置的元素值
  * - 移动到下一个或上一个位置
  * - 与其他迭代器进行比较
- * 
+ *
  * @note 使用前需要确保迭代器已正确初始化且指向有效位置
- * 
+ *
  * @see dsa_const_iterator_pt
  * @see trait_iterator_t
  */
@@ -321,20 +322,20 @@ typedef struct dsa_iterator_t* dsa_iterator_pt;
 /**
  * @typedef dsa_const_iterator_pt
  * @brief 常量迭代器指针类型
- * 
+ *
  * 指向dsa_iterator_t结构体的常量指针，用于表示只读迭代器。
  * 通过此类型的迭代器只能读取容器中的元素，不能修改。
- * 
+ *
  * @details
  * 常量迭代器支持以下操作：
  * - 读取当前位置的元素值（只读）
  * - 移动到下一个或上一个位置
  * - 与其他迭代器进行比较
- * 
- * @note 
+ *
+ * @note
  * - 常量迭代器不支持元素修改操作
  * - 使用前需要确保迭代器已正确初始化且指向有效位置
- * 
+ *
  * @see dsa_iterator_pt
  * @see trait_iterator_t
  */
@@ -414,7 +415,7 @@ typedef struct {
      */
     dsa_result_t (*insert_range)(dsa_container_pt container, size_t index,
                                  dsa_element_pt *elements, size_t count);
-    
+
     /**
      * @brief 移除一段连续的元素
      * @param container 容器指针
@@ -424,7 +425,7 @@ typedef struct {
      * @note 此函数不负责释放被移除元素的内存，调用者需要事先保存并管理这些元素
      */
     dsa_result_t (*remove_range)(dsa_container_pt container, size_t start_index, size_t count);
-    
+
     /**
      * @brief 复制容器中一段连续的元素到目标数组
      * @param container 容器的常量指针
@@ -437,7 +438,7 @@ typedef struct {
      */
     dsa_result_t (*copy_range)(dsa_const_container_pt container, size_t start_index,
                                size_t count, dsa_element_pt *dest, size_t dest_size);
-    
+
     /**
      * @brief 将另一个容器的所有元素追加到当前容器末尾
      * @param container 目标容器指针
@@ -446,7 +447,7 @@ typedef struct {
      * @note 此操作只复制元素指针，不会复制元素内容，两个容器将共享相同的元素
      */
     dsa_result_t (*append_all)(dsa_container_pt container, dsa_const_container_pt source);
-    
+
     /**
      * @brief 从容器中移除所有匹配的元素
      * @param container 容器指针
@@ -457,7 +458,7 @@ typedef struct {
      */
     size_t (*remove_all)(dsa_container_pt container, dsa_element_pt element,
                          int (*compare)(const void *a, const void *b));
-    
+
     /**
      * @brief 保留所有匹配的元素，移除其他元素
      * @param container 容器指针
@@ -468,7 +469,7 @@ typedef struct {
      */
     size_t (*retain_all)(dsa_container_pt container, dsa_element_pt element,
                          int (*compare)(const void *a, const void *b));
-    
+
     /**
      * @brief 调整容器的容量
      * @param container 容器指针
@@ -477,7 +478,7 @@ typedef struct {
      * @note 如果新容量小于当前元素数量，可能会导致数据丢失
      */
     dsa_result_t (*resize)(dsa_container_pt container, size_t new_capacity);
-    
+
     /**
      * @brief 预留容器空间以避免频繁重新分配
      * @param container 容器指针

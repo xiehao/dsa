@@ -21,13 +21,13 @@
  * 使用组合模式来实现多种容器接口。
  */
 typedef struct {
-    trait_basic_t const *basic;           ///< 基本容器接口
+    trait_basic_t const *basic;                 ///< 基本容器接口
     trait_random_access_t const *random_access; ///< 随机访问接口
-    container_back_interface_t const *back;             ///< 尾部操作接口
-    array_list_interface_t const *array;                ///< 数组接口
-    dsa_element_pt *data;                               ///< 指向元素指针数组的指针
-    size_t size;                                        ///< 当前元素数量
-    size_t capacity;                                    ///< 当前分配的容量
+    trait_linear_t const *linear;               ///< 尾部操作接口
+    trait_array_list_t const *array_list;       ///< 数组接口
+    dsa_element_pt *data;                       ///< 指向元素指针数组的指针
+    size_t size;                                ///< 当前元素数量
+    size_t capacity;                            ///< 当前分配的容量
 } dynamic_array_t;
 
 /**
@@ -358,7 +358,7 @@ static dsa_element_pt dynamic_array_remove(dsa_container_pt array, size_t index)
     this->size--;
 
     // 可选：将最后一个（现在未使用的）槽位置为 NULL
-    // this->data[array->size] = NULL;
+    // this->data[array_list->size] = NULL;
 
     // 可选：如果大小远小于容量，考虑缩小数组
     if (this->size > 0 && this->size <= this->capacity / 4 && this->capacity > DEFAULT_CAPACITY) {
@@ -403,15 +403,14 @@ static dsa_element_pt dynamic_array_pop_back(dsa_container_pt array) {
 }
 
 /// 尾部操作接口实现
-static container_back_interface_t const back_trait = {
+static trait_linear_t const linear_trait = {
     .push_back = dynamic_array_push_back,
     .pop_back = dynamic_array_pop_back,
 };
 
 /**
  * @brief 获取动态数组类型
- * 
- * @param array 指向动态数组的指针
+ *
  * @return 数组类型枚举值
  */
 static dsa_array_list_type_t dynamic_array_get_type() {
@@ -428,7 +427,7 @@ static char const *dynamic_array_get_type_name() {
 }
 
 /// 数组接口实现
-static array_list_interface_t const array_trait = {
+static trait_array_list_t const array_trait = {
     .get_type = dynamic_array_get_type,
     .get_type_name = dynamic_array_get_type_name,
 };
@@ -451,8 +450,8 @@ dsa_array_list_t *dynamic_array_create(size_t initial_capacity) {
     }
     array->basic = &basic_trait;
     array->random_access = &random_access_trait;
-    array->back = &back_trait;
-    array->array = &array_trait;
+    array->linear = &linear_trait;
+    array->array_list = &array_trait;
     array->size = 0;
     array->capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
     array->data = (dsa_element_pt *) malloc(array->capacity * sizeof(dsa_element_pt));

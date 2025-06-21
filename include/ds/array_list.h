@@ -504,7 +504,7 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  *
 //  * 类型安全的整型元素添加函数，避免了手动类型转换。
 //  *
-//  * @param[in,out] array 数组指针，不能为NULL
+//  * @param[in,out] array_list 数组指针，不能为NULL
 //  * @param[in] value 要添加的整型值
 //  *
 //  * @return dsa_result_t 操作结果
@@ -520,14 +520,14 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_get_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_push_back_int(dsa_array_list_t* array, int value);
+// dsa_result_t array_push_back_int(dsa_array_list_t* array_list, int value);
 //
 // /**
 //  * @brief 从整型数组获取元素
 //  *
 //  * 类型安全的整型元素获取函数。
 //  *
-//  * @param[in] array 数组指针，不能为NULL
+//  * @param[in] array_list 数组指针，不能为NULL
 //  * @param[in] index 元素索引，必须小于数组大小
 //  * @param[out] value 输出参数，存储获取的值，不能为NULL
 //  *
@@ -543,14 +543,14 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_set_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_get_int(const dsa_array_list_t* array, size_t index, int* value);
+// dsa_result_t array_get_int(const dsa_array_list_t* array_list, size_t index, int* value);
 //
 // /**
 //  * @brief 向整型数组设置元素
 //  *
 //  * 类型安全的整型元素设置函数。
 //  *
-//  * @param[in,out] array 数组指针，不能为NULL
+//  * @param[in,out] array_list 数组指针，不能为NULL
 //  * @param[in] index 元素索引，必须小于数组大小
 //  * @param[in] value 要设置的整型值
 //  *
@@ -566,14 +566,14 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_get_int()
 //  * @since 1.0
 //  */
-// dsa_result_t array_set_int(dsa_array_list_t* array, size_t index, int value);
+// dsa_result_t array_set_int(dsa_array_list_t* array_list, size_t index, int value);
 //
 // /**
 //  * @brief 向双精度浮点数组添加元素
 //  *
 //  * 类型安全的双精度浮点元素添加函数。
 //  *
-//  * @param[in,out] array 数组指针，不能为NULL
+//  * @param[in,out] array_list 数组指针，不能为NULL
 //  * @param[in] value 要添加的双精度浮点值
 //  *
 //  * @return dsa_result_t 操作结果
@@ -589,14 +589,14 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_get_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_push_back_double(dsa_array_list_t* array, double value);
+// dsa_result_t array_push_back_double(dsa_array_list_t* array_list, double value);
 //
 // /**
 //  * @brief 从双精度浮点数组获取元素
 //  *
 //  * 类型安全的双精度浮点元素获取函数。
 //  *
-//  * @param[in] array 数组指针，不能为NULL
+//  * @param[in] array_list 数组指针，不能为NULL
 //  * @param[in] index 元素索引，必须小于数组大小
 //  * @param[out] value 输出参数，存储获取的值，不能为NULL
 //  *
@@ -612,14 +612,14 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_set_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_get_double(const dsa_array_list_t* array, size_t index, double* value);
+// dsa_result_t array_get_double(const dsa_array_list_t* array_list, size_t index, double* value);
 //
 // /**
 //  * @brief 向双精度浮点数组设置元素
 //  *
 //  * 类型安全的双精度浮点元素设置函数。
 //  *
-//  * @param[in,out] array 数组指针，不能为NULL
+//  * @param[in,out] array_list 数组指针，不能为NULL
 //  * @param[in] index 元素索引，必须小于数组大小
 //  * @param[in] value 要设置的双精度浮点值
 //  *
@@ -635,7 +635,7 @@ void array_list_print_info(const dsa_array_list_t *array_list);
 //  * @see array_get_double()
 //  * @since 1.0
 //  */
-// dsa_result_t array_set_double(dsa_array_list_t* array, size_t index, double value);
+// dsa_result_t array_set_double(dsa_array_list_t* array_list, size_t index, double value);
 
 /** @} */ // end of type_safe_functions
 

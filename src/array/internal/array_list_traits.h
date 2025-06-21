@@ -41,6 +41,6 @@ typedef struct {
      * @warning 返回的字符串不应被修改，且其生命周期由实现者管理
      */
     char const *(*get_type_name)();
-} array_list_interface_t;
+} trait_array_list_t;
 
 #endif // DSA_ARRAY_TRAITS_H

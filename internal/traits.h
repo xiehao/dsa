@@ -55,7 +55,7 @@ typedef struct {
      * @return 容器中的元素数量
      */
     size_t (*get_size)(dsa_const_container_pt container);
-    
+
     /**
      * @brief 获取容器的最大容量
      * @param container 容器的常量指针
@@ -116,8 +116,9 @@ typedef struct {
 
 /**
  * @struct trait_linear_t
- * @brief 线性容器前端操作接口
- * @details 定义了支持前端操作的线性容器（如双端队列、列表）应实现的接口
+ * @brief 线性容器双端操作接口
+ * @details 定义了支持双端操作的线性容器（如双端队列、列表）应实现的接口，
+ *          包括在容器前端和后端进行元素插入和删除操作
  */
 typedef struct {
     /**
@@ -317,7 +318,7 @@ typedef struct {
  * @see dsa_const_iterator_pt
  * @see trait_iterator_t
  */
-typedef struct dsa_iterator_t* dsa_iterator_pt;
+typedef struct dsa_iterator_t *dsa_iterator_pt;
 
 /**
  * @typedef dsa_const_iterator_pt
@@ -339,7 +340,7 @@ typedef struct dsa_iterator_t* dsa_iterator_pt;
  * @see dsa_iterator_pt
  * @see trait_iterator_t
  */
-typedef const struct dsa_iterator_t* dsa_const_iterator_pt;
+typedef const struct dsa_iterator_t *dsa_const_iterator_pt;
 
 /**
  * @struct trait_iterator_t

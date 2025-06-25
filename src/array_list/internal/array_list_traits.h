@@ -7,8 +7,8 @@
  * @version 1.0
  */
 
-#ifndef DSA_ARRAY_TRAITS_H
-#define DSA_ARRAY_TRAITS_H
+#ifndef DSA_ARRAY_LIST_TRAITS_H
+#define DSA_ARRAY_LIST_TRAITS_H
 
 #include <traits.h>
 #include <ds/array_list.h>
@@ -46,4 +46,4 @@ typedef struct {
     char const *(*get_type_name)();
 } trait_array_list_t;
 
-#endif // DSA_ARRAY_TRAITS_H
+#endif // DSA_ARRAY_LIST_TRAITS_H

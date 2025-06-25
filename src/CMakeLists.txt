@@ -1,5 +1,5 @@
 # Add subdirectories for each data structure
-add_subdirectory(array)
+add_subdirectory(array_list)
 add_subdirectory(linked_list)
 add_subdirectory(stack)
 add_subdirectory(deque)
@@ -10,7 +10,7 @@ add_library(dsa_internal INTERFACE)
 # Link sub-libraries to the interface library
 target_link_libraries(dsa_internal INTERFACE
         ds_array_list
-        dsa_linked_list
+        ds_linked_list
         dsa_stack
         dsa_deque
 )

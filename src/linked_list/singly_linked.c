@@ -1,8 +1,7 @@
 //
 // Created by oaheixiehao on 2025/6/23.
 //
-
-#include <internal/single_linked.h>
+#include <internal/singly_linked.h>
 #include <internal/linked_list_traits.h>
 
 typedef struct node_t {
@@ -28,21 +27,30 @@ static bool singly_linked_is_empty(dsa_const_container_pt list) {
 
 static void singly_linked_clear(dsa_container_pt list) {
     singly_linked_t *this = list;
-    if (this) {
-        node_t *current = this->head;
+    if (this && this->head) {
+        // 跳过头结点，从第一个数据节点开始清理
+        node_t *current = this->head->next;
         while (current) {
             node_t *next = current->next;
             free(current);
             current = next;
         }
-        this->head = NULL;
-        this->size = 0; // 重置大小计数器
+        // 重置头结点的next指针和大小计数器
+        this->head->next = NULL;
+        this->size = 0;
     }
 }
 
 static void singly_linked_destroy(dsa_container_pt list) {
-    singly_linked_clear(list);
-    free(list);
+    singly_linked_t *this = list;
+    if (this) {
+        singly_linked_clear(list);
+        // 释放头结点
+        if (this->head) {
+            free(this->head);
+        }
+        free(this);
+    }
 }
 
 static trait_basic_t const basic_trait = {
@@ -52,22 +60,23 @@ static trait_basic_t const basic_trait = {
     .destroy = singly_linked_destroy,
 };
 
-// 内部辅助函数：根据索引查找节点
-static node_t *find_node_at(singly_linked_t *this, size_t index) {
-    if (!this || index >= this->size) {
+// 内部辅助函数：根据索引查找前一个节点（用于插入和删除操作）
+static node_t *find_node_before(singly_linked_t const *this, size_t index) {
+    if (!this || !this->head || index > this->size) {
         return NULL;
     }
 
-    node_t *current = this->head;
-    for (size_t i = 0; i < index; ++i) {
-        current = current->next;
+    // 从头结点开始查找前一个节点
+    node_t *previous = this->head;
+    for (size_t i = 0; i < index && previous->next; ++i) {
+        previous = previous->next;
     }
-    return current;
+    return previous;
 }
 
 static dsa_element_pt singly_linked_get(dsa_const_container_pt list, size_t index) {
     singly_linked_t const *this = list;
-    node_t *node = find_node_at(this, index);
+    node_t const *node = find_node_before(this, index + 1);
     return node ? node->data : NULL;
 }
 
@@ -77,7 +86,7 @@ static dsa_result_t singly_linked_set(dsa_container_pt list, size_t index, dsa_e
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *node = find_node_at(this, index);
+    node_t *node = find_node_before(this, index + 1);
     if (!node) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
@@ -111,23 +120,40 @@ static dsa_result_t attach_node_after(node_t *node, node_t *new_node) {
     return DSA_SUCCESS;
 }
 
-static dsa_result_t singly_linked_insert_after(dsa_container_pt list, size_t index, dsa_element_pt element) {
+// 重构后的插入函数
+static dsa_result_t singly_linked_insert_at(dsa_container_pt list, size_t index, dsa_element_pt element) {
     singly_linked_t *this = list;
-    if (!this || !element) {
+    if (!this || !this->head || !element) {
         return DSA_ERROR_NULL_POINTER;
     }
-    node_t *node = find_node_at(this, index);
-    if (!node) {
+
+    // 允许在末尾插入
+    if (index > this->size) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
+
+    // 使用统一的查找函数找到插入位置的前一个节点
+    node_t *previous_node = find_node_before(this, index);
+    if (!previous_node) {
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
+    }
+
     node_t *new_node;
     dsa_result_t result = create_node(element, &new_node);
-    if (DSA_SUCCESS != result) { return result; }
-    result = attach_node_after(node, new_node);
-    if (DSA_SUCCESS != result) { return result; }
+    if (DSA_SUCCESS != result) {
+        return result;
+    }
+
+    result = attach_node_after(previous_node, new_node);
+    if (DSA_SUCCESS != result) {
+        free(new_node);
+        return result;
+    }
+
     this->size++;
     return DSA_SUCCESS;
 }
+
 
 static node_t *detach_node_after(node_t *node) {
     if (!node || !node->next) { return NULL; }
@@ -138,16 +164,23 @@ static node_t *detach_node_after(node_t *node) {
 
 static dsa_element_pt singly_linked_remove_at(dsa_container_pt list, size_t index) {
     singly_linked_t *this = list;
-    if (!this) {
+    if (!this || !this->head || index >= this->size) {
         return NULL;
     }
-    node_t *node = find_node_at(this, index - 1);
-    if (!node || !node->next) {
+
+    // 使用统一的查找函数找到要删除节点的前一个节点
+    node_t *prev = find_node_before(this, index);
+    if (!prev || !prev->next) {
+        return NULL; // 没有要删除的节点
+    }
+
+    node_t *to_remove = detach_node_after(prev);
+    if (!to_remove) {
         return NULL;
     }
-    node_t *next = detach_node_after(node);
-    dsa_element_pt data = next->data;
-    free(next);
+
+    dsa_element_pt data = to_remove->data;
+    free(to_remove);
     this->size--;
     return data;
 }
@@ -155,7 +188,7 @@ static dsa_element_pt singly_linked_remove_at(dsa_container_pt list, size_t inde
 static trait_random_access_t const random_access_trait = {
     .get_at = singly_linked_get,
     .set_at = singly_linked_set,
-    .insert_at = singly_linked_insert_after,
+    .insert_at = singly_linked_insert_at, // 修正：使用insert_at而不是insert_after
     .remove_at = singly_linked_remove_at,
 };
 
@@ -177,11 +210,14 @@ static trait_linked_list_t const linked_list_trait = {
 dsa_linked_list_t *singly_linked_create() {
     singly_linked_t *list = malloc(sizeof(singly_linked_t));
     if (!list) { return NULL; }
-    node_t *head = malloc(sizeof(node_t));
-    if (!head || DSA_SUCCESS != create_node(NULL, &head)) {
+
+    node_t *head;
+    dsa_result_t result = create_node(NULL, &head);  // 传入NULL作为头结点数据
+    if (result != DSA_SUCCESS) {
         free(list);
         return NULL;
     }
+
     list->head = head;
     list->size = 0;
     list->traits = &linked_list_trait;

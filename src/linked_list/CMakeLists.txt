@@ -1,7 +1,7 @@
 # Add library target for linked_list
 add_library(ds_linked_list STATIC
         linked_list.c
-        single_linked.c
+        singly_linked.c
 )
 
 # 继承公共设置

@@ -6,9 +6,9 @@ project(dsa
 )
 
 # 设置默认构建类型（推荐添加）
-if(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
-endif()
+endif ()
 
 # Enable compile_commands.json generation
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -45,7 +45,7 @@ target_include_directories(dsa_internal_dev
 )
 
 # 可选：添加调试选项
-if(DSA_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (DSA_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(dsa_internal_dev
             INTERFACE
             $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:Clang>>:-fsanitize=address,undefined>
@@ -54,25 +54,25 @@ if(DSA_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
             INTERFACE
             $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:Clang>>:-fsanitize=address,undefined>
     )
-endif()
+endif ()
 
 # 添加源码子目录
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src")
     add_subdirectory(src)
-else()
+else ()
     message(WARNING "src directory not found")
-endif()
+endif ()
 
 # 创建主库目标
 add_library(${PROJECT_NAME} INTERFACE)
 target_link_libraries(${PROJECT_NAME} INTERFACE dsa_common)
 
 # 检查并链接内部目标
-if(TARGET dsa_internal)
+if (TARGET dsa_internal)
     target_link_libraries(${PROJECT_NAME} INTERFACE dsa_internal)
-else()
+else ()
     message(WARNING "dsa_internal target not found")
-endif()
+endif ()
 
 # 创建别名目标（推荐添加）
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -84,22 +84,22 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C Standard: C11")
 
 # 示例目录
-if(DSA_BUILD_EXAMPLES AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+if (DSA_BUILD_EXAMPLES AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples")
     add_subdirectory(examples)
-endif()
+endif ()
 
 # 测试配置
-if(DSA_BUILD_TESTS)
+if (DSA_BUILD_TESTS)
     enable_testing()
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
         add_subdirectory(tests)
-    endif()
-endif()
+    endif ()
+endif ()
 
 # 文档配置（可选）
-if(DSA_BUILD_DOCS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/docs")
+if (DSA_BUILD_DOCS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/docs")
     add_subdirectory(docs)
-endif()
+endif ()
 
 # 安装配置
 include(GNUInstallDirs)
@@ -109,11 +109,11 @@ install(TARGETS ${PROJECT_NAME} dsa_common
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
     install(DIRECTORY include/
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
-endif()
+endif ()
 
 # 导出目标
 install(EXPORT ${PROJECT_NAME}Targets

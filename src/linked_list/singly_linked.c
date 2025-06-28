@@ -15,42 +15,52 @@ typedef struct {
     size_t size;
 } singly_linked_t;
 
+// 查询类函数：返回数据，特殊值表示错误
 static size_t singly_linked_size(dsa_const_container_pt list) {
     singly_linked_t const *this = list;
-    return this ? this->size : 0;
+    return this ? this->size : SIZE_MAX; // SIZE_MAX表示错误
 }
 
 static bool singly_linked_is_empty(dsa_const_container_pt list) {
     singly_linked_t const *this = list;
-    return this ? this->size == 0 : true;
+    if (!this) return true; // NULL指针视为空
+    return this->size == 0;
 }
 
-static void singly_linked_clear(dsa_container_pt list) {
+// 修改类函数：返回错误码
+static dsa_result_t singly_linked_clear(dsa_container_pt list) {
     singly_linked_t *this = list;
-    if (this && this->head) {
-        // 跳过头结点，从第一个数据节点开始清理
-        node_t *current = this->head->next;
-        while (current) {
-            node_t *next = current->next;
-            free(current);
-            current = next;
-        }
-        // 重置头结点的next指针和大小计数器
-        this->head->next = NULL;
-        this->size = 0;
+    if (!this || !this->head) {
+        return DSA_ERROR_NULL_POINTER;
     }
+    
+    // 跳过头结点，从第一个数据节点开始清理
+    node_t *current = this->head->next;
+    while (current) {
+        node_t *next = current->next;
+        free(current);
+        current = next;
+    }
+    // 重置头结点的next指针和大小计数器
+    this->head->next = NULL;
+    this->size = 0;
+    return DSA_SUCCESS;
 }
 
-static void singly_linked_destroy(dsa_container_pt list) {
+// 析构类函数：返回错误码
+static dsa_result_t singly_linked_destroy(dsa_container_pt list) {
     singly_linked_t *this = list;
-    if (this) {
-        singly_linked_clear(list);
-        // 释放头结点
-        if (this->head) {
-            free(this->head);
-        }
-        free(this);
+    if (!this) {
+        return DSA_ERROR_NULL_POINTER;
     }
+    
+    dsa_result_t result = singly_linked_clear(list);
+    // 释放头结点
+    if (this->head) {
+        free(this->head);
+    }
+    free(this);
+    return result;
 }
 
 static trait_basic_t const basic_trait = {
@@ -61,6 +71,7 @@ static trait_basic_t const basic_trait = {
 };
 
 // 内部辅助函数：根据索引查找前一个节点（用于插入和删除操作）
+// 内部函数保持返回指针的方式
 static node_t *find_node_before(singly_linked_t const *this, size_t index) {
     if (!this || !this->head || index > this->size) {
         return NULL;
@@ -74,12 +85,18 @@ static node_t *find_node_before(singly_linked_t const *this, size_t index) {
     return previous;
 }
 
+// 查询类函数：返回数据，NULL表示错误
 static dsa_element_pt singly_linked_get(dsa_const_container_pt list, size_t index) {
     singly_linked_t const *this = list;
+    if (!this || index >= this->size) {
+        return NULL;
+    }
+    
     node_t const *node = find_node_before(this, index + 1);
     return node ? node->data : NULL;
 }
 
+// 修改类函数：返回错误码
 static dsa_result_t singly_linked_set(dsa_container_pt list, size_t index, dsa_element_pt element) {
     singly_linked_t *this = list;
     if (!this || !element) {
@@ -95,7 +112,7 @@ static dsa_result_t singly_linked_set(dsa_container_pt list, size_t index, dsa_e
     return DSA_SUCCESS;
 }
 
-// 内部辅助函数：创建新节点
+// 内部辅助函数：创建新节点 - 保持当前风格
 static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
     if (!out_node) {
         return DSA_ERROR_NULL_POINTER;
@@ -113,14 +130,17 @@ static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
     return DSA_SUCCESS;
 }
 
+// 内部辅助函数 - 保持返回错误码风格
 static dsa_result_t attach_node_after(node_t *node, node_t *new_node) {
-    if (!node || !new_node) { return DSA_ERROR_NULL_POINTER; }
+    if (!node || !new_node) { 
+        return DSA_ERROR_NULL_POINTER; 
+    }
     new_node->next = node->next;
     node->next = new_node;
     return DSA_SUCCESS;
 }
 
-// 重构后的插入函数
+// 修改类函数：返回错误码
 static dsa_result_t singly_linked_insert_at(dsa_container_pt list, size_t index, dsa_element_pt element) {
     singly_linked_t *this = list;
     if (!this || !this->head || !element) {
@@ -154,14 +174,17 @@ static dsa_result_t singly_linked_insert_at(dsa_container_pt list, size_t index,
     return DSA_SUCCESS;
 }
 
-
+// 内部辅助函数 - 返回指针
 static node_t *detach_node_after(node_t *node) {
-    if (!node || !node->next) { return NULL; }
+    if (!node || !node->next) { 
+        return NULL; 
+    }
     node_t *next = node->next;
     node->next = next->next;
     return next;
 }
 
+// 查询类函数：返回数据，NULL表示错误或空
 static dsa_element_pt singly_linked_remove_at(dsa_container_pt list, size_t index) {
     singly_linked_t *this = list;
     if (!this || !this->head || index >= this->size) {
@@ -188,14 +211,16 @@ static dsa_element_pt singly_linked_remove_at(dsa_container_pt list, size_t inde
 static trait_random_access_t const random_access_trait = {
     .get_at = singly_linked_get,
     .set_at = singly_linked_set,
-    .insert_at = singly_linked_insert_at, // 修正：使用insert_at而不是insert_after
+    .insert_at = singly_linked_insert_at,
     .remove_at = singly_linked_remove_at,
 };
 
+// 查询类函数：返回数据
 static dsa_linked_list_type_t singly_linked_get_type(void) {
     return LINKED_LIST_TYPE_SINGLY;
 }
 
+// 查询类函数：返回数据
 static char const *singly_linked_get_type_name(void) {
     return "单链表(Singly Linked List)";
 }
@@ -207,9 +232,12 @@ static trait_linked_list_t const linked_list_trait = {
     .get_type_name = singly_linked_get_type_name,
 };
 
+// 创建类函数：返回对象指针，NULL表示失败
 dsa_linked_list_t *singly_linked_create() {
     singly_linked_t *list = malloc(sizeof(singly_linked_t));
-    if (!list) { return NULL; }
+    if (!list) { 
+        return NULL; 
+    }
 
     node_t *head;
     dsa_result_t result = create_node(NULL, &head);  // 传入NULL作为头结点数据

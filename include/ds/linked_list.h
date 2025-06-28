@@ -25,7 +25,7 @@ size_t linked_list_size(const dsa_linked_list_t *linked_list);
 
 bool linked_list_is_empty(const dsa_linked_list_t *linked_list);
 
-void linked_list_clear(dsa_linked_list_t *linked_list);
+dsa_result_t linked_list_clear(dsa_linked_list_t *linked_list);
 
 /**
  * @brief 销毁链表并释放其关联的内存。
@@ -35,7 +35,7 @@ void linked_list_clear(dsa_linked_list_t *linked_list);
  *
  * @param linked_list 指向要销毁的 LinkedList 的指针。
  */
-void linked_list_destroy(dsa_linked_list_t *linked_list);
+dsa_result_t linked_list_destroy(dsa_linked_list_t *linked_list);
 
 /**
  * @brief 获取链表中指定索引处的元素但不移除它。
@@ -54,7 +54,7 @@ dsa_element_pt linked_list_get(const dsa_linked_list_t *linked_list, size_t inde
  * @param data A pointer to the new data. The old data at this index is overwritten but not freed by this function.
  * @return True if the data was set successfully, false if the index is out of bounds.
  */
-bool linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data);
+dsa_result_t linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data);
 
 /**
  * @brief 在链表的指定索引处插入一个元素。
@@ -64,7 +64,7 @@ bool linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_p
  * @param data 指向要插入的数据的指针。
  * @return 如果元素插入成功则返回 True，否则返回 false（例如，索引越界或分配失败）。
  */
-bool linked_list_insert_after(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data);
+dsa_result_t linked_list_insert_at(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data);
 
 /**
  * @brief 从链表的指定索引处移除并返回元素。

@@ -31,14 +31,14 @@ bool linked_list_is_empty(const dsa_linked_list_t *linked_list) {
     return linked_list ? linked_list->traits->basic->is_empty(linked_list) : true;
 }
 
-void linked_list_clear(dsa_linked_list_t *linked_list) {
-    if (!linked_list) { return; }
-    linked_list->traits->basic->clear(linked_list);
+dsa_result_t linked_list_clear(dsa_linked_list_t *linked_list) {
+    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
+    return linked_list->traits->basic->clear(linked_list);
 }
 
-void linked_list_destroy(dsa_linked_list_t *linked_list) {
-    if (!linked_list) { return; }
-    linked_list->traits->basic->destroy(linked_list);
+dsa_result_t linked_list_destroy(dsa_linked_list_t *linked_list) {
+    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
+    return linked_list->traits->basic->destroy(linked_list);
 }
 
 dsa_element_pt linked_list_get(const dsa_linked_list_t *linked_list, size_t index) {
@@ -46,13 +46,13 @@ dsa_element_pt linked_list_get(const dsa_linked_list_t *linked_list, size_t inde
     return linked_list->traits->random_access->get_at(linked_list, index);
 }
 
-bool linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
-    if (!linked_list) { return false; }
+dsa_result_t linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
+    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
     return linked_list->traits->random_access->set_at(linked_list, index, data);
 }
 
-bool linked_list_insert_after(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
-    if (!linked_list) { return false; }
+dsa_result_t linked_list_insert_at(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
+    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
     return linked_list->traits->random_access->insert_at(linked_list, index, data);
 }
 

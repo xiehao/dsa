@@ -23,9 +23,9 @@ int main() {
     *data3 = 30;
 
     // Insert elements
-    linked_list_insert_after(list, 0, data1);
-    linked_list_insert_after(list, 1, data2);
-    linked_list_insert_after(list, 2, data3);
+    linked_list_insert_at(list, 0, data1);
+    linked_list_insert_at(list, 1, data2);
+    linked_list_insert_at(list, 2, data3);
 
     // Print the list size
     printf("List size: %zu\n", linked_list_size(list));

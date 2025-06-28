@@ -80,30 +80,34 @@ typedef struct {
     /**
      * @brief 清空容器中的所有元素但不释放它们的内存
      * @param container 容器指针
+     * @return dsa_result_t 操作结果状态码
      * @note 此操作将容器重置为空状态，但不释放元素占用的内存
      */
-    void (*clear)(dsa_container_pt container);
+    dsa_result_t (*clear)(dsa_container_pt container);
 
     /**
      * @brief 清空容器并释放所有元素的内存
      * @param container 容器指针
+     * @return dsa_result_t 操作结果状态码
      * @note 此操作会释放所有元素占用的内存，然后重置容器为空状态
      */
-    void (*clear_with_free)(dsa_container_pt container);
+    dsa_result_t (*clear_with_free)(dsa_container_pt container);
 
     /**
      * @brief 销毁容器并释放相关资源
      * @param container 要销毁的容器指针
+     * @return dsa_result_t 操作结果状态码
      * @note 此函数不会释放容器元素的内存，仅释放容器结构本身的内存
      */
-    void (*destroy)(dsa_container_pt container);
+    dsa_result_t (*destroy)(dsa_container_pt container);
 
     /**
      * @brief 销毁容器并释放所有元素的内存
      * @param container 要销毁的容器指针
+     * @return dsa_result_t 操作结果状态码
      * @note 此函数会先释放容器中所有元素的内存，然后释放容器结构的内存
      */
-    void (*destroy_with_free)(dsa_container_pt container);
+    dsa_result_t (*destroy_with_free)(dsa_container_pt container);
 } trait_basic_t;
 
 /** @} */ // BasicInterface

@@ -98,33 +98,38 @@ static bool static_array_is_full(dsa_const_container_pt array) {
 /**
  * @brief 清空数组
  * @param array 数组容器指针
+ * @return DSA_SUCCESS 成功，DSA_ERROR_NULL_POINTER 空指针错误
  * @details 将数组大小重置为0，但不释放内存
  */
-static void static_array_clear(dsa_container_pt array) {
+static dsa_result_t static_array_clear(dsa_container_pt array) {
     if (array == NULL) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
     static_array_t *this = array;
     this->size = 0;
     // 可选：清除内存（非严格必要）
     // memset(arr->data, 0, arr->capacity * arr->element_size);
+    return DSA_SUCCESS;
 }
 
 /**
  * @brief 销毁数组
  * @param array 数组容器指针
+ * @return DSA_SUCCESS 成功，DSA_ERROR_NULL_POINTER 空指针错误
  * @details 重置数组结构体，但不释放外部管理的内存
  */
-static void static_array_destroy(dsa_container_pt array) {
+static dsa_result_t static_array_destroy(dsa_container_pt array) {
+    if (array == NULL) {
+        return DSA_ERROR_NULL_POINTER;
+    }
     static_array_t *this = array;
     // 对于内存由外部管理的静态数组（例如栈上的 VLA），
     // destroy 不需要释放内存。它只是重置结构体。
-    if (this) {
-        this->data = NULL;
-        this->size = 0;
-        this->capacity = 0;
-        this->element_size = 0;
-    }
+    this->data = NULL;
+    this->size = 0;
+    this->capacity = 0;
+    this->element_size = 0;
+    return DSA_SUCCESS;
 }
 
 /**

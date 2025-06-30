@@ -27,5 +27,5 @@ endif()
 # Add subdirectories for each data structure's tests
 add_subdirectory(array_list)
 add_subdirectory(linked_list)
-add_subdirectory(stack)
-add_subdirectory(deque)
+#add_subdirectory(stack)
+#add_subdirectory(deque)

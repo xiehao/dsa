@@ -59,7 +59,7 @@ static const char *get_error_string(dsa_result_t result) {
 }
 
 // ============================================================================
-// 创建和销毁函数
+// 创建函数
 // ============================================================================
 
 /**
@@ -90,28 +90,120 @@ dsa_array_list_t *array_list_create_dynamic(size_t initial_capacity) {
     return dynamic_array_create(initial_capacity);
 }
 
+// ============================================================================
+// 基本函数
+// ============================================================================
+
+/**
+ * @brief 获取数组当前大小
+ * @param array_list 数组指针
+ * @return 数组中元素的数量
+ * @note 如果数组指针无效，返回 0
+ */
+size_t array_list_size(const dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return 0;
+    }
+    return array_list->trait->basic->get_size(array_list);
+}
+
+/**
+ * @brief 获取数组容量
+ * @param array_list 数组指针
+ * @return 数组的最大容量
+ * @note 如果数组指针无效，返回 0
+ */
+size_t array_list_capacity(const dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return 0;
+    }
+    return array_list->trait->basic->get_capacity(array_list);
+}
+
+/**
+ * @brief 检查数组是否为空
+ * @param array_list 数组指针
+ * @return 如果数组为空返回 true，否则返回 false
+ * @note 如果数组指针无效，返回 true
+ */
+bool array_list_is_empty(const dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return true;
+    }
+    return array_list->trait->basic->is_empty(array_list);
+}
+
+/**
+ * @brief 检查数组是否已满
+ * @param array_list 数组指针
+ * @return 如果数组已满返回 true，否则返回 false
+ * @note 如果数组指针无效，返回 false
+ */
+bool array_list_is_full(const dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return false;
+    }
+    return array_list->trait->basic->is_full(array_list);
+}
+
+/**
+ * @brief 清空数组
+ * @param array_list 数组指针
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
+ * @note 移除所有元素但不释放元素内存
+ */
+dsa_result_t array_list_clear(dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return DSA_ERROR_NULL_POINTER;
+    }
+    return array_list->trait->basic->clear(array_list);
+}
+
+/**
+ * @brief 清空数组并释放所有元素内存
+ * @param array_list 数组指针
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
+ * @note 移除所有元素并释放它们占用的内存
+ */
+dsa_result_t array_list_clear_with_free(dsa_array_list_t *array_list) {
+    if (!is_valid_array(array_list)) {
+        return DSA_ERROR_NULL_POINTER;
+    }
+    return array_list->trait->basic->clear_with_free(array_list);
+}
+
 /**
  * @brief 销毁数组
  * @param array_list 要销毁的数组
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
  * @note 释放数组结构体占用的内存，但不释放元素内存
  */
-void array_list_destroy(dsa_array_list_t *array_list) {
+dsa_result_t array_list_destroy(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
-    array_list->trait->basic->destroy(array_list);
+    return array_list->trait->basic->destroy(array_list);
 }
 
 /**
  * @brief 销毁数组并释放所有内存
  * @param array_list 要销毁的数组
+ * @return 操作结果代码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 空指针错误
  * @note 释放数组结构体和所有元素占用的内存
  */
-void array_list_destroy_with_free(dsa_array_list_t *array_list) {
+dsa_result_t array_list_destroy_with_free(dsa_array_list_t *array_list) {
     if (!is_valid_array(array_list)) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
-    array_list->trait->basic->destroy_with_free(array_list);
+    return array_list->trait->basic->destroy_with_free(array_list);
 }
 
 // ============================================================================
@@ -210,62 +302,6 @@ dsa_element_pt array_list_remove(dsa_array_list_t *array_list, size_t index) {
     return array_list->trait->random_access->remove_at(array_list, index);
 }
 
-// ============================================================================
-// 查询函数
-// ============================================================================
-
-/**
- * @brief 获取数组当前大小
- * @param array_list 数组指针
- * @return 数组中元素的数量
- * @note 如果数组指针无效，返回 0
- */
-size_t array_list_size(const dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return 0;
-    }
-    return array_list->trait->basic->get_size(array_list);
-}
-
-/**
- * @brief 获取数组容量
- * @param array_list 数组指针
- * @return 数组的最大容量
- * @note 如果数组指针无效，返回 0
- */
-size_t array_list_capacity(const dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return 0;
-    }
-    return array_list->trait->basic->get_capacity(array_list);
-}
-
-/**
- * @brief 检查数组是否为空
- * @param array_list 数组指针
- * @return 如果数组为空返回 true，否则返回 false
- * @note 如果数组指针无效，返回 true
- */
-bool array_list_is_empty(const dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return true;
-    }
-    return array_list->trait->basic->is_empty(array_list);
-}
-
-/**
- * @brief 检查数组是否已满
- * @param array_list 数组指针
- * @return 如果数组已满返回 true，否则返回 false
- * @note 如果数组指针无效，返回 false
- */
-bool array_list_is_full(const dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return false;
-    }
-    return array_list->trait->basic->is_full(array_list);
-}
-
 /**
  * @brief 获取数组类型
  * @param array_list 数组指针
@@ -295,30 +331,6 @@ const char *array_list_get_type_name(const dsa_array_list_t *array_list) {
 // ============================================================================
 // 其他操作函数
 // ============================================================================
-
-/**
- * @brief 清空数组
- * @param array_list 数组指针
- * @note 移除所有元素但不释放元素内存
- */
-void array_list_clear(dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return;
-    }
-    return array_list->trait->basic->clear(array_list);
-}
-
-/**
- * @brief 清空数组并释放所有元素内存
- * @param array_list 数组指针
- * @note 移除所有元素并释放它们占用的内存
- */
-void array_list_clear_with_free(dsa_array_list_t *array_list) {
-    if (!is_valid_array(array_list)) {
-        return;
-    }
-    return array_list->trait->basic->clear_with_free(array_list);
-}
 
 /**
  * @brief 打印数组信息

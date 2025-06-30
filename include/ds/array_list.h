@@ -112,6 +112,135 @@ dsa_array_list_t *array_list_create_static(void *buffer, size_t capacity, size_t
  */
 dsa_array_list_t *array_list_create_dynamic(size_t initial_capacity);
 
+
+/**
+ * @brief 获取数组当前大小
+ *
+ * 返回数组中当前存储的元素个数。
+ *
+ * @param[in] array_list 数组指针
+ *
+ * @return size_t 数组大小
+ *
+ * @retval 0 array_list为NULL或数组为空
+ *
+ * @note 函数对NULL指针安全
+ *
+ * @see array_list_capacity()
+ * @see array_list_is_empty()
+ * @since 1.0
+ */
+size_t array_list_size(const dsa_array_list_t *array_list);
+
+/**
+ * @brief 获取数组容量
+ *
+ * 返回数组的最大容量（不触发扩容的情况下能存储的最大元素个数）。
+ *
+ * @param[in] array_list 数组指针
+ *
+ * @return size_t 数组容量
+ *
+ * @retval 0 array_list为NULL
+ *
+ * @note 函数对NULL指针安全
+ * @note 对于动态数组，容量可能在插入操作时自动增长
+ *
+ * @see array_list_size()
+ * @see array_list_is_full()
+ * @since 1.0
+ */
+size_t array_list_capacity(const dsa_array_list_t *array_list);
+
+/**
+ * @brief 检查数组是否为空
+ *
+ * 检查数组中是否包含任何元素。
+ *
+ * @param[in] array_list 数组指针
+ *
+ * @return bool 空返回true，否则返回false
+ *
+ * @retval true array_list为NULL或数组为空
+ * @retval false 数组包含至少一个元素
+ *
+ * @note 函数对NULL指针安全
+ *
+ * @see array_list_size()
+ * @see array_list_is_full()
+ * @since 1.0
+ */
+bool array_list_is_empty(const dsa_array_list_t *array_list);
+
+/**
+ * @brief 检查数组是否已满
+ *
+ * 检查数组是否已达到容量上限。对于动态数组，总是返回false
+ * （因为可以自动扩容）。
+ *
+ * @param[in] array_list 数组指针
+ *
+ * @return bool 满返回true，否则返回false
+ *
+ * @retval false array_list为NULL
+ * @retval false 动态数组（总是可以扩容）
+ * @retval true 静态数组且大小等于容量
+ * @retval false 静态数组且大小小于容量
+ *
+ * @note 函数对NULL指针安全
+ * @note 动态数组总是返回false
+ *
+ * @see array_list_size()
+ * @see array_list_capacity()
+ * @see array_list_is_empty()
+ * @since 1.0
+ */
+bool array_list_is_full(const dsa_array_list_t *array_list);
+
+/**
+ * @brief 清空数组
+ *
+ * 移除数组中的所有元素，但不释放元素指向的内存。数组容量保持不变。
+ *
+ * @param[in,out] array_list 数组指针，可以为NULL
+ *
+ * @return dsa_result_t 操作结果
+ *
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER array_list为NULL
+ *
+ * @note 函数对NULL指针安全，但会返回错误码
+ * @note 不会释放元素指向的内存
+ * @note 如需释放元素内存，请使用 array_list_clear_with_free()
+ *
+ * @see array_list_clear_with_free()
+ * @since 1.0
+ */
+dsa_result_t array_list_clear(dsa_array_list_t *array_list);
+
+/**
+ * @brief 清空数组并释放元素内存
+ *
+ * 移除数组中的所有元素，并释放每个元素指向的内存。
+ *
+ * @param[in,out] array_list 数组指针，可以为NULL
+ *
+ * @return dsa_result_t 操作结果
+ *
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER array_list为NULL
+ * @retval DSA_ERROR_MEMORY_OPERATION 内存释放过程中发生错误
+ *
+ * @note 函数对NULL指针安全，但会返回错误码
+ * @note 对于动态数组：释放所有元素指向的内存，然后清空数组
+ * @note 对于静态数组：只清空数组，不释放元素内存（静默降级为普通clear）
+ * @warning 仅适用于元素为指针类型且指向malloc分配内存的情况
+ *
+ * @see array_list_clear()
+ * @since 1.0
+ */
+dsa_result_t array_list_clear_with_free(dsa_array_list_t *array_list);
+
 /**
  * @brief 销毁数组
  *
@@ -120,13 +249,19 @@ dsa_array_list_t *array_list_create_dynamic(size_t initial_capacity);
  *
  * @param[in] array_list 要销毁的数组指针，可以为NULL
  *
- * @note 函数对NULL指针安全
+ * @return dsa_result_t 操作结果
+ *
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER array_list为NULL
+ * @retval DSA_ERROR_MEMORY_OPERATION 内存释放过程中发生错误
+ *
+ * @note 函数对NULL指针安全，但会返回错误码
  * @note 如果需要释放元素指向的内存，请使用 array_list_destroy_with_free()
  *
  * @see array_list_destroy_with_free()
  * @since 1.0
  */
-void array_list_destroy(dsa_array_list_t *array_list);
+dsa_result_t array_list_destroy(dsa_array_list_t *array_list);
 
 /**
  * @brief 销毁动态数组并释放所有元素
@@ -136,17 +271,24 @@ void array_list_destroy(dsa_array_list_t *array_list);
  *
  * @param[in] array_list 要销毁的数组指针，可以为NULL
  *
+ * @return dsa_result_t 操作结果
+ *
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER array_list为NULL
+ * @retval DSA_ERROR_MEMORY_OPERATION 内存释放过程中发生错误
+ * @retval DSA_ERROR_INVALID_OPERATION 对静态数组执行此操作
+ *
  * @warning 仅适用于动态数组
  * @warning 仅适用于元素为指针类型的数组
  * @warning 元素指向的内存必须是通过malloc分配的
  *
- * @note 函数对NULL指针安全
- * @note 对静态数组调用此函数等同于调用 array_list_destroy()
+ * @note 函数对NULL指针安全，但会返回错误码
+ * @note 对静态数组调用此函数会返回错误码，但仍会执行基本的destroy操作
  *
  * @see array_list_destroy()
  * @since 1.0
  */
-void array_list_destroy_with_free(dsa_array_list_t *array_list);
+dsa_result_t array_list_destroy_with_free(dsa_array_list_t *array_list);
 
 /** @} */ // end of creation_destruction
 
@@ -308,90 +450,6 @@ dsa_element_pt array_list_remove(dsa_array_list_t *array_list, size_t index);
  */
 
 /**
- * @brief 获取数组当前大小
- *
- * 返回数组中当前存储的元素个数。
- *
- * @param[in] array_list 数组指针
- *
- * @return size_t 数组大小
- *
- * @retval 0 array_list为NULL或数组为空
- *
- * @note 函数对NULL指针安全
- *
- * @see array_list_capacity()
- * @see array_list_is_empty()
- * @since 1.0
- */
-size_t array_list_size(const dsa_array_list_t *array_list);
-
-/**
- * @brief 获取数组容量
- *
- * 返回数组的最大容量（不触发扩容的情况下能存储的最大元素个数）。
- *
- * @param[in] array_list 数组指针
- *
- * @return size_t 数组容量
- *
- * @retval 0 array_list为NULL
- *
- * @note 函数对NULL指针安全
- * @note 对于动态数组，容量可能在插入操作时自动增长
- *
- * @see array_list_size()
- * @see array_list_is_full()
- * @since 1.0
- */
-size_t array_list_capacity(const dsa_array_list_t *array_list);
-
-/**
- * @brief 检查数组是否为空
- *
- * 检查数组中是否包含任何元素。
- *
- * @param[in] array_list 数组指针
- *
- * @return bool 空返回true，否则返回false
- *
- * @retval true array_list为NULL或数组为空
- * @retval false 数组包含至少一个元素
- *
- * @note 函数对NULL指针安全
- *
- * @see array_list_size()
- * @see array_list_is_full()
- * @since 1.0
- */
-bool array_list_is_empty(const dsa_array_list_t *array_list);
-
-/**
- * @brief 检查数组是否已满
- *
- * 检查数组是否已达到容量上限。对于动态数组，总是返回false
- * （因为可以自动扩容）。
- *
- * @param[in] array_list 数组指针
- *
- * @return bool 满返回true，否则返回false
- *
- * @retval false array_list为NULL
- * @retval false 动态数组（总是可以扩容）
- * @retval true 静态数组且大小等于容量
- * @retval false 静态数组且大小小于容量
- *
- * @note 函数对NULL指针安全
- * @note 动态数组总是返回false
- *
- * @see array_list_size()
- * @see array_list_capacity()
- * @see array_list_is_empty()
- * @since 1.0
- */
-bool array_list_is_full(const dsa_array_list_t *array_list);
-
-/**
  * @brief 获取数组类型
  *
  * 返回数组的类型（静态或动态）。
@@ -438,39 +496,6 @@ const char *array_list_get_type_name(const dsa_array_list_t *array_list);
  * @brief 数组的实用工具函数
  * @{
  */
-
-/**
- * @brief 清空数组
- *
- * 移除数组中的所有元素，但不释放元素指向的内存。数组容量保持不变。
- *
- * @param[in,out] array_list 数组指针，可以为NULL
- *
- * @note 函数对NULL指针安全
- * @note 不会释放元素指向的内存
- * @note 如需释放元素内存，请使用 array_list_clear_with_free()
- *
- * @see array_list_clear_with_free()
- * @since 1.0
- */
-void array_list_clear(dsa_array_list_t *array_list);
-
-/**
- * @brief 清空数组并释放元素内存
- *
- * 移除数组中的所有元素，并释放每个元素指向的内存。
- *
- * @param[in,out] array_list 数组指针，可以为NULL
- *
- * @note 函数对NULL指针安全
- * @note 对于动态数组：释放所有元素指向的内存，然后清空数组
- * @note 对于静态数组：只清空数组，不释放元素内存（静默降级为普通clear）
- * @warning 仅适用于元素为指针类型且指向malloc分配内存的情况
- *
- * @see array_list_clear()
- * @since 1.0
- */
-void array_list_clear_with_free(dsa_array_list_t *array_list);
 
 /**
  * @brief 打印数组信息（用于调试）

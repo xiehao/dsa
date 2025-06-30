@@ -153,14 +153,16 @@ static bool dynamic_array_is_full(dsa_const_container_pt array) {
  * 也不释放数组的存储空间。数组可以继续使用。
  *
  * @param array 指向要清空的DynamicArray的指针
+ * @return DSA_SUCCESS 表示操作成功，DSA_ERROR_NULL_POINTER 表示数组指针为空
  */
-static void dynamic_array_clear(dsa_container_pt array) {
+static dsa_result_t dynamic_array_clear(dsa_container_pt array) {
     if (!array) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
     dynamic_array_t *this = array;
     // 只重置大小，保留容量和数据指针
     this->size = 0;
+    return DSA_SUCCESS;
 }
 
 /**
@@ -170,10 +172,11 @@ static void dynamic_array_clear(dsa_container_pt array) {
  * 然后将数组大小重置为0。数组结构本身保留，可以继续使用。
  *
  * @param array 指向要清空的DynamicArray的指针
+ * @return DSA_SUCCESS 表示操作成功，DSA_ERROR_NULL_POINTER 表示数组指针为空
  */
-static void dynamic_array_clear_with_free(dsa_container_pt array) {
+static dsa_result_t dynamic_array_clear_with_free(dsa_container_pt array) {
     if (!array) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
     dynamic_array_t *this = array;
     // 释放每个元素指向的内存
@@ -183,6 +186,7 @@ static void dynamic_array_clear_with_free(dsa_container_pt array) {
     }
     // 重置大小，保留容量
     this->size = 0;
+    return DSA_SUCCESS;
 }
 
 /**
@@ -192,17 +196,19 @@ static void dynamic_array_clear_with_free(dsa_container_pt array) {
  * 调用者需要自行管理元素的生命周期。
  *
  * @param array 指向要销毁的动态数组的指针
+ * @return DSA_SUCCESS 表示操作成功，DSA_ERROR_NULL_POINTER 表示数组指针为空
  */
-static void dynamic_array_destroy(dsa_container_pt array) {
+static dsa_result_t dynamic_array_destroy(dsa_container_pt array) {
     dynamic_array_t const *this = array;
     if (!this) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
     // 注意：此函数不会释放数组指向的元素，
     // 因为数组只存储指针。调用者负责管理
     // 实际元素的生命周期。
     free(this->data);
     free(array);
+    return DSA_SUCCESS;
 }
 
 /**
@@ -213,10 +219,11 @@ static void dynamic_array_destroy(dsa_container_pt array) {
  * 只有当数组存储的是堆分配的指针时才应使用此函数。
  *
  * @param array 指向要销毁的DynamicArray的指针
+ * @return DSA_SUCCESS 表示操作成功，DSA_ERROR_NULL_POINTER 表示数组指针为空
  */
-static void dynamic_array_destroy_with_free(dsa_container_pt array) {
+static dsa_result_t dynamic_array_destroy_with_free(dsa_container_pt array) {
     if (!array) {
-        return;
+        return DSA_ERROR_NULL_POINTER;
     }
     dynamic_array_t *this = array;
     // 释放每个元素指向的内存
@@ -228,6 +235,7 @@ static void dynamic_array_destroy_with_free(dsa_container_pt array) {
     free(this->data);
     // 释放动态数组结构本身
     free(array);
+    return DSA_SUCCESS;
 }
 
 /// 基本容器接口实现

@@ -14,8 +14,8 @@ static int *create_int(int value) {
     return data;
 }
 
-// 链表创建测试用例
-static void test_linked_list_creation(void **state) {
+// 单链表创建测试用例
+static void test_singly_linked_list_creation(void **state) {
     (void) state; // 未使用
     // 根据错误信息，linked_list_create需要1个参数（可能是释放函数）
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
@@ -26,8 +26,8 @@ static void test_linked_list_creation(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试向链表头部添加元素 - 使用 linked_list_add 在索引0处添加
-static void test_linked_list_add_first(void **state) {
+// 测试向单链表头部添加元素 - 使用 linked_list_add 在索引0处添加
+static void test_singly_linked_list_add_first(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY); // 使用NULL以便手动管理内存
     int *data1 = create_int(10);
@@ -50,8 +50,8 @@ static void test_linked_list_add_first(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试向链表尾部添加元素 - 使用 linked_list_add 在末尾添加
-static void test_linked_list_add_last(void **state) {
+// 测试向单链表尾部添加元素 - 使用 linked_list_add 在末尾添加
+static void test_singly_linked_list_add_last(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     int *data1 = create_int(10);
@@ -73,8 +73,8 @@ static void test_linked_list_add_last(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试从链表头部移除元素 - 使用 linked_list_remove 从索引0移除
-static void test_linked_list_remove_first(void **state) {
+// 测试从单链表头部移除元素 - 使用 linked_list_remove 从索引0移除
+static void test_singly_linked_list_remove_first(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     int *data1 = create_int(10);
@@ -102,8 +102,8 @@ static void test_linked_list_remove_first(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试从链表尾部移除元素 - 使用 linked_list_remove 从最后索引移除
-static void test_linked_list_remove_last(void **state) {
+// 测试从单链表尾部移除元素 - 使用 linked_list_remove 从最后索引移除
+static void test_singly_linked_list_remove_last(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     int *data1 = create_int(10);
@@ -131,8 +131,8 @@ static void test_linked_list_remove_last(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试按索引获取元素
-static void test_linked_list_get(void **state) {
+// 测试按索引获取单链表元素
+static void test_singly_linked_list_get(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     int *data1 = create_int(10);
@@ -157,8 +157,8 @@ static void test_linked_list_get(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试按索引设置元素
-static void test_linked_list_set(void **state) {
+// 测试按索引设置单链表元素
+static void test_singly_linked_list_set(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     int *data1 = create_int(10);
@@ -192,8 +192,8 @@ static void test_linked_list_set(void **state) {
     linked_list_destroy(list);
 }
 
-// 测试空列表上的操作
-static void test_linked_list_empty_operations(void **state) {
+// 测试单链表空列表上的操作
+static void test_singly_linked_list_empty_operations(void **state) {
     (void) state;
     dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
     assert_true(linked_list_is_empty(list));
@@ -209,14 +209,14 @@ static void test_linked_list_empty_operations(void **state) {
 
 int main(void) {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_linked_list_creation),
-        cmocka_unit_test(test_linked_list_add_first),
-        cmocka_unit_test(test_linked_list_add_last),
-        cmocka_unit_test(test_linked_list_remove_first),
-        cmocka_unit_test(test_linked_list_remove_last),
-        cmocka_unit_test(test_linked_list_get),
-        cmocka_unit_test(test_linked_list_set),
-        cmocka_unit_test(test_linked_list_empty_operations),
+        cmocka_unit_test(test_singly_linked_list_creation),
+        cmocka_unit_test(test_singly_linked_list_add_first),
+        cmocka_unit_test(test_singly_linked_list_add_last),
+        cmocka_unit_test(test_singly_linked_list_remove_first),
+        cmocka_unit_test(test_singly_linked_list_remove_last),
+        cmocka_unit_test(test_singly_linked_list_get),
+        cmocka_unit_test(test_singly_linked_list_set),
+        cmocka_unit_test(test_singly_linked_list_empty_operations),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

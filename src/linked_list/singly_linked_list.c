@@ -178,7 +178,7 @@ static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *new_node = (node_t *) malloc(sizeof(node_t));
+    node_t *new_node = malloc(sizeof(node_t));
     if (!new_node) {
         return DSA_ERROR_MEMORY_ALLOCATION;
     }

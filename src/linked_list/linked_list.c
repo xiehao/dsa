@@ -6,12 +6,13 @@
  * @date 2025-06-28
  */
 
-#include "ds/linked_list.h"
+#include <ds/linked_list.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <common.h>
 #include <internal/linked_list_traits.h>
 #include <internal/singly_linked_list.h>
+#include <internal/doubly_linked_list.h>
 
 /**
  * @brief 链表结构体定义
@@ -33,7 +34,7 @@ dsa_linked_list_t *linked_list_create(dsa_linked_list_type_t type) {
         case LINKED_LIST_TYPE_SINGLY:
             return singly_linked_create();
         case LINKED_LIST_TYPE_DOUBLY:
-        // return NULL;
+            return doubly_linked_create();
         case LINKED_LIST_TYPE_CIRCULAR:
             // return NULL;
         default:

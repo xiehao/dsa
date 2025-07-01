@@ -14,8 +14,8 @@
 #include <internal/array_list_traits.h>
 
 // 包含内部头文件
-#include <internal/static_array.h>
-#include <internal/dynamic_array.h>
+#include <internal/static_array_list.h>
+#include <internal/dynamic_array_list.h>
 
 /**
  * @brief 数组结构体定义

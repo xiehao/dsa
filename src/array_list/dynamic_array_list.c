@@ -5,7 +5,7 @@
  * @date 2025-06-15
  */
 
-#include <internal/dynamic_array.h>
+#include <internal/dynamic_array_list.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

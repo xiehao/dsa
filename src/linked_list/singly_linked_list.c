@@ -6,7 +6,7 @@
  * @date 2025/6/23
  */
 
-#include <internal/singly_linked.h>
+#include <internal/singly_linked_list.h>
 #include <internal/linked_list_traits.h>
 
 /**
@@ -139,10 +139,6 @@ static node_t *find_node_before(singly_linked_t const *this, size_t index) {
  */
 static dsa_element_pt singly_linked_get(dsa_const_container_pt list, size_t index) {
     singly_linked_t const *this = list;
-    if (!this || index >= this->size) {
-        return NULL;
-    }
-
     node_t const *node = find_node_before(this, index + 1);
     return node ? node->data : NULL;
 }

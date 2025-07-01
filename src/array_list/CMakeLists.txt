@@ -1,7 +1,7 @@
 # Add library target for array modules
 add_library(ds_array_list STATIC
-        dynamic_array.c
-        static_array.c
+        dynamic_array_list.c
+        static_array_list.c
         array_list.c
 )
 

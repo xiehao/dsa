@@ -245,7 +245,7 @@ typedef struct {
      * @note 如果多个元素匹配，返回第一个匹配的元素
      */
     dsa_element_pt (*find)(dsa_const_container_pt container, dsa_element_pt element,
-                           int (*compare)(const void *a, const void *b));
+                           compare_func_t compare);
 
     /**
      * @brief 查找元素在容器中的索引
@@ -255,7 +255,7 @@ typedef struct {
      * @return 元素的索引，如果未找到则返回容器大小
      */
     size_t (*find_index)(dsa_const_container_pt container, dsa_element_pt element,
-                         int (*compare)(const void *a, const void *b));
+                         compare_func_t compare);
 
     /**
      * @brief 检查容器是否包含指定元素
@@ -265,7 +265,7 @@ typedef struct {
      * @return 如果容器包含该元素则返回true，否则返回false
      */
     bool (*contains)(dsa_const_container_pt container, dsa_element_pt element,
-                     int (*compare)(const void *a, const void *b));
+                     compare_func_t compare);
 
     /**
      * @brief 计算容器中匹配指定元素的数量
@@ -275,7 +275,7 @@ typedef struct {
      * @return 匹配元素的数量
      */
     size_t (*count)(dsa_const_container_pt container, dsa_element_pt element,
-                    int (*compare)(const void *a, const void *b));
+                    compare_func_t compare);
 } trait_search_t;
 
 /** @} */ // SearchInterface
@@ -514,7 +514,7 @@ typedef struct {
      * @param compare 比较函数，签名为int (*)(const void*, const void*)，
      *               小于返回负值，等于返回0，大于返回正值
      */
-    void (*sort)(dsa_container_pt container, int (*compare)(const void *lhs, const void *rhs));
+    void (*sort)(dsa_container_pt container, compare_func_t compare);
 
     /**
      * @brief 反转容器中元素的顺序
@@ -572,25 +572,25 @@ typedef struct {
 typedef struct {
     /**
      * @brief 比较两个容器是否相等
-     * @param container1 第一个容器的常量指针
-     * @param container2 第二个容器的常量指针
+     * @param lhs 第一个容器的常量指针
+     * @param rhs 第二个容器的常量指针
      * @param compare 元素比较函数，签名为int (*)(const void*, const void*)
      * @return 如果两个容器大小相等且所有对应元素都相等则返回true，否则返回false
      */
-    bool (*equals)(dsa_const_container_pt container1, dsa_const_container_pt container2,
-                   int (*compare)(const void *a, const void *b));
+    bool (*equals)(dsa_const_container_pt lhs, dsa_const_container_pt rhs,
+                   compare_func_t compare);
 
     /**
      * @brief 比较两个容器的顺序
-     * @param container1 第一个容器的常量指针
-     * @param container2 第二个容器的常量指针
+     * @param lhs 第一个容器的常量指针
+     * @param rhs 第二个容器的常量指针
      * @param compare 元素比较函数，签名为int (*)(const void*, const void*)
      * @return 负值表示container1小于container2，0表示相等，正值表示大于
      * @note 比较方式类似于字典序：先比较第一对不相等的元素，如果所有对应元素都相等，则较短的容器较小
      */
-    int (*compare_containers)(dsa_const_container_pt container1,
-                              dsa_const_container_pt container2,
-                              int (*compare)(const void *a, const void *b));
+    int (*compare_containers)(dsa_const_container_pt lhs,
+                              dsa_const_container_pt rhs,
+                              compare_func_t compare);
 
     /**
      * @brief 创建容器的完整副本

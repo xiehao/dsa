@@ -27,6 +27,46 @@
 typedef void *dsa_element_pt;
 
 /**
+ * @typedef dsa_const_element_pt
+ * @brief 通用常量元素指针类型
+ * @details 用于表示指向任意类型常量数据的通用指针，提供类型安全的只读抽象接口。
+ *          与 dsa_element_pt 相对应，确保指向的数据不能被修改，适用于只读访问场景。
+ *          在具体使用时需要转换为相应的具体类型常量指针。
+ * @note 此类型保证指向的数据内容不可修改，提供额外的类型安全保障
+ * @see dsa_element_pt
+ */
+typedef void const *dsa_const_element_pt;
+
+/**
+ * @typedef compare_func_t
+ * @brief 通用比较函数指针类型
+ * @details 定义了用于比较两个元素的函数指针类型，广泛用于排序、搜索等算法中。
+ *          比较函数应该实现严格弱序关系，以确保算法的正确性。
+ * @param lhs 左操作数，指向要比较的第一个元素的常量指针
+ * @param rhs 右操作数，指向要比较的第二个元素的常量指针
+ * @return 比较结果的整数值：
+ *         - 负数：lhs < rhs（左操作数小于右操作数）
+ *         - 零：  lhs == rhs（两操作数相等）
+ *         - 正数：lhs > rhs（左操作数大于右操作数）
+ * @note 比较函数必须满足以下性质：
+ *       - 反对称性：如果 f(a,b) < 0，则 f(b,a) > 0
+ *       - 传递性：如果 f(a,b) < 0 且 f(b,c) < 0，则 f(a,c) < 0
+ *       - 等价传递性：如果 f(a,b) == 0 且 f(b,c) == 0，则 f(a,c) == 0
+ * @warning 传入的指针参数不能为NULL，比较函数需要对此进行检查
+ * @example
+ * @code
+ * // 整数比较函数示例
+ * int int_compare(dsa_const_element_pt lhs, dsa_const_element_pt rhs) {
+ *     int a = ELEMENT_VALUE(int, lhs);
+ *     int b = ELEMENT_VALUE(int, rhs);
+ *     return (a > b) - (a < b);  // 返回 -1, 0, 或 1
+ * }
+ * @endcode
+ * @see dsa_const_element_pt
+ */
+typedef int (*compare_func_t)(dsa_const_element_pt lhs, dsa_const_element_pt rhs);
+
+/**
  * @enum dsa_result_t
  * @brief 数据结构操作结果枚举
  * @details 定义了DSA库中所有操作可能返回的结果状态码，

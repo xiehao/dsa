@@ -2,22 +2,56 @@
 
 本项目包含了一些常见数据结构和算法的C语言实现。
 
+## 项目结构
+
+```
+dsa/
+├── CMakeLists.txt          # CMake主配置文件
+├── include/                # 头文件目录
+│   ├── common.h            # 通用定义
+│   ├── ds/                 # 数据结构接口
+│   │   ├── array_list.h    # 动态数组接口
+│   │   └── linked_list.h   # 链表接口
+│   └── adt/                # 抽象数据类型
+│       ├── stack.h         # 栈接口
+│       └── deque.h         # 双端队列接口
+├── src/                    # 源代码实现目录
+│   ├── array_list/         # 动态数组实现
+│   ├── linked_list/        # 链表实现
+│   ├── stack/              # 栈实现
+│   └── deque/              # 双端队列实现
+├── tests/                  # 单元测试代码
+└── examples/               # 使用示例
+```
+
 ## 功能特性
 
 目前已实现的数据结构包括：
 
-*   **统一数组接口 (Unified Array Interface):** 位于 `include/dsa/array.h`
-    - 支持静态数组和动态数组的统一操作接口
-    - 提供类型安全的便利函数（如 `array_push_back_int`）
-    - 函数式接口，便于调试和教学
-    - 内部实现封装在 `src/array/` 目录
-*   **链表 (Linked List):** 位于 `src/linked_list` 和 `include/dsa/linked_list.h`
-*   **栈 (Stack):** 位于 `src/stack` 和 `include/dsa/stack.h` (基于统一数组接口实现)
-*   **双端队列 (Deque):** 位于 `src/deque` 和 `include/dsa/deque.h`
+*   **动态数组 (Array List):** 位于 `include/ds/array_list.h`
+    - 支持动态扩容的数组实现
+    - 提供类型安全的操作接口
+    - 内部实现封装在 `src/array_list/` 目录
+*   **链表 (Linked List):** 位于 `src/linked_list` 和 `include/ds/linked_list.h`
+*   **栈 (Stack):** 位于 `src/stack` 和 `include/adt/stack.h`
+*   **双端队列 (Deque):** 位于 `src/deque` 和 `include/adt/deque.h`
 
 ## 构建项目
 
 本项目使用 CMake 进行构建。
+
+### 前提条件
+- CMake 3.10 或更高版本
+- C编译器 (GCC, Clang, 或 MSVC)
+
+### 构建步骤
+
+### 前提条件
+
+- CMake 3.10 或更高版本
+- C编译器 (GCC, Clang, 或 MSVC)
+
+### 构建步骤
 
 1.  **配置项目 (包含测试):**
     为了确保包含单元测试，推荐使用 `-DBUILD_TESTING=ON` 选项：
@@ -50,15 +84,13 @@ ctest --test-dir build --output-on-failure
 
 ```bash
 # 确保从项目根目录运行，或者先 cd build
-build/tests/array/test_unified_array    # 统一数组接口测试
-build/tests/array/test_static_array     # 静态数组测试
-build/tests/array/test_array            # 动态数组测试
-build/tests/linked_list/test_linked_list
-build/tests/stack/test_stack
-build/tests/deque/test_deque
+build/tests/array_list/test_array_list     # 动态数组测试
+build/tests/linked_list/test_linked_list   # 链表测试
+build/tests/adt/test_stack                 # 栈测试
+build/tests/adt/test_deque                 # 双端队列测试
 ```
 
-(注意：你需要先成功构建项目，这些可执行文件才会存在于 `build` 目录下)
+**注意**：你需要先成功构建项目，这些可执行文件才会存在于 `build` 目录下。
 
 ## 示例
 

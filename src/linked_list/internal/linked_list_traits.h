@@ -5,8 +5,8 @@
  * @date 2025/6/23
  */
 
-#ifndef LINKED_LIST_TRAIT_H
-#define LINKED_LIST_TRAIT_H
+#ifndef DSA_LINKED_LIST_TRAITS_H
+#define DSA_LINKED_LIST_TRAITS_H
 
 #include <traits.h>
 #include <ds/linked_list.h>
@@ -39,13 +39,13 @@ typedef struct {
      * @brief 获取链表类型的函数指针
      * @return 返回链表的类型枚举值
      */
-    dsa_linked_list_type_t (*get_type)();
+    dsa_linked_list_type_t (*get_type)(void);
 
     /**
      * @brief 获取链表类型名称的函数指针
      * @return 返回链表类型的字符串描述
      */
-    char const *(*get_type_name)();
+    char const *(*get_type_name)(void);
 } trait_linked_list_t;
 
-#endif //LINKED_LIST_TRAIT_H
+#endif // DSA_LINKED_LIST_TRAITS_H

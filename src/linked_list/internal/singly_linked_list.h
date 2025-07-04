@@ -30,6 +30,6 @@
  * }
  * @endcode
  */
-dsa_linked_list_t *singly_linked_create();
+dsa_linked_list_t *singly_linked_create(void);
 
 #endif // SINGLY_LINKED_H

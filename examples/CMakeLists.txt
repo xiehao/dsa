@@ -34,3 +34,14 @@ target_include_directories(example_circular_linked_list PRIVATE ${CMAKE_SOURCE_D
 add_executable(example_linked_list linked_list_example.c)
 target_link_libraries(example_linked_list PRIVATE ds_linked_list)
 target_include_directories(example_linked_list PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Stack Examples
+# Add array stack example executable
+add_executable(example_array_stack array_stack_example.c)
+target_link_libraries(example_array_stack PRIVATE adt_stack)
+target_include_directories(example_array_stack PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Add linked stack example executable
+add_executable(example_linked_stack linked_stack_example.c)
+target_link_libraries(example_linked_stack PRIVATE adt_stack)
+target_include_directories(example_linked_stack PRIVATE ${CMAKE_SOURCE_DIR}/include)

@@ -341,7 +341,7 @@ static trait_linked_list_t const linked_list_trait = {
  * @note 创建类函数：返回对象指针，NULL表示失败
  * @details 分配内存并初始化单链表结构，包括创建哨兵头节点
  */
-dsa_linked_list_t *singly_linked_create() {
+dsa_linked_list_t *singly_linked_create(void) {
     singly_linked_t *list = malloc(sizeof(singly_linked_t));
     if (!list) { 
         return NULL; 

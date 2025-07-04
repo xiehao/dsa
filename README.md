@@ -56,6 +56,13 @@ dsa/
 - **循环链表**: 尾节点连接头节点，适合循环操作
 - **统一接口**: 相同的API操作不同类型的链表
 
+### 📚 栈 (Stack)
+- **数组栈**: 基于动态数组实现，LIFO访问模式，内存局部性好
+- **链表栈**: 基于单链表实现，完全动态内存分配，无容量限制
+- **高效操作**: O(1)时间复杂度的压入、弹出、查看栈顶
+- **统一接口**: 相同的API操作不同类型的栈实现
+- **类型安全**: 支持运行时类型识别和多态操作
+
 ### 🎯 核心特性
 - **工厂模式**: 通过类型参数创建不同的数据结构实例
 - **内存管理**: 自动内存管理和清理功能
@@ -120,6 +127,11 @@ ctest --output-on-failure
 ./build/tests/linked_list/test_singly_linked_list
 ./build/tests/linked_list/test_doubly_linked_list
 ./build/tests/linked_list/test_circular_linked_list
+
+# 栈测试
+./build/tests/stack/test_stack              # 通用栈测试
+./build/tests/stack/test_array_stack        # 数组栈专用测试
+./build/tests/stack/test_linked_stack       # 链表栈专用测试
 ```
 
 ### 测试覆盖范围
@@ -143,6 +155,10 @@ ctest --output-on-failure
 ./build/examples/example_singly_linked_list     # 单链表演示
 ./build/examples/example_doubly_linked_list     # 双链表演示
 ./build/examples/example_circular_linked_list   # 循环链表演示
+
+# 栈示例
+./build/examples/example_array_stack            # 数组栈演示
+./build/examples/example_linked_stack           # 链表栈演示
 ```
 
 ### 🔄 综合示例

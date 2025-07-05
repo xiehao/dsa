@@ -125,6 +125,92 @@ static void demonstrate_basic_operations(void) {
 }
 
 /**
+ * @brief 演示循环链表的linear_trait功能
+ */
+static void demonstrate_linear_trait_operations(void) {
+    printf("\n🔄 Linear Trait 操作演示\n");
+    printf("========================================\n");
+    printf("演示循环链表的push_front, push_back, pop_front, pop_back操作\n");
+    printf("循环链表的特点：内部结构是循环的，但操作接口与其他链表一致\n");
+
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_CIRCULAR);
+    if (!list) {
+        printf("❌ 创建循环链表失败\n");
+        return;
+    }
+
+    print_list(list, "初始状态");
+
+    // 演示push_front操作
+    printf("\n📥 Push Front 操作演示\n");
+    for (int i = 1; i <= 3; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_front(list, data) == DSA_SUCCESS) {
+            printf("✅ push_front(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示push_back操作
+    printf("\n📥 Push Back 操作演示\n");
+    for (int i = 4; i <= 6; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_back(list, data) == DSA_SUCCESS) {
+            printf("✅ push_back(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示循环特性
+    printf("\n🔄 循环特性演示\n");
+    printf("虽然内部是循环结构，但通过标准接口访问时表现为线性：\n");
+    printf("第一个元素: %d\n", *(int*)linked_list_get(list, 0));
+    printf("最后一个元素: %d\n", *(int*)linked_list_get(list, linked_list_size(list) - 1));
+
+    // 演示pop操作
+    printf("\n📤 Pop 操作演示\n");
+    printf("交替从前端和后端弹出元素：\n");
+
+    for (int i = 0; i < 3; i++) {
+        if (i % 2 == 0) {
+            // 从前端弹出
+            int *popped = (int*)linked_list_pop_front(list);
+            if (popped) {
+                printf("✅ pop_front() 返回: %d\n", *popped);
+                free(popped);
+                print_list(list, "pop_front后");
+            }
+        } else {
+            // 从后端弹出
+            int *popped = (int*)linked_list_pop_back(list);
+            if (popped) {
+                printf("✅ pop_back() 返回: %d\n", *popped);
+                free(popped);
+                print_list(list, "pop_back后");
+            }
+        }
+    }
+
+    // 演示循环链表在单元素时的特性
+    printf("\n🔄 单元素循环链表特性\n");
+    int *single_data = create_int(999);
+    linked_list_push_front(list, single_data);
+    print_list(list, "单元素循环链表");
+    printf("注意：单元素循环链表中，该元素的next指针指向自己\n");
+
+    // 清空并测试空链表操作
+    linked_list_clear(list);
+    printf("\n⚠️ 空循环链表操作测试\n");
+    printf("pop_front() 在空链表上: %s\n",
+           linked_list_pop_front(list) == NULL ? "返回NULL（正确）" : "异常");
+    printf("pop_back() 在空链表上: %s\n",
+           linked_list_pop_back(list) == NULL ? "返回NULL（正确）" : "异常");
+
+    linked_list_destroy(list);
+    printf("✅ Linear Trait 演示完成\n");
+}
+
+/**
  * @brief 演示循环链表的边界情况处理
  */
 static void demonstrate_edge_cases(void) {
@@ -283,7 +369,10 @@ int main(void) {
     
     // 基本操作演示
     demonstrate_basic_operations();
-    
+
+    // Linear Trait 操作演示
+    demonstrate_linear_trait_operations();
+
     // 边界情况演示
     demonstrate_edge_cases();
     

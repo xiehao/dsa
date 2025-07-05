@@ -180,73 +180,71 @@ dsa_result_t linked_list_insert_at(dsa_linked_list_t *linked_list, size_t index,
  */
 dsa_element_pt linked_list_remove_at(dsa_linked_list_t *list, size_t index);
 
-// 以下是被注释掉的函数，为了完整性也添加了注释
+/**
+ * @brief 在链表的开头添加一个元素
+ *
+ * 在链表的第一个位置插入新元素，原有元素向后移动。
+ * 这是一个O(1)时间复杂度的操作。
+ *
+ * @param list 指向链表的指针
+ * @param data 指向要添加数据的指针
+ * @return 操作结果状态码
+ * @retval DSA_SUCCESS 添加成功
+ * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
+ * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+ * 
+ * @pre list != NULL
+ * @post linked_list_size(list) 增加1
+ */
+dsa_result_t linked_list_push_front(dsa_linked_list_t* list, dsa_element_pt data);
 
-// /**
-//  * @brief 在链表的开头添加一个元素
-//  *
-//  * 在链表的第一个位置插入新元素，原有元素向后移动。
-//  * 这是一个O(1)时间复杂度的操作。
-//  *
-//  * @param list 指向链表的指针
-//  * @param data 指向要添加数据的指针
-//  * @return 操作结果状态码
-//  * @retval DSA_SUCCESS 添加成功
-//  * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
-//  * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
-//  * 
-//  * @pre list != NULL
-//  * @post linked_list_size(list) 增加1
-//  */
-// dsa_result_t linked_list_add_first(dsa_linked_list_t* list, dsa_element_pt data);
-//
-// /**
-//  * @brief 在链表的末尾添加一个元素
-//  *
-//  * 在链表的最后位置添加新元素。对于单向链表，
-//  * 这可能是O(n)操作，对于双向链表是O(1)操作。
-//  *
-//  * @param list 指向链表的指针
-//  * @param data 指向要添加数据的指针
-//  * @return 操作结果状态码
-//  * @retval DSA_SUCCESS 添加成功
-//  * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
-//  * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
-//  * 
-//  * @pre list != NULL
-//  * @post linked_list_size(list) 增加1
-//  */
-// dsa_result_t linked_list_add_last(dsa_linked_list_t* list, dsa_element_pt data);
-//
-// /**
-//  * @brief 从链表的开头移除并返回元素
-//  *
-//  * 移除并返回链表的第一个元素。这是一个O(1)时间复杂度的操作。
-//  *
-//  * @param list 指向链表的指针
-//  * @return 指向被移除元素数据的指针，如果链表为空则返回NULL
-//  * 
-//  * @pre list != NULL
-//  * @post 如果链表不为空，linked_list_size(list) 减少1
-//  * 
-//  * @note 调用者负责释放返回的数据指针所指向的内存（如果需要的话）
-//  */
-// dsa_element_pt linked_list_remove_first(dsa_linked_list_t* list);
-//
-// /**
-//  * @brief 从链表的末尾移除并返回元素
-//  *
-//  * 移除并返回链表的最后一个元素。对于单向链表，
-//  * 这可能是O(n)操作，对于双向链表是O(1)操作。
-//  *
-//  * @param list 指向链表的指针
-//  * @return 指向被移除元素数据的指针，如果链表为空则返回NULL
-//  * 
-//  * @pre list != NULL
-//  * @post 如果链表不为空，linked_list_size(list) 减少1
-//  * 
-//  * @note 调用者负责释放返回的数据指针所指向的内存（如果需要的话）
-//  */
-// dsa_element_pt linked_list_remove_last(dsa_linked_list_t* list);
+/**
+ * @brief 在链表的末尾添加一个元素
+ *
+ * 在链表的最后位置添加新元素。对于单向链表，
+ * 这可能是O(n)操作，对于双向链表是O(1)操作。
+ *
+ * @param list 指向链表的指针
+ * @param data 指向要添加数据的指针
+ * @return 操作结果状态码
+ * @retval DSA_SUCCESS 添加成功
+ * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
+ * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+ * 
+ * @pre list != NULL
+ * @post linked_list_size(list) 增加1
+ */
+dsa_result_t linked_list_push_back(dsa_linked_list_t* list, dsa_element_pt data);
+
+/**
+ * @brief 从链表的开头移除并返回元素
+ *
+ * 移除并返回链表的第一个元素。这是一个O(1)时间复杂度的操作。
+ *
+ * @param list 指向链表的指针
+ * @return 指向被移除元素数据的指针，如果链表为空则返回NULL
+ * 
+ * @pre list != NULL
+ * @post 如果链表不为空，linked_list_size(list) 减少1
+ * 
+ * @note 调用者负责释放返回的数据指针所指向的内存（如果需要的话）
+ */
+dsa_element_pt linked_list_pop_front(dsa_linked_list_t* list);
+
+/**
+ * @brief 从链表的末尾移除并返回元素
+ *
+ * 移除并返回链表的最后一个元素。对于单向链表，
+ * 这可能是O(n)操作，对于双向链表是O(1)操作。
+ *
+ * @param list 指向链表的指针
+ * @return 指向被移除元素数据的指针，如果链表为空则返回NULL
+ * 
+ * @pre list != NULL
+ * @post 如果链表不为空，linked_list_size(list) 减少1
+ * 
+ * @note 调用者负责释放返回的数据指针所指向的内存（如果需要的话）
+ */
+dsa_element_pt linked_list_pop_back(dsa_linked_list_t* list);
 
 #endif // DSA_LINKED_LIST_H

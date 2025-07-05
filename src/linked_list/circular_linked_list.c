@@ -326,6 +326,41 @@ static trait_random_access_t const random_access_trait = {
     .remove_at = circular_linked_remove_at,
 };
 
+static dsa_result_t circular_linked_push_front(dsa_container_pt list, dsa_element_pt element) {
+    circular_linked_t *this = list;
+    return this
+               ? circular_linked_insert_at(this, 0, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_result_t circular_linked_push_back(dsa_container_pt list, dsa_element_pt element) {
+    circular_linked_t *this = list;
+    return this
+               ? circular_linked_insert_at(this, this->size, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_element_pt circular_linked_pop_front(dsa_container_pt list) {
+    circular_linked_t *this = list;
+    return this
+               ? circular_linked_remove_at(this, 0)
+               : NULL;
+}
+
+static dsa_element_pt circular_linked_pop_back(dsa_container_pt list) {
+    circular_linked_t *this = list;
+    return this && this->size > 0
+               ? circular_linked_remove_at(this, this->size - 1)
+               : NULL;
+}
+
+static trait_linear_t const linear_trait = {
+    .push_front = circular_linked_push_front,
+    .push_back = circular_linked_push_back,
+    .pop_front = circular_linked_pop_front,
+    .pop_back = circular_linked_pop_back,
+};
+
 /**
  * @brief 获取链表类型
  * @return 返回循环链表类型标识
@@ -351,6 +386,7 @@ static char const *circular_linked_get_type_name(void) {
 static trait_linked_list_t const linked_list_trait = {
     .basic = &basic_trait,
     .random_access = &random_access_trait,
+    .linear = &linear_trait,
     .get_type = circular_linked_get_type,
     .get_type_name = circular_linked_get_type_name,
 };

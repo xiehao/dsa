@@ -29,11 +29,11 @@ typedef struct {
     /** @brief 指向基本特性接口的常量指针 */
     trait_basic_t const *basic;
 
-    /** @brief 指向线性特性接口的常量指针 */
-    trait_linear_t const *linear;
-
     /** @brief 指向随机访问特性接口的常量指针 */
     trait_random_access_t const *random_access;
+
+    /** @brief 指向线性特性接口的常量指针 */
+    trait_linear_t const *linear;
 
     /**
      * @brief 获取链表类型的函数指针

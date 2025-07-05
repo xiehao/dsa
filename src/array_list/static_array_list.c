@@ -298,7 +298,7 @@ static trait_linear_t const linear_trait = {
  * @brief 获取数组类型
  * @return 数组类型枚举值
  */
-static dsa_array_list_type_t static_array_get_type() {
+static dsa_array_list_type_t static_array_get_type(void) {
     return ARRAY_LIST_TYPE_STATIC;
 }
 
@@ -306,7 +306,7 @@ static dsa_array_list_type_t static_array_get_type() {
  * @brief 获取数组类型名称
  * @return 数组类型名称字符串
  */
-static char const *static_array_get_type_name() {
+static char const *static_array_get_type_name(void) {
     return "静态数组(Static Array)";
 }
 

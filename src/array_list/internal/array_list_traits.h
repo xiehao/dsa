@@ -34,7 +34,7 @@ typedef struct {
      * @return dsa_array_type_t 数组类型枚举值
      * @retval 具体的数组类型值，如动态数组、静态数组等
      */
-    dsa_array_list_type_t (*get_type)();
+    dsa_array_list_type_t (*get_type)(void);
     
     /**
      * @brief 获取数组类型名称
@@ -43,7 +43,7 @@ typedef struct {
      * @retval 非空的字符串指针，包含类型的可读名称
      * @warning 返回的字符串不应被修改，且其生命周期由实现者管理
      */
-    char const *(*get_type_name)();
+    char const *(*get_type_name)(void);
 } trait_array_list_t;
 
 #endif // DSA_ARRAY_LIST_TRAITS_H

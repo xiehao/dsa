@@ -581,6 +581,195 @@ static void test_doubly_linked_list_single_element(void **state) {
     linked_list_destroy(list);
 }
 
+// 测试双链表的push_front操作
+static void test_doubly_linked_list_push_front(void **state) {
+    (void) state;
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    int *data1 = create_int(10);
+    int *data2 = create_int(20);
+    int *data3 = create_int(30);
+
+    // 测试push_front操作
+    assert_int_equal(linked_list_push_front(list, data1), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 1);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+
+    assert_int_equal(linked_list_push_front(list, data2), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 2);
+    assert_ptr_equal(linked_list_get(list, 0), data2); // 新元素在前面
+    assert_ptr_equal(linked_list_get(list, 1), data1);
+
+    assert_int_equal(linked_list_push_front(list, data3), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 3);
+    assert_ptr_equal(linked_list_get(list, 0), data3); // 最新元素在最前面
+    assert_ptr_equal(linked_list_get(list, 1), data2);
+    assert_ptr_equal(linked_list_get(list, 2), data1);
+
+    // 测试NULL指针
+    assert_int_equal(linked_list_push_front(NULL, data1), DSA_ERROR_NULL_POINTER);
+
+    free(data1);
+    free(data2);
+    free(data3);
+    linked_list_destroy(list);
+}
+
+// 测试双链表的push_back操作
+static void test_doubly_linked_list_push_back(void **state) {
+    (void) state;
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    int *data1 = create_int(10);
+    int *data2 = create_int(20);
+    int *data3 = create_int(30);
+
+    // 测试push_back操作
+    assert_int_equal(linked_list_push_back(list, data1), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 1);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+
+    assert_int_equal(linked_list_push_back(list, data2), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 2);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+    assert_ptr_equal(linked_list_get(list, 1), data2); // 新元素在后面
+
+    assert_int_equal(linked_list_push_back(list, data3), DSA_SUCCESS);
+    assert_int_equal(linked_list_size(list), 3);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+    assert_ptr_equal(linked_list_get(list, 1), data2);
+    assert_ptr_equal(linked_list_get(list, 2), data3); // 最新元素在最后面
+
+    // 测试NULL指针
+    assert_int_equal(linked_list_push_back(NULL, data1), DSA_ERROR_NULL_POINTER);
+
+    free(data1);
+    free(data2);
+    free(data3);
+    linked_list_destroy(list);
+}
+
+// 测试双链表的pop_front操作
+static void test_doubly_linked_list_pop_front(void **state) {
+    (void) state;
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    int *data1 = create_int(10);
+    int *data2 = create_int(20);
+    int *data3 = create_int(30);
+
+    // 先添加一些元素
+    linked_list_push_back(list, data1);
+    linked_list_push_back(list, data2);
+    linked_list_push_back(list, data3);
+
+    // 测试pop_front操作
+    void *popped = linked_list_pop_front(list);
+    assert_ptr_equal(popped, data1);
+    assert_int_equal(linked_list_size(list), 2);
+    assert_ptr_equal(linked_list_get(list, 0), data2);
+    free(popped);
+
+    popped = linked_list_pop_front(list);
+    assert_ptr_equal(popped, data2);
+    assert_int_equal(linked_list_size(list), 1);
+    assert_ptr_equal(linked_list_get(list, 0), data3);
+    free(popped);
+
+    popped = linked_list_pop_front(list);
+    assert_ptr_equal(popped, data3);
+    assert_int_equal(linked_list_size(list), 0);
+    assert_true(linked_list_is_empty(list));
+    free(popped);
+
+    // 测试空链表pop_front
+    popped = linked_list_pop_front(list);
+    assert_null(popped);
+
+    // 测试NULL指针
+    assert_null(linked_list_pop_front(NULL));
+
+    linked_list_destroy(list);
+}
+
+// 测试双链表的pop_back操作
+static void test_doubly_linked_list_pop_back(void **state) {
+    (void) state;
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    int *data1 = create_int(10);
+    int *data2 = create_int(20);
+    int *data3 = create_int(30);
+
+    // 先添加一些元素
+    linked_list_push_back(list, data1);
+    linked_list_push_back(list, data2);
+    linked_list_push_back(list, data3);
+
+    // 测试pop_back操作（双链表的优势：O(1)时间复杂度）
+    void *popped = linked_list_pop_back(list);
+    assert_ptr_equal(popped, data3);
+    assert_int_equal(linked_list_size(list), 2);
+    assert_ptr_equal(linked_list_get(list, 1), data2);
+    free(popped);
+
+    popped = linked_list_pop_back(list);
+    assert_ptr_equal(popped, data2);
+    assert_int_equal(linked_list_size(list), 1);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+    free(popped);
+
+    popped = linked_list_pop_back(list);
+    assert_ptr_equal(popped, data1);
+    assert_int_equal(linked_list_size(list), 0);
+    assert_true(linked_list_is_empty(list));
+    free(popped);
+
+    // 测试空链表pop_back
+    popped = linked_list_pop_back(list);
+    assert_null(popped);
+
+    // 测试NULL指针
+    assert_null(linked_list_pop_back(NULL));
+
+    linked_list_destroy(list);
+}
+
+// 测试双链表的高效双端操作
+static void test_doubly_linked_list_efficient_double_ended_operations(void **state) {
+    (void) state;
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    int *data1 = create_int(10);
+    int *data2 = create_int(20);
+    int *data3 = create_int(30);
+    int *data4 = create_int(40);
+
+    // 测试双链表的双端操作优势：所有操作都是O(1)
+    linked_list_push_front(list, data2);  // [20]
+    linked_list_push_back(list, data3);   // [20, 30]
+    linked_list_push_front(list, data1);  // [10, 20, 30]
+    linked_list_push_back(list, data4);   // [10, 20, 30, 40]
+
+    assert_int_equal(linked_list_size(list), 4);
+    assert_ptr_equal(linked_list_get(list, 0), data1);
+    assert_ptr_equal(linked_list_get(list, 1), data2);
+    assert_ptr_equal(linked_list_get(list, 2), data3);
+    assert_ptr_equal(linked_list_get(list, 3), data4);
+
+    // 高效的双端删除操作
+    void *popped_back = linked_list_pop_back(list);    // 移除40，剩余[10, 20, 30]
+    assert_ptr_equal(popped_back, data4);
+    free(popped_back);
+
+    void *popped_front = linked_list_pop_front(list);  // 移除10，剩余[20, 30]
+    assert_ptr_equal(popped_front, data1);
+    free(popped_front);
+
+    assert_int_equal(linked_list_size(list), 2);
+    assert_ptr_equal(linked_list_get(list, 0), data2);
+    assert_ptr_equal(linked_list_get(list, 1), data3);
+
+    free(data2);
+    free(data3);
+    linked_list_destroy(list);
+}
+
 // 主测试函数
 int main(void) {
     const struct CMUnitTest tests[] = {
@@ -602,6 +791,12 @@ int main(void) {
         cmocka_unit_test(test_doubly_linked_list_null_pointer_handling),
         cmocka_unit_test(test_doubly_linked_list_different_data_types),
         cmocka_unit_test(test_doubly_linked_list_single_element),
+        // Linear trait tests
+        cmocka_unit_test(test_doubly_linked_list_push_front),
+        cmocka_unit_test(test_doubly_linked_list_push_back),
+        cmocka_unit_test(test_doubly_linked_list_pop_front),
+        cmocka_unit_test(test_doubly_linked_list_pop_back),
+        cmocka_unit_test(test_doubly_linked_list_efficient_double_ended_operations),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

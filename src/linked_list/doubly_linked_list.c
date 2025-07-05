@@ -16,9 +16,9 @@
  * @details 双向链表的基本节点，包含指向前一个和后一个节点的指针，以及数据指针
  */
 typedef struct node_t {
-    struct node_t *previous;  /**< 指向前一个节点的指针 */
-    struct node_t *next;      /**< 指向后一个节点的指针 */
-    dsa_element_pt data;      /**< 节点存储的数据指针 */
+    struct node_t *previous; /**< 指向前一个节点的指针 */
+    struct node_t *next; /**< 指向后一个节点的指针 */
+    dsa_element_pt data; /**< 节点存储的数据指针 */
 } node_t;
 
 /**
@@ -26,10 +26,10 @@ typedef struct node_t {
  * @details 双向链表的主要结构，包含特征表、哨兵节点和大小信息
  */
 typedef struct {
-    trait_linked_list_t const *traits;  /**< 链表特征函数表指针 */
-    node_t *head;                        /**< 头哨兵节点指针 */
-    node_t *tail;                        /**< 尾哨兵节点指针 */
-    size_t size;                         /**< 链表中元素的数量 */
+    trait_linked_list_t const *traits; /**< 链表特征函数表指针 */
+    node_t *head; /**< 头哨兵节点指针 */
+    node_t *tail; /**< 尾哨兵节点指针 */
+    size_t size; /**< 链表中元素的数量 */
 } doubly_linked_t;
 
 /**
@@ -139,6 +139,12 @@ static trait_basic_t const basic_trait = {
 static node_t *find_node_before(doubly_linked_t const *this, size_t index) {
     if (!this || !this->head || index > this->size) {
         return NULL;
+    }
+
+    if (this->size == index) {
+        return this->tail->previous;
+    } else if (this->size == index + 1) {
+        return this->tail->previous->previous;
     }
 
     node_t *node = this->head;
@@ -356,6 +362,41 @@ static trait_random_access_t const random_access_trait = {
     .remove_at = doubly_linked_remove_at,
 };
 
+static dsa_result_t doubly_linked_push_front(dsa_container_pt list, dsa_element_pt element) {
+    doubly_linked_t *this = list;
+    return this
+               ? doubly_linked_insert_at(this, 0, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_result_t doubly_linked_push_back(dsa_container_pt list, dsa_element_pt element) {
+    doubly_linked_t *this = list;
+    return this
+               ? doubly_linked_insert_at(this, this->size, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_element_pt doubly_linked_pop_front(dsa_container_pt list) {
+    doubly_linked_t *this = list;
+    return this
+               ? doubly_linked_remove_at(list, 0)
+               : NULL;
+}
+
+static dsa_element_pt doubly_linked_pop_back(dsa_container_pt list) {
+    doubly_linked_t *this = list;
+    return this && this->size > 0
+               ? doubly_linked_remove_at(list, this->size - 1)
+               : NULL;
+}
+
+static trait_linear_t const linear_trait = {
+    .push_front = doubly_linked_push_front,
+    .push_back = doubly_linked_push_back,
+    .pop_front = doubly_linked_pop_front,
+    .pop_back = doubly_linked_pop_back,
+};
+
 /**
  * @brief 获取链表类型
  * @return 链表类型枚举值
@@ -381,6 +422,7 @@ static char const *doubly_linked_get_type_name() {
 static trait_linked_list_t const doubly_linked_trait = {
     .basic = &basic_trait,
     .random_access = &random_access_trait,
+    .linear = &linear_trait,
     .get_type = doubly_linked_get_type,
     .get_type_name = doubly_linked_get_type_name,
 };

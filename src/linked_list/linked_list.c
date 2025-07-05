@@ -72,8 +72,9 @@ bool linked_list_is_empty(const dsa_linked_list_t *linked_list) {
  * @pre linked_list 不能为NULL
  */
 dsa_result_t linked_list_clear(dsa_linked_list_t *linked_list) {
-    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
-    return linked_list->traits->basic->clear(linked_list);
+    return linked_list
+               ? linked_list->traits->basic->clear(linked_list)
+               : DSA_ERROR_NULL_POINTER;
 }
 
 /**
@@ -86,8 +87,9 @@ dsa_result_t linked_list_clear(dsa_linked_list_t *linked_list) {
  * @warning 调用此函数后，链表指针将变为无效
  */
 dsa_result_t linked_list_destroy(dsa_linked_list_t *linked_list) {
-    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
-    return linked_list->traits->basic->destroy(linked_list);
+    return linked_list
+               ? linked_list->traits->basic->destroy(linked_list)
+               : DSA_ERROR_NULL_POINTER;
 }
 
 /**
@@ -99,8 +101,9 @@ dsa_result_t linked_list_destroy(dsa_linked_list_t *linked_list) {
  * @pre index 必须在有效范围内
  */
 dsa_element_pt linked_list_get(const dsa_linked_list_t *linked_list, size_t index) {
-    if (!linked_list) { return NULL; }
-    return linked_list->traits->random_access->get_at(linked_list, index);
+    return linked_list
+               ? linked_list->traits->random_access->get_at(linked_list, index)
+               : NULL;
 }
 
 /**
@@ -116,8 +119,9 @@ dsa_element_pt linked_list_get(const dsa_linked_list_t *linked_list, size_t inde
  * @pre index 必须在有效范围内
  */
 dsa_result_t linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
-    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
-    return linked_list->traits->random_access->set_at(linked_list, index, data);
+    return linked_list
+               ? linked_list->traits->random_access->set_at(linked_list, index, data)
+               : DSA_ERROR_NULL_POINTER;
 }
 
 /**
@@ -134,8 +138,9 @@ dsa_result_t linked_list_set(dsa_linked_list_t *linked_list, size_t index, dsa_e
  * @pre index 必须在有效范围内（0到size）
  */
 dsa_result_t linked_list_insert_at(dsa_linked_list_t *linked_list, size_t index, dsa_element_pt data) {
-    if (!linked_list) { return DSA_ERROR_NULL_POINTER; }
-    return linked_list->traits->random_access->insert_at(linked_list, index, data);
+    return linked_list
+               ? linked_list->traits->random_access->insert_at(linked_list, index, data)
+               : DSA_ERROR_NULL_POINTER;
 }
 
 /**
@@ -148,6 +153,65 @@ dsa_result_t linked_list_insert_at(dsa_linked_list_t *linked_list, size_t index,
  * @note 调用者负责释放返回的元素内存
  */
 dsa_element_pt linked_list_remove_at(dsa_linked_list_t *linked_list, size_t index) {
-    if (!linked_list) { return NULL; }
-    return linked_list->traits->random_access->remove_at(linked_list, index);
+    return linked_list
+               ? linked_list->traits->random_access->remove_at(linked_list, index)
+               : NULL;
+}
+
+/**
+ * @brief 在链表的开头添加一个元素
+ * @param linked_list 链表指针
+ * @param data 要添加的数据指针
+ * @return 操作结果码
+ * @retval DSA_SUCCESS 操作成功
+ * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
+ * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+ * @pre linked_list 不能为NULL
+ */
+dsa_result_t linked_list_push_front(dsa_linked_list_t *linked_list, dsa_element_pt data) {
+    return linked_list
+               ? linked_list->traits->linear->push_front(linked_list, data)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+/**
+ * @brief 在链表的末尾添加一个元素
+ * @param linked_list 链表指针
+ * @param data 要添加的数据指针
+ * @return 操作结果码
+ * @retval DSA_SUCCESS 操作成功 
+ * @retval DSA_ERROR_NULL_POINTER 链表指针为NULL
+ * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
+ * @pre linked_list 不能为NULL
+ */
+dsa_result_t linked_list_push_back(dsa_linked_list_t *linked_list, dsa_element_pt data) {
+    return linked_list
+               ? linked_list->traits->linear->push_back(linked_list, data)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+/**
+ * @brief 从链表的开头移除并返回元素
+ * @param linked_list 链表指针
+ * @return 成功返回被移除的元素指针，失败返回NULL
+ * @pre linked_list 不能为NULL
+ * @note 调用者负责释放返回的元素内存
+ */
+dsa_element_pt linked_list_pop_front(dsa_linked_list_t *linked_list) {
+    return linked_list
+               ? linked_list->traits->linear->pop_front(linked_list)
+               : NULL;
+}
+
+/**
+ * @brief 从链表的末尾移除并返回元素
+ * @param linked_list 链表指针
+ * @return 成功返回被移除的元素指针，失败返回NULL
+ * @pre linked_list 不能为NULL
+ * @note 调用者负责释放返回的元素内存
+ */
+dsa_element_pt linked_list_pop_back(dsa_linked_list_t *linked_list) {
+    return linked_list
+               ? linked_list->traits->linear->pop_back(linked_list)
+               : NULL;
 }

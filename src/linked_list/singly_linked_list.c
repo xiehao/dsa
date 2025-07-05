@@ -14,8 +14,8 @@
  * @details 定义了单链表的基本节点结构，包含数据指针和下一个节点的指针
  */
 typedef struct node_t {
-    struct node_t *next;    /**< 指向下一个节点的指针 */
-    dsa_element_pt data;    /**< 存储的数据元素指针 */
+    struct node_t *next; /**< 指向下一个节点的指针 */
+    dsa_element_pt data; /**< 存储的数据元素指针 */
 } node_t;
 
 /**
@@ -23,9 +23,9 @@ typedef struct node_t {
  * @details 定义了单链表的主体结构，包含特性指针、头节点和大小信息
  */
 typedef struct {
-    trait_linked_list_t const *traits;  /**< 链表特性接口指针 */
-    node_t *head;                       /**< 头节点指针（哨兵节点） */
-    size_t size;                        /**< 链表中元素的数量 */
+    trait_linked_list_t const *traits; /**< 链表特性接口指针 */
+    node_t *head; /**< 头节点指针（哨兵节点） */
+    size_t size; /**< 链表中元素的数量 */
 } singly_linked_t;
 
 /**
@@ -306,6 +306,41 @@ static trait_random_access_t const random_access_trait = {
     .remove_at = singly_linked_remove_at,
 };
 
+static dsa_result_t singly_linked_push_front(dsa_container_pt list, dsa_element_pt element) {
+    singly_linked_t *this = list;
+    return this
+               ? singly_linked_insert_at(this, 0, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_result_t singly_linked_push_back(dsa_container_pt list, dsa_element_pt element) {
+    singly_linked_t *this = list;
+    return this
+               ? singly_linked_insert_at(this, this->size, element)
+               : DSA_ERROR_NULL_POINTER;
+}
+
+static dsa_element_pt singly_linked_pop_front(dsa_container_pt list) {
+    singly_linked_t *this = list;
+    return this
+               ? singly_linked_remove_at(this, 0)
+               : NULL;
+}
+
+static dsa_element_pt singly_linked_pop_back(dsa_container_pt list) {
+    singly_linked_t *this = list;
+    return this && this->size > 0
+               ? singly_linked_remove_at(this, this->size - 1)
+               : NULL;
+}
+
+static trait_linear_t const linear_trait = {
+    .push_front = singly_linked_push_front,
+    .push_back = singly_linked_push_back,
+    .pop_front = singly_linked_pop_front,
+    .pop_back = singly_linked_pop_back,
+};
+
 /**
  * @brief 获取链表类型
  * @return 返回单链表类型标识
@@ -331,6 +366,7 @@ static char const *singly_linked_get_type_name(void) {
 static trait_linked_list_t const linked_list_trait = {
     .basic = &basic_trait,
     .random_access = &random_access_trait,
+    .linear = &linear_trait,
     .get_type = singly_linked_get_type,
     .get_type_name = singly_linked_get_type_name,
 };
@@ -343,12 +379,12 @@ static trait_linked_list_t const linked_list_trait = {
  */
 dsa_linked_list_t *singly_linked_create(void) {
     singly_linked_t *list = malloc(sizeof(singly_linked_t));
-    if (!list) { 
-        return NULL; 
+    if (!list) {
+        return NULL;
     }
 
     node_t *head;
-    dsa_result_t result = create_node(NULL, &head);  // 传入NULL作为头结点数据
+    dsa_result_t result = create_node(NULL, &head); // 传入NULL作为头结点数据
     if (result != DSA_SUCCESS) {
         free(list);
         return NULL;

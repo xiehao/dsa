@@ -125,6 +125,112 @@ static void demonstrate_basic_operations(void) {
 }
 
 /**
+ * @brief 演示双链表的linear_trait功能
+ */
+static void demonstrate_linear_trait_operations(void) {
+    printf("\n🔄 Linear Trait 操作演示\n");
+    printf("========================================\n");
+    printf("演示双链表的push_front, push_back, pop_front, pop_back操作\n");
+    printf("双链表的优势：所有操作都是O(1)时间复杂度！\n");
+
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
+    if (!list) {
+        printf("❌ 创建双链表失败\n");
+        return;
+    }
+
+    print_list(list, "初始状态");
+
+    // 演示push_front操作
+    printf("\n📥 Push Front 操作演示（O(1)）\n");
+    for (int i = 1; i <= 3; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_front(list, data) == DSA_SUCCESS) {
+            printf("✅ push_front(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示push_back操作
+    printf("\n📥 Push Back 操作演示（O(1)）\n");
+    for (int i = 4; i <= 6; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_back(list, data) == DSA_SUCCESS) {
+            printf("✅ push_back(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示混合操作
+    printf("\n🔀 混合操作演示\n");
+    printf("交替使用前端和后端操作:\n");
+
+    // 从前端弹出一个
+    int *front_popped = (int*)linked_list_pop_front(list);
+    if (front_popped) {
+        printf("✅ pop_front() 返回: %d\n", *front_popped);
+        free(front_popped);
+        print_list(list, "pop_front后");
+    }
+
+    // 从后端弹出一个
+    int *back_popped = (int*)linked_list_pop_back(list);
+    if (back_popped) {
+        printf("✅ pop_back() 返回: %d\n", *back_popped);
+        free(back_popped);
+        print_list(list, "pop_back后");
+    }
+
+    // 在前端添加一个
+    int *new_front = create_int(99);
+    if (linked_list_push_front(list, new_front) == DSA_SUCCESS) {
+        printf("✅ push_front(99) 成功\n");
+        print_list(list, "push_front后");
+    }
+
+    // 在后端添加一个
+    int *new_back = create_int(88);
+    if (linked_list_push_back(list, new_back) == DSA_SUCCESS) {
+        printf("✅ push_back(88) 成功\n");
+        print_list(list, "push_back后");
+    }
+
+    // 清空链表
+    printf("\n🗑️ 清空链表演示\n");
+    printf("使用pop操作清空链表:\n");
+    int count = 0;
+    while (!linked_list_is_empty(list)) {
+        if (count % 2 == 0) {
+            // 偶数次从前端弹出
+            int *popped = (int*)linked_list_pop_front(list);
+            if (popped) {
+                printf("  📤 pop_front() 返回: %d\n", *popped);
+                free(popped);
+            }
+        } else {
+            // 奇数次从后端弹出
+            int *popped = (int*)linked_list_pop_back(list);
+            if (popped) {
+                printf("  📤 pop_back() 返回: %d\n", *popped);
+                free(popped);
+            }
+        }
+        count++;
+        printf("     剩余元素数: %zu\n", linked_list_size(list));
+    }
+
+    // 测试空链表上的操作
+    printf("\n⚠️ 空链表操作测试\n");
+    printf("pop_front() 在空链表上: %s\n",
+           linked_list_pop_front(list) == NULL ? "返回NULL（正确）" : "异常");
+    printf("pop_back() 在空链表上: %s\n",
+           linked_list_pop_back(list) == NULL ? "返回NULL（正确）" : "异常");
+
+    linked_list_destroy(list);
+    printf("✅ Linear Trait 演示完成\n");
+}
+
+/**
  * @brief 演示双链表的性能优势
  */
 static void demonstrate_performance_advantages(void) {
@@ -298,7 +404,10 @@ int main(void) {
     
     // 基本操作演示
     demonstrate_basic_operations();
-    
+
+    // Linear Trait 操作演示
+    demonstrate_linear_trait_operations();
+
     // 性能优势演示
     demonstrate_performance_advantages();
     

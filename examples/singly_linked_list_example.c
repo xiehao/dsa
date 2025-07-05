@@ -167,49 +167,147 @@ static void demonstrate_performance_characteristics(void) {
 }
 
 /**
+ * @brief 演示单链表的linear_trait功能
+ */
+static void demonstrate_linear_trait_operations(void) {
+    printf("\n🔄 Linear Trait 操作演示\n");
+    printf("========================================\n");
+    printf("演示新增的push_front, push_back, pop_front, pop_back操作\n");
+
+    dsa_linked_list_t *list = linked_list_create(LINKED_LIST_TYPE_SINGLY);
+    if (!list) {
+        printf("❌ 创建单链表失败\n");
+        return;
+    }
+
+    print_list(list, "初始状态");
+
+    // 演示push_front操作
+    printf("\n📥 Push Front 操作演示\n");
+    for (int i = 1; i <= 3; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_front(list, data) == DSA_SUCCESS) {
+            printf("✅ push_front(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示push_back操作
+    printf("\n📥 Push Back 操作演示\n");
+    for (int i = 4; i <= 6; i++) {
+        int *data = create_int(i * 10);
+        if (linked_list_push_back(list, data) == DSA_SUCCESS) {
+            printf("✅ push_back(%d) 成功\n", i * 10);
+            print_list(list, "当前状态");
+        }
+    }
+
+    // 演示pop_front操作
+    printf("\n📤 Pop Front 操作演示\n");
+    for (int i = 0; i < 3; i++) {
+        int *popped = (int*)linked_list_pop_front(list);
+        if (popped) {
+            printf("✅ pop_front() 返回: %d\n", *popped);
+            free(popped);
+            print_list(list, "当前状态");
+        } else {
+            printf("❌ pop_front() 返回 NULL（链表为空）\n");
+            break;
+        }
+    }
+
+    // 演示pop_back操作
+    printf("\n📤 Pop Back 操作演示\n");
+    while (!linked_list_is_empty(list)) {
+        int *popped = (int*)linked_list_pop_back(list);
+        if (popped) {
+            printf("✅ pop_back() 返回: %d\n", *popped);
+            free(popped);
+            print_list(list, "当前状态");
+        } else {
+            printf("❌ pop_back() 返回 NULL（链表为空）\n");
+            break;
+        }
+    }
+
+    // 测试空链表上的操作
+    printf("\n⚠️ 空链表操作测试\n");
+    printf("pop_front() 在空链表上: %s\n",
+           linked_list_pop_front(list) == NULL ? "返回NULL（正确）" : "异常");
+    printf("pop_back() 在空链表上: %s\n",
+           linked_list_pop_back(list) == NULL ? "返回NULL（正确）" : "异常");
+
+    linked_list_destroy(list);
+    printf("✅ Linear Trait 演示完成\n");
+}
+
+/**
  * @brief 演示单链表的实际应用场景
  */
 static void demonstrate_practical_usage(void) {
     printf("\n🎯 实际应用场景演示\n");
     printf("========================================\n");
-    printf("场景: 任务队列（先进先出）\n");
-    
-    dsa_linked_list_t *task_queue = linked_list_create(LINKED_LIST_TYPE_SINGLY);
-    if (!task_queue) {
-        printf("❌ 创建任务队列失败\n");
+    printf("场景1: 栈操作（LIFO - 后进先出）\n");
+
+    dsa_linked_list_t *stack = linked_list_create(LINKED_LIST_TYPE_SINGLY);
+    if (!stack) {
+        printf("❌ 创建栈失败\n");
         return;
     }
-    
-    // 添加任务（在尾部添加）
-    printf("📝 添加任务到队列:\n");
-    const char *tasks[] = {"发送邮件", "处理订单", "生成报告", "备份数据"};
-    
+
+    // 使用push_front模拟栈的push操作
+    printf("📚 压栈操作（使用push_front）:\n");
+    const char *books[] = {"《数据结构》", "《算法导论》", "《编程珠玑》", "《代码大全》"};
+
     for (int i = 0; i < 4; i++) {
-        int *task_id = create_int(i + 1);
-        // 在尾部添加（模拟队列的enqueue操作）
-        if (linked_list_insert_at(task_queue, linked_list_size(task_queue), task_id) == DSA_SUCCESS) {
-            printf("  ✅ 添加任务: %s (ID: %d)\n", tasks[i], i + 1);
+        int *book_id = create_int(i + 1);
+        if (linked_list_push_front(stack, book_id) == DSA_SUCCESS) {
+            printf("  📖 压栈: %s (ID: %d)\n", books[i], i + 1);
         }
     }
-    
-    print_list(task_queue, "完整任务队列");
-    
-    // 处理任务（从头部移除）
-    printf("\n⚙️ 处理任务（FIFO - 先进先出）:\n");
-    while (!linked_list_is_empty(task_queue)) {
-        int *task_id = (int*)linked_list_remove_at(task_queue, 0);
-        if (task_id) {
-            printf("  🔄 正在处理: %s (ID: %d)\n", tasks[*task_id - 1], *task_id);
-            printf("     剩余任务数: %zu\n", linked_list_size(task_queue));
-            free(task_id);
+    print_list(stack, "栈状态");
+
+    // 使用pop_front模拟栈的pop操作
+    printf("\n📚 出栈操作（使用pop_front）:\n");
+    while (!linked_list_is_empty(stack)) {
+        int *book_id = (int*)linked_list_pop_front(stack);
+        if (book_id) {
+            printf("  📖 出栈: %s (ID: %d)\n", books[*book_id - 1], *book_id);
+            printf("     剩余书籍数: %zu\n", linked_list_size(stack));
+            free(book_id);
         }
     }
-    
-    printf("✅ 所有任务处理完成\n");
-    
+    printf("✅ 栈演示完成\n");
+
+    printf("\n场景2: 队列操作（FIFO - 先进先出）\n");
+
+    // 使用push_back和pop_front模拟队列操作
+    printf("🎫 排队买票（使用push_back入队，pop_front出队）:\n");
+    const char *customers[] = {"张三", "李四", "王五", "赵六"};
+
+    for (int i = 0; i < 4; i++) {
+        int *customer_id = create_int(i + 1);
+        if (linked_list_push_back(stack, customer_id) == DSA_SUCCESS) {
+            printf("  👤 %s 排队 (ID: %d)\n", customers[i], i + 1);
+        }
+    }
+    print_list(stack, "队列状态");
+
+    printf("\n🎫 开始售票:\n");
+    while (!linked_list_is_empty(stack)) {
+        int *customer_id = (int*)linked_list_pop_front(stack);
+        if (customer_id) {
+            printf("  🎟️ %s 买票完成 (ID: %d)\n", customers[*customer_id - 1], *customer_id);
+            printf("     队列剩余人数: %zu\n", linked_list_size(stack));
+            free(customer_id);
+        }
+    }
+
+    printf("✅ 队列演示完成\n");
+
     // 清理
-    linked_list_destroy(task_queue);
-    printf("✅ 任务队列演示完成\n");
+    linked_list_destroy(stack);
+    printf("✅ 实际应用场景演示完成\n");
 }
 
 /**
@@ -258,26 +356,30 @@ int main(void) {
     printf("🎉 单链表示例程序\n");
     printf("========================================\n");
     printf("本程序演示单链表的各种操作和特性\n");
-    
+
     // 基本操作演示
     demonstrate_basic_operations();
-    
+
+    // Linear Trait 操作演示
+    demonstrate_linear_trait_operations();
+
     // 性能特点演示
     demonstrate_performance_characteristics();
-    
+
     // 实际应用场景
     demonstrate_practical_usage();
-    
+
     // 边界情况演示
     demonstrate_edge_cases();
-    
+
     printf("\n🎊 所有演示完成！\n");
     printf("单链表特点总结:\n");
     printf("✅ 动态大小，内存使用灵活\n");
     printf("✅ 头部插入效率高 O(1)\n");
+    printf("✅ 支持双端操作（push_front/back, pop_front/back）\n");
     printf("⚠️ 随机访问效率低 O(n)\n");
     printf("⚠️ 不支持反向遍历\n");
-    printf("🎯 适用场景: 频繁头部插入、大小变化频繁的数据集合\n");
-    
+    printf("🎯 适用场景: 栈、队列、频繁头部插入的数据集合\n");
+
     return 0;
 }

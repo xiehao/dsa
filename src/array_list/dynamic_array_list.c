@@ -418,7 +418,7 @@ static trait_linear_t const linear_trait = {
  *
  * @return 数组类型枚举值
  */
-static dsa_array_list_type_t dynamic_array_get_type() {
+static dsa_array_list_type_t dynamic_array_get_type(void) {
     return ARRAY_LIST_TYPE_DYNAMIC;
 }
 
@@ -427,7 +427,7 @@ static dsa_array_list_type_t dynamic_array_get_type() {
  *
  * @return 指向类型名称字符串的指针
  */
-static char const *dynamic_array_get_type_name() {
+static char const *dynamic_array_get_type_name(void) {
     return "动态数组 (Dynamic Array)";
 }
 

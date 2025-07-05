@@ -42,6 +42,6 @@
  * @see doubly_linked_insert() 用于插入节点
  * @see doubly_linked_delete() 用于删除节点
  */
-dsa_linked_list_t *doubly_linked_create();
+dsa_linked_list_t *doubly_linked_create(void);
 
-#endif //DOUBLY_LINKED_LIST_H
+#endif // DOUBLY_LINKED_LIST_H

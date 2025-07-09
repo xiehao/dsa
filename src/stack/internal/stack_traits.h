@@ -13,7 +13,7 @@ typedef struct {
     trait_basic_t const *basic;
     /**
      * @brief 将元素压入栈顶
-     * @param container 栈容器指针
+     * @param stack 栈容器指针
      * @param element 要压入的元素指针
      * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
      */
@@ -21,7 +21,7 @@ typedef struct {
 
     /**
      * @brief 弹出并返回栈顶元素
-     * @param container 栈容器指针
+     * @param stack 栈容器指针
      * @return 栈顶元素指针，如果栈为空则返回NULL
      * @note 调用者负责释放返回元素的内存（如果需要）
      */
@@ -29,7 +29,7 @@ typedef struct {
 
     /**
      * @brief 查看栈顶元素但不移除
-     * @param container 栈容器的常量指针
+     * @param stack 栈容器的常量指针
      * @return 栈顶元素指针，如果栈为空则返回NULL
      */
     dsa_element_pt (*peek)(dsa_stack_t const *stack);

@@ -1,17 +1,23 @@
 # Add library target for deque
-add_library(dsa_deque STATIC
-    deque.c
+add_library(adt_deque STATIC
+        deque.c
+        circular_array_deque.c
 )
 
-# Set target properties
-target_include_directories(dsa_deque
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
-        $<INSTALL_INTERFACE:include>
+# 继承公共设置
+target_link_libraries(adt_deque
+        PUBLIC
+        dsa_common
+#        ds_array_list
+        ds_linked_list
 )
 
-# Add compile options if needed (can inherit from parent)
-# target_compile_options(dsa_deque PRIVATE ...)
+# 只需要设置私有的include目录
+target_include_directories(adt_deque
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/internal>
+)
 
 # Export the library for installation
-install(TARGETS dsa_deque EXPORT dsaTargets)
+install(TARGETS adt_deque EXPORT dsaTargets)

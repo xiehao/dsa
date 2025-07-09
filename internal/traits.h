@@ -146,6 +146,8 @@ typedef struct {
      */
     dsa_element_pt (*pop_front)(dsa_container_pt container);
 
+    dsa_element_pt (*peek_front)(dsa_const_container_pt container);
+
     /**
      * @brief 在容器后端添加元素
      * @param container 目标容器指针
@@ -166,6 +168,8 @@ typedef struct {
      * @warning 在空容器上调用此函数会返回NULL
      */
     dsa_element_pt (*pop_back)(dsa_container_pt container);
+
+    dsa_element_pt (*peek_back)(dsa_const_container_pt container);
 } trait_linear_t;
 
 /** @} */ // LinearInterface

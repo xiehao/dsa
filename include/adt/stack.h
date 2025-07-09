@@ -1,7 +1,7 @@
 #ifndef DSA_STACK_H
 #define DSA_STACK_H
 
-#include "common.h"
+#include <common.h>
 #include <stdbool.h>
 #include <stddef.h>
 

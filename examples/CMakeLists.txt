@@ -45,3 +45,9 @@ target_include_directories(example_array_stack PRIVATE ${CMAKE_SOURCE_DIR}/inclu
 add_executable(example_linked_stack linked_stack_example.c)
 target_link_libraries(example_linked_stack PRIVATE adt_stack)
 target_include_directories(example_linked_stack PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Deque Examples
+# Add circular array deque example executable
+add_executable(example_circular_array_deque circular_array_deque_example.c)
+target_link_libraries(example_circular_array_deque PRIVATE adt_deque)
+target_include_directories(example_circular_array_deque PRIVATE ${CMAKE_SOURCE_DIR}/include)

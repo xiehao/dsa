@@ -2,6 +2,7 @@
 add_library(adt_deque STATIC
         deque.c
         circular_array_deque.c
+        doubly_linked_deque.c
 )
 
 # 继承公共设置

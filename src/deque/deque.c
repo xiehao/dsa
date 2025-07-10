@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <internal/deque_traits.h>
 #include <internal/circular_array_deque.h>
+#include <internal/doubly_linked_deque.h>
 
 struct deque_t {
     trait_deque_t const *traits;
@@ -13,7 +14,7 @@ dsa_deque_t *deque_create(dsa_deque_type_t type) {
         case DEQUE_TYPE_CIRCULAR_ARRAY_LIST:
             return circular_array_deque_create();
         case DEQUE_TYPE_DOUBLY_LINKED_LIST:
-            return NULL; // 暂未实现
+            return doubly_linked_deque_create();
         default:
             return NULL;
     }

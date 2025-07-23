@@ -616,50 +616,50 @@ typedef struct {
 
 /** @} */ // UtilityInterface
 
-/**
- * @defgroup StackQueueInterface 栈和队列接口
- * @brief 栈和队列特定操作接口
- * @{
- */
-
-/**
- * @struct trait_queue_t
- * @brief 队列容器特定接口
- * @details 定义了队列数据结构的FIFO（先进先出）操作
- */
-typedef struct {
-    /**
-     * @brief 将元素加入队列尾部
-     * @param container 队列容器指针
-     * @param element 要入队的元素指针
-     * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
-     */
-    dsa_result_t (*enqueue)(dsa_container_pt container, dsa_element_pt element);
-
-    /**
-     * @brief 移除并返回队列头部元素
-     * @param container 队列容器指针
-     * @return 队列头部元素指针，如果队列为空则返回NULL
-     * @note 调用者负责释放返回元素的内存（如果需要）
-     */
-    dsa_element_pt (*dequeue)(dsa_container_pt container);
-
-    /**
-     * @brief 查看队列头部元素但不移除
-     * @param container 队列容器的常量指针
-     * @return 队列头部元素指针，如果队列为空则返回NULL
-     */
-    dsa_element_pt (*front)(dsa_const_container_pt container);
-
-    /**
-     * @brief 查看队列尾部元素但不移除
-     * @param container 队列容器的常量指针
-     * @return 队列尾部元素指针，如果队列为空则返回NULL
-     */
-    dsa_element_pt (*rear)(dsa_const_container_pt container);
-} trait_queue_t;
-
-/** @} */ // StackQueueInterface
+// /**
+//  * @defgroup StackQueueInterface 栈和队列接口
+//  * @brief 栈和队列特定操作接口
+//  * @{
+//  */
+//
+// /**
+//  * @struct trait_queue_t
+//  * @brief 队列容器特定接口
+//  * @details 定义了队列数据结构的FIFO（先进先出）操作
+//  */
+// typedef struct {
+//     /**
+//      * @brief 将元素加入队列尾部
+//      * @param container 队列容器指针
+//      * @param element 要入队的元素指针
+//      * @return 成功返回DSA_SUCCESS，失败返回相应的错误码
+//      */
+//     dsa_result_t (*enqueue)(dsa_container_pt container, dsa_element_pt element);
+//
+//     /**
+//      * @brief 移除并返回队列头部元素
+//      * @param container 队列容器指针
+//      * @return 队列头部元素指针，如果队列为空则返回NULL
+//      * @note 调用者负责释放返回元素的内存（如果需要）
+//      */
+//     dsa_element_pt (*dequeue)(dsa_container_pt container);
+//
+//     /**
+//      * @brief 查看队列头部元素但不移除
+//      * @param container 队列容器的常量指针
+//      * @return 队列头部元素指针，如果队列为空则返回NULL
+//      */
+//     dsa_element_pt (*front)(dsa_const_container_pt container);
+//
+//     /**
+//      * @brief 查看队列尾部元素但不移除
+//      * @param container 队列容器的常量指针
+//      * @return 队列尾部元素指针，如果队列为空则返回NULL
+//      */
+//     dsa_element_pt (*rear)(dsa_const_container_pt container);
+// } trait_queue_t;
+//
+// /** @} */ // StackQueueInterface
 
 /**
  * @defgroup PriorityQueueInterface 优先队列接口

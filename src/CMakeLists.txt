@@ -3,6 +3,7 @@ add_subdirectory(array_list)
 add_subdirectory(linked_list)
 add_subdirectory(deque)
 add_subdirectory(stack)
+add_subdirectory(queue)
 
 # Create an interface library to aggregate sub-libraries
 add_library(dsa_internal INTERFACE)
@@ -13,6 +14,7 @@ target_link_libraries(dsa_internal INTERFACE
         ds_linked_list
         adt_deque
         adt_stack
+        adt_queue
 )
 
 # Propagate include directories from the interface library

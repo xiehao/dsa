@@ -3,12 +3,14 @@ add_library(ds_array_list STATIC
         dynamic_array_list.c
         static_array_list.c
         array_list.c
+        array_iterator.c
 )
 
 # 继承公共设置
 target_link_libraries(ds_array_list
         PUBLIC
         dsa_common
+        dsa_common_impl
 )
 
 # 只需要设置私有的include目录

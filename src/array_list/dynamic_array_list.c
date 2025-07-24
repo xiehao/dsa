@@ -14,18 +14,7 @@
 /// 默认初始容量
 #define DEFAULT_CAPACITY 10
 
-/**
- * @brief 动态数组结构定义（实现细节）
- * 
- * 该结构体包含了动态数组的所有内部状态信息以及接口指针。
- * 使用组合模式来实现多种容器接口。
- */
-typedef struct {
-    trait_array_list_t const *trait;       ///< 数组接口
-    dsa_element_pt *data;                  ///< 指向元素指针数组的指针
-    size_t size;                           ///< 当前元素数量
-    size_t capacity;                       ///< 当前分配的容量
-} dynamic_array_t;
+
 
 /**
  * @brief 调整动态数组容量的内部辅助函数

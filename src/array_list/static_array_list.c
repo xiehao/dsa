@@ -14,18 +14,7 @@
 #include <stdbool.h>
 #include <internal/array_list_traits.h>
 
-/**
- * @struct static_array_t
- * @brief 静态数组结构体
- * @details 基于预分配缓冲区的静态数组容器，容量固定不可变
- */
-typedef struct {
-    trait_array_list_t const *trait;       ///< 数组接口
-    dsa_element_pt data;                   ///< 指向实际数据存储的指针 (通常是 VLA)
-    size_t size;                           ///< 当前元素数量
-    size_t capacity;                       ///< 数组的总容量 (固定)
-    size_t element_size;                   ///< 单个元素的大小（字节）
-} static_array_t;
+
 
 /**
  * @def ELEMENT_ADDR(arr, index)

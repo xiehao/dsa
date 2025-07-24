@@ -35,7 +35,7 @@ typedef struct {
      * @retval 具体的数组类型值，如动态数组、静态数组等
      */
     dsa_array_list_type_t (*get_type)(void);
-    
+
     /**
      * @brief 获取数组类型名称
      * @details 返回当前数组类型的字符串表示，用于调试和日志输出

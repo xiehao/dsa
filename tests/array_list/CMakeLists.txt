@@ -15,3 +15,12 @@ target_link_libraries(test_dynamic_array_list PRIVATE ds_array_list CMocka::CMoc
 
 # Add the dynamic array test to CTest
 add_test(NAME DynamicArrayListTest COMMAND test_dynamic_array_list)
+
+# Define the array iterator test executable
+add_executable(test_array_iterator test_array_iterator.c)
+
+# Link the dsa_array library and CMocka
+target_link_libraries(test_array_iterator PRIVATE ds_array_list CMocka::CMocka)
+
+# Add the array iterator test to CTest
+add_test(NAME ArrayIteratorTest COMMAND test_array_iterator)

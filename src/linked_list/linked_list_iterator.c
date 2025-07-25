@@ -21,92 +21,121 @@
 #include <internal/circular_linked_list.h>
 
 /**
- * @brief 将迭代器移动到下一个元素
+ * @brief 将迭代器向前移动n步
  * @param iterator 当前迭代器
- * @return 指向下一个元素的迭代器，如果没有下一个元素则返回等同于end()的迭代器
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回等同于end()的迭代器
+ * @note 对于链表，这是O(n)操作
  */
-static dsa_iterator_pt linked_list_iterator_next(dsa_iterator_pt iterator) {
+static dsa_iterator_pt linked_list_iterator_next_n(dsa_iterator_pt iterator, size_t n) {
     if (!iterator) {
         return NULL;
     }
-    
+
+    // 如果n为0，不移动
+    if (n == 0) {
+        return iterator;
+    }
+
     linked_list_iterator_t *iter = (linked_list_iterator_t *)iterator;
-    
-    switch (iter->iterator_type) {
-        case LINKED_LIST_ITERATOR_TYPE_SINGLY: {
-            singly_node_t *node = (singly_node_t *)iter->current_node;
-            if (node) {
-                singly_linked_t *list = (singly_linked_t *)iter->container;
-                // 检查下一个节点是否是哨兵节点（头节点）
-                if (node->next == list->head) {
-                    // 到达末尾，设置为end标记
-                    iter->current_node = iter->end_marker;
-                } else {
-                    iter->current_node = node->next;
-                }
-            }
+
+    // 对于链表，我们需要逐步移动n次
+    for (size_t i = 0; i < n; i++) {
+        // 检查是否已经到达末尾
+        if (iter->current_node == iter->end_marker) {
             break;
         }
-        case LINKED_LIST_ITERATOR_TYPE_DOUBLY: {
-            doubly_node_t *node = (doubly_node_t *)iter->current_node;
-            if (node) {
-                doubly_linked_t *list = (doubly_linked_t *)iter->container;
-                // 检查下一个节点是否是尾哨兵节点
-                if (node->next == list->tail) {
-                    // 到达末尾，设置为end标记
-                    iter->current_node = iter->end_marker;
-                } else {
-                    iter->current_node = node->next;
+
+        switch (iter->iterator_type) {
+            case LINKED_LIST_ITERATOR_TYPE_SINGLY: {
+                singly_node_t *node = (singly_node_t *)iter->current_node;
+                if (node) {
+                    singly_linked_t *list = (singly_linked_t *)iter->container;
+                    // 检查下一个节点是否是哨兵节点（头节点）
+                    if (node->next == list->head) {
+                        // 到达末尾，设置为end标记
+                        iter->current_node = iter->end_marker;
+                    } else {
+                        iter->current_node = node->next;
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case LINKED_LIST_ITERATOR_TYPE_CIRCULAR: {
-            circular_node_t *node = (circular_node_t *)iter->current_node;
-            if (node) {
-                circular_linked_t *list = (circular_linked_t *)iter->container;
-                // 检查下一个节点是否回到头节点
-                if (node->next == list->head) {
-                    // 到达末尾，设置为end标记
-                    iter->current_node = iter->end_marker;
-                } else {
-                    iter->current_node = node->next;
+            case LINKED_LIST_ITERATOR_TYPE_DOUBLY: {
+                doubly_node_t *node = (doubly_node_t *)iter->current_node;
+                if (node) {
+                    doubly_linked_t *list = (doubly_linked_t *)iter->container;
+                    // 检查下一个节点是否是尾哨兵节点
+                    if (node->next == list->tail) {
+                        // 到达末尾，设置为end标记
+                        iter->current_node = iter->end_marker;
+                    } else {
+                        iter->current_node = node->next;
+                    }
                 }
+                break;
             }
-            break;
+            case LINKED_LIST_ITERATOR_TYPE_CIRCULAR: {
+                circular_node_t *node = (circular_node_t *)iter->current_node;
+                if (node) {
+                    circular_linked_t *list = (circular_linked_t *)iter->container;
+                    // 检查下一个节点是否回到头节点
+                    if (node->next == list->head) {
+                        // 到达末尾，设置为end标记
+                        iter->current_node = iter->end_marker;
+                    } else {
+                        iter->current_node = node->next;
+                    }
+                }
+                break;
+            }
         }
     }
-    
+
     return iterator;
 }
 
 /**
- * @brief 将迭代器移动到前一个元素
+ * @brief 将迭代器向后移动n步
  * @param iterator 当前迭代器
- * @return 指向前一个元素的迭代器，如果没有前一个元素则返回NULL
- * @note 单链表和循环链表不支持反向遍历
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回NULL
+ * @note 单链表和循环链表不支持反向遍历，对于双链表这是O(n)操作
  */
-static dsa_iterator_pt linked_list_iterator_prev(dsa_iterator_pt iterator) {
+static dsa_iterator_pt linked_list_iterator_prev_n(dsa_iterator_pt iterator, size_t n) {
     if (!iterator) {
         return NULL;
     }
-    
+
+    // 如果n为0，不移动
+    if (n == 0) {
+        return iterator;
+    }
+
     linked_list_iterator_t *iter = (linked_list_iterator_t *)iterator;
-    
+
     switch (iter->iterator_type) {
         case LINKED_LIST_ITERATOR_TYPE_SINGLY:
         case LINKED_LIST_ITERATOR_TYPE_CIRCULAR:
             // 单链表和循环链表不支持反向遍历
             return NULL;
-            
+
         case LINKED_LIST_ITERATOR_TYPE_DOUBLY: {
-            doubly_node_t *node = (doubly_node_t *)iter->current_node;
-            if (node && node->previous) {
+            // 对于双链表，逐步向后移动n次
+            for (size_t i = 0; i < n; i++) {
+                doubly_node_t *node = (doubly_node_t *)iter->current_node;
+                if (!node || !node->previous) {
+                    // 已经到达开头或无效状态
+                    iter->current_node = NULL;
+                    break;
+                }
+
                 // 检查是否到达头哨兵节点
                 doubly_linked_t *list = (doubly_linked_t *)iter->container;
                 if (node->previous == list->head) {
                     // 到达开头，设置为无效状态
                     iter->current_node = NULL;
+                    break;
                 } else {
                     iter->current_node = node->previous;
                 }
@@ -114,7 +143,7 @@ static dsa_iterator_pt linked_list_iterator_prev(dsa_iterator_pt iterator) {
             break;
         }
     }
-    
+
     return iterator;
 }
 
@@ -212,8 +241,8 @@ static bool linked_list_iterator_is_valid(dsa_iterator_pt iterator) {
 static trait_iterator_t const linked_list_iterator_trait = {
     .begin = NULL,  // 不再需要，因为begin/end函数直接实现
     .end = NULL,    // 不再需要，因为begin/end函数直接实现
-    .next = linked_list_iterator_next,
-    .prev = linked_list_iterator_prev,
+    .next_n = linked_list_iterator_next_n,
+    .prev_n = linked_list_iterator_prev_n,
     .get_value = linked_list_iterator_get_value,
     .set_value = linked_list_iterator_set_value,
     .is_valid = linked_list_iterator_is_valid,

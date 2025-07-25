@@ -17,25 +17,25 @@
 
 
 /**
- * @brief 将迭代器移动到下一个元素
+ * @brief 将迭代器向前移动n步
  */
-dsa_iterator_t *iterator_next(dsa_iterator_t *iter) {
-    if (!iter || !iter->trait || !iter->trait->next) {
+dsa_iterator_t *iterator_next_n(dsa_iterator_t *iter, size_t n) {
+    if (!iter || !iter->trait || !iter->trait->next_n) {
         return NULL;
     }
-    
-    return (dsa_iterator_t *)iter->trait->next(iter);
+
+    return (dsa_iterator_t *)iter->trait->next_n(iter, n);
 }
 
 /**
- * @brief 将迭代器移动到前一个元素
+ * @brief 将迭代器向后移动n步
  */
-dsa_iterator_t *iterator_prev(dsa_iterator_t *iter) {
-    if (!iter || !iter->trait || !iter->trait->prev) {
+dsa_iterator_t *iterator_prev_n(dsa_iterator_t *iter, size_t n) {
+    if (!iter || !iter->trait || !iter->trait->prev_n) {
         return NULL;
     }
-    
-    return (dsa_iterator_t *)iter->trait->prev(iter);
+
+    return (dsa_iterator_t *)iter->trait->prev_n(iter, n);
 }
 
 /**
@@ -165,38 +165,7 @@ size_t iterator_distance(dsa_iterator_t *begin, dsa_iterator_t *end) {
     return distance;
 }
 
-/**
- * @brief 将迭代器向前移动指定步数
- */
-dsa_iterator_t *iterator_advance(dsa_iterator_t *iter, size_t n) {
-    if (!iter) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i < n && iterator_is_valid(iter); i++) {
-        iterator_next(iter);
-    }
-
-    return iter;
-}
-
-/**
- * @brief 将迭代器向后移动指定步数
- */
-dsa_iterator_t *iterator_retreat(dsa_iterator_t *iter, size_t n) {
-    if (!iter) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i < n; i++) {
-        dsa_iterator_t *prev_result = iterator_prev(iter);
-        if (!prev_result || !iterator_is_valid(iter)) {
-            break;
-        }
-    }
-
-    return iter;
-}
+// iterator_advance和iterator_retreat现在是宏定义，不需要函数实现
 
 /**
  * @brief 在指定范围内查找第一个满足条件的元素

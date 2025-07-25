@@ -353,7 +353,7 @@ typedef const struct dsa_iterator_t *dsa_const_iterator_pt;
 /**
  * @struct trait_iterator_t
  * @brief 容器迭代器接口
- * @details 定义了容器迭代访问的标准接口，支持双向迭代
+ * @details 定义了容器迭代访问的标准接口，支持双向迭代和随机访问优化
  */
 typedef struct {
     /**
@@ -371,18 +371,23 @@ typedef struct {
     void * (*end)(dsa_const_container_pt container);
 
     /**
-     * @brief 将迭代器移动到下一个元素
+     * @brief 将迭代器向前移动n步
      * @param iterator 当前迭代器
-     * @return 指向下一个元素的迭代器，如果没有下一个元素则返回等同于end()的迭代器
+     * @param n 移动的步数，n=1相当于原来的next()操作
+     * @return 指向移动后位置的迭代器，如果移动超出范围则返回等同于end()的迭代器
+     * @note 对于数组列表，这是O(1)操作；对于链表，这是O(n)操作
      */
-    dsa_iterator_pt (*next)(dsa_iterator_pt iterator);
+    dsa_iterator_pt (*next_n)(dsa_iterator_pt iterator, size_t n);
 
     /**
-     * @brief 将迭代器移动到前一个元素
+     * @brief 将迭代器向后移动n步
      * @param iterator 当前迭代器
-     * @return 指向前一个元素的迭代器，如果没有前一个元素则返回NULL
+     * @param n 移动的步数，n=1相当于原来的prev()操作
+     * @return 指向移动后位置的迭代器，如果移动超出范围则返回NULL
+     * @note 对于数组列表，这是O(1)操作；对于链表，这是O(n)操作
+     * @note 并非所有迭代器类型都支持反向遍历（如单向链表迭代器）
      */
-    dsa_iterator_pt (*prev)(dsa_iterator_pt iterator);
+    dsa_iterator_pt (*prev_n)(dsa_iterator_pt iterator, size_t n);
 
     /**
      * @brief 获取迭代器当前指向的元素

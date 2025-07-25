@@ -29,27 +29,51 @@ typedef struct dsa_iterator_t dsa_iterator_t;
  */
 
 /**
- * @brief 将迭代器移动到下一个元素
+ * @brief 将迭代器向前移动n步
+ *
+ * @param iter 当前迭代器指针
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回等同于end()的迭代器
+ *
+ * @pre iter != NULL
+ * @note 对于数组列表，这是O(1)操作；对于链表，这是O(n)操作
+ * @note 如果n=0，迭代器位置不变
+ */
+dsa_iterator_t *iterator_next_n(dsa_iterator_t *iter, size_t n);
+
+/**
+ * @brief 将迭代器向后移动n步
+ *
+ * @param iter 当前迭代器指针
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回NULL
+ *
+ * @pre iter != NULL
+ * @note 对于数组列表，这是O(1)操作；对于链表，这是O(n)操作
+ * @note 并非所有迭代器类型都支持反向遍历（如单向链表迭代器）
+ * @note 如果n=0，迭代器位置不变
+ */
+dsa_iterator_t *iterator_prev_n(dsa_iterator_t *iter, size_t n);
+
+/**
+ * @brief 将迭代器移动到下一个元素（向后兼容宏）
  *
  * @param iter 当前迭代器指针
  * @return 指向下一个元素的迭代器，如果已到达末尾则返回等同于end()的迭代器
- * 
- * @pre iter != NULL
- * @note 如果迭代器已经指向末尾，行为是未定义的
+ *
+ * @note 这是iterator_next_n(iter, 1)的便利宏
  */
-dsa_iterator_t *iterator_next(dsa_iterator_t *iter);
+#define iterator_next(iter) iterator_next_n((iter), 1)
 
 /**
- * @brief 将迭代器移动到前一个元素
+ * @brief 将迭代器移动到前一个元素（向后兼容宏）
  *
  * @param iter 当前迭代器指针
  * @return 指向前一个元素的迭代器，如果已到达开头则返回NULL
- * 
- * @pre iter != NULL
- * @note 如果迭代器已经指向开头，行为是未定义的
- * @note 并非所有迭代器类型都支持反向遍历（如单向链表迭代器）
+ *
+ * @note 这是iterator_prev_n(iter, 1)的便利宏
  */
-dsa_iterator_t *iterator_prev(dsa_iterator_t *iter);
+#define iterator_prev(iter) iterator_prev_n((iter), 1)
 
 /**
  * @brief 获取迭代器当前指向的元素
@@ -142,33 +166,16 @@ dsa_iterator_t *iterator_clone(const dsa_iterator_t *iter);
 size_t iterator_distance(dsa_iterator_t *begin, dsa_iterator_t *end);
 
 /**
- * @brief 将迭代器向前移动指定步数
- * @details 相当于连续调用n次iterator_next()
- *
- * @param iter 要移动的迭代器
- * @param n 移动的步数
- * @return 移动后的迭代器指针（与输入相同）
- *
- * @pre iter != NULL
- * @note 如果移动超出容器范围，迭代器将指向end位置
- * @note 时间复杂度：O(n)
+ * @brief 将迭代器向前移动指定步数（已弃用，使用iterator_next_n替代）
+ * @deprecated 使用iterator_next_n(iter, n)替代
  */
-dsa_iterator_t *iterator_advance(dsa_iterator_t *iter, size_t n);
+#define iterator_advance(iter, n) iterator_next_n((iter), (n))
 
 /**
- * @brief 将迭代器向后移动指定步数
- * @details 相当于连续调用n次iterator_prev()
- *
- * @param iter 要移动的迭代器
- * @param n 移动的步数
- * @return 移动后的迭代器指针（与输入相同）
- *
- * @pre iter != NULL
- * @note 如果移动超出容器范围，迭代器将指向begin位置
- * @note 时间复杂度：O(n)
- * @note 并非所有迭代器类型都支持反向移动
+ * @brief 将迭代器向后移动指定步数（已弃用，使用iterator_prev_n替代）
+ * @deprecated 使用iterator_prev_n(iter, n)替代
  */
-dsa_iterator_t *iterator_retreat(dsa_iterator_t *iter, size_t n);
+#define iterator_retreat(iter, n) iterator_prev_n((iter), (n))
 
 /**
  * @brief 在指定范围内查找第一个满足条件的元素

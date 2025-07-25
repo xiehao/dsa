@@ -22,40 +22,82 @@
 
 
 /**
- * @brief 将迭代器移动到下一个元素
+ * @brief 将迭代器向前移动n步（优化的随机访问版本）
  * @param iterator 当前迭代器
- * @return 指向下一个元素的迭代器，如果没有下一个元素则返回等同于end()的迭代器
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回等同于end()的迭代器
+ * @note 对于数组列表，这是O(1)操作
  */
-static dsa_iterator_pt array_iterator_next(dsa_iterator_pt iterator) {
+static dsa_iterator_pt array_iterator_next_n(dsa_iterator_pt iterator, size_t n) {
     if (!iterator) {
         return NULL;
     }
-    
+
     array_iterator_t *iter = (array_iterator_t *)iterator;
-    if (iter->current_index < iter->container_size) {
-        iter->current_index++;
+
+    // 如果n为0，不移动
+    if (n == 0) {
+        return iterator;
     }
+
+    // 如果已经到达末尾，保持在末尾位置
+    if (iter->current_index >= iter->container_size) {
+        iter->current_index = iter->container_size;
+        return iterator;
+    }
+
+    // O(1)随机访问：直接计算新位置
+    size_t new_index = iter->current_index + n;
+
+    // 检查是否超出范围
+    if (new_index >= iter->container_size) {
+        iter->current_index = iter->container_size; // 设置为end位置
+    } else {
+        iter->current_index = new_index;
+    }
+
     return iterator;
 }
 
 /**
- * @brief 将迭代器移动到前一个元素
+ * @brief 将迭代器向后移动n步（优化的随机访问版本）
  * @param iterator 当前迭代器
- * @return 指向前一个元素的迭代器，如果没有前一个元素则返回NULL
+ * @param n 移动的步数
+ * @return 指向移动后位置的迭代器，如果移动超出范围则返回NULL
+ * @note 对于数组列表，这是O(1)操作
  */
-static dsa_iterator_pt array_iterator_prev(dsa_iterator_pt iterator) {
+static dsa_iterator_pt array_iterator_prev_n(dsa_iterator_pt iterator, size_t n) {
     if (!iterator) {
         return NULL;
     }
 
     array_iterator_t *iter = (array_iterator_t *)iterator;
-    if (iter->current_index > 0) {
-        iter->current_index--;
-    } else {
-        // 如果已经在开始位置，设置为一个无效的索引值
-        // 使用SIZE_MAX表示超出开始位置
-        iter->current_index = SIZE_MAX;
+
+    // 如果n为0，不移动
+    if (n == 0) {
+        return iterator;
     }
+
+    // 如果当前在end位置，先移动到最后一个有效元素
+    if (iter->current_index >= iter->container_size) {
+        if (iter->container_size == 0) {
+            iter->current_index = SIZE_MAX; // 空容器，设置为无效状态
+            return iterator;
+        }
+        iter->current_index = iter->container_size - 1;
+        n--; // 已经移动了一步
+        if (n == 0) {
+            return iterator;
+        }
+    }
+
+    // O(1)随机访问：检查是否会超出开始位置
+    if (n > iter->current_index) {
+        iter->current_index = SIZE_MAX; // 表示超出开始位置
+    } else {
+        iter->current_index -= n;
+    }
+
     return iterator;
 }
 
@@ -146,8 +188,8 @@ static bool array_iterator_is_valid(dsa_iterator_pt iterator) {
 static trait_iterator_t const array_iterator_trait = {
     .begin = NULL,  // 不再需要，因为begin/end函数直接实现
     .end = NULL,    // 不再需要，因为begin/end函数直接实现
-    .next = array_iterator_next,
-    .prev = array_iterator_prev,
+    .next_n = array_iterator_next_n,
+    .prev_n = array_iterator_prev_n,
     .get_value = array_iterator_get_value,
     .set_value = array_iterator_set_value,
     .is_valid = array_iterator_is_valid,

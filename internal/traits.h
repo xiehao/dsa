@@ -375,28 +375,36 @@ typedef struct {
      * @param iterator 当前迭代器
      * @return 指向下一个元素的迭代器，如果没有下一个元素则返回等同于end()的迭代器
      */
-    void * (*next)(void *iterator);
+    dsa_iterator_pt (*next)(dsa_iterator_pt iterator);
 
     /**
      * @brief 将迭代器移动到前一个元素
      * @param iterator 当前迭代器
      * @return 指向前一个元素的迭代器，如果没有前一个元素则返回NULL
      */
-    void * (*prev)(void *iterator);
+    dsa_iterator_pt (*prev)(dsa_iterator_pt iterator);
 
     /**
      * @brief 获取迭代器当前指向的元素
      * @param iterator 当前迭代器
      * @return 当前元素的指针，如果迭代器无效则返回NULL
      */
-    dsa_element_pt (*get_value)(void *iterator);
+    dsa_element_pt (*get_value)(dsa_iterator_pt iterator);
+
+    /**
+     * @brief 设置迭代器当前指向的元素值
+     * @param iterator 当前迭代器
+     * @param value 要设置的新值指针
+     * @return 操作结果，成功返回DSA_SUCCESS
+     */
+    dsa_result_t (*set_value)(dsa_iterator_pt iterator, dsa_element_pt value);
 
     /**
      * @brief 检查迭代器是否有效
      * @param iterator 要检查的迭代器
      * @return 如果迭代器有效返回true，否则返回false
      */
-    bool (*is_valid)(void *iterator);
+    bool (*is_valid)(dsa_iterator_pt iterator);
 } trait_iterator_t;
 
 /** @} */ // IteratorInterface

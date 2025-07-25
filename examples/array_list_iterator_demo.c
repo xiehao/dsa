@@ -124,7 +124,7 @@ static void demo_dynamic_array_iterator(void) {
  */
 static void demo_reverse_iteration(void) {
     printf("\n=== 反向遍历演示 ===\n");
-    
+
     // 创建静态数组
     int buffer[10];
     dsa_array_list_t *arr = array_list_create_static(buffer, 10, sizeof(int));
@@ -132,19 +132,19 @@ static void demo_reverse_iteration(void) {
         printf("创建数组失败\n");
         return;
     }
-    
+
     // 添加元素
     for (int i = 0; i < 6; i++) {
         int value = i + 1;
         array_list_push_back(arr, &value);
     }
-    
+
     printf("数组内容: ");
-    
+
     // 从末尾开始反向遍历
     dsa_iterator_t *iter = array_list_end(arr);
     iterator_prev(iter);  // 移动到最后一个有效元素
-    
+
     while (iterator_is_valid(iter)) {
         int *value = (int *)iterator_get_value(iter);
         if (value) {
@@ -153,10 +153,144 @@ static void demo_reverse_iteration(void) {
         iterator_prev(iter);
     }
     printf("\n");
-    
+
     // 清理
     iterator_destroy(iter);
     array_list_destroy(arr);
+}
+
+/**
+ * @brief 演示迭代器的读写功能
+ */
+static void demo_iterator_read_write(void) {
+    printf("\n=== 迭代器读写功能演示 ===\n");
+
+    // 创建静态数组
+    int buffer[5];
+    dsa_array_list_t *arr = array_list_create_static(buffer, 5, sizeof(int));
+    if (!arr) {
+        printf("创建数组失败\n");
+        return;
+    }
+
+    // 添加初始数据
+    printf("初始数据: ");
+    for (int i = 0; i < 5; i++) {
+        int value = i + 1;  // 1, 2, 3, 4, 5
+        array_list_push_back(arr, &value);
+        printf("%d ", value);
+    }
+    printf("\n");
+
+    // 使用迭代器将所有元素乘以2
+    printf("使用迭代器修改元素（乘以2）...\n");
+    dsa_iterator_t *iter = array_list_begin(arr);
+    if (!iter) {
+        printf("创建迭代器失败\n");
+        array_list_destroy(arr);
+        return;
+    }
+
+    while (iterator_is_valid(iter)) {
+        int *current_value = (int *)iterator_get_value(iter);
+        if (current_value) {
+            int new_value = (*current_value) * 2;
+            dsa_result_t result = iterator_set_value(iter, &new_value);
+            if (result != DSA_SUCCESS) {
+                printf("设置值失败: %d\n", result);
+            }
+        }
+        iterator_next(iter);
+    }
+
+    iterator_destroy(iter);
+
+    // 验证修改结果
+    printf("修改后数据: ");
+    iter = array_list_begin(arr);
+    while (iterator_is_valid(iter)) {
+        int *value = (int *)iterator_get_value(iter);
+        if (value) {
+            printf("%d ", *value);
+        }
+        iterator_next(iter);
+    }
+    printf("\n");
+
+    iterator_destroy(iter);
+    array_list_destroy(arr);
+}
+
+/**
+ * @brief 演示迭代器的条件修改
+ */
+static void demo_conditional_modification(void) {
+    printf("\n=== 条件修改演示 ===\n");
+
+    // 创建动态数组
+    dsa_array_list_t *arr = array_list_create_dynamic(5);
+    if (!arr) {
+        printf("创建动态数组失败\n");
+        return;
+    }
+
+    // 添加包含负数的测试数据
+    int test_data[] = {-3, 5, -1, 8, -7, 2};
+    printf("原始数据: ");
+    for (int i = 0; i < 6; i++) {
+        int *value = malloc(sizeof(int));
+        if (!value) {
+            printf("内存分配失败\n");
+            array_list_destroy_with_free(arr);
+            return;
+        }
+        *value = test_data[i];
+        array_list_push_back(arr, value);
+        printf("%d ", *value);
+    }
+    printf("\n");
+
+    // 使用迭代器将所有负数转换为正数
+    printf("将负数转换为正数...\n");
+    dsa_iterator_t *iter = array_list_begin(arr);
+    if (!iter) {
+        printf("创建迭代器失败\n");
+        array_list_destroy_with_free(arr);
+        return;
+    }
+
+    while (iterator_is_valid(iter)) {
+        int *current_value = (int *)iterator_get_value(iter);
+        if (current_value && *current_value < 0) {
+            int *new_value = malloc(sizeof(int));
+            if (new_value) {
+                *new_value = -(*current_value);  // 转换为正数
+                dsa_result_t result = iterator_set_value(iter, new_value);
+                if (result != DSA_SUCCESS) {
+                    printf("设置值失败: %d\n", result);
+                    free(new_value);
+                }
+            }
+        }
+        iterator_next(iter);
+    }
+
+    iterator_destroy(iter);
+
+    // 显示修改结果
+    printf("修改后数据: ");
+    iter = array_list_begin(arr);
+    while (iterator_is_valid(iter)) {
+        int *value = (int *)iterator_get_value(iter);
+        if (value) {
+            printf("%d ", *value);
+        }
+        iterator_next(iter);
+    }
+    printf("\n");
+
+    iterator_destroy(iter);
+    array_list_destroy_with_free(arr);
 }
 
 /**
@@ -169,6 +303,8 @@ int main(void) {
     demo_static_array_iterator();
     demo_dynamic_array_iterator();
     demo_reverse_iteration();
+    demo_iterator_read_write();
+    demo_conditional_modification();
 
     printf("\n演示完成！\n");
     return 0;

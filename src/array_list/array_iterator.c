@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 #include <iterator_internal.h>
 #include <internal/array_iterator_internal.h>
 #include <internal/static_array_list.h>
@@ -25,7 +26,7 @@
  * @param iterator 当前迭代器
  * @return 指向下一个元素的迭代器，如果没有下一个元素则返回等同于end()的迭代器
  */
-static void *array_iterator_next(void *iterator) {
+static dsa_iterator_pt array_iterator_next(dsa_iterator_pt iterator) {
     if (!iterator) {
         return NULL;
     }
@@ -42,7 +43,7 @@ static void *array_iterator_next(void *iterator) {
  * @param iterator 当前迭代器
  * @return 指向前一个元素的迭代器，如果没有前一个元素则返回NULL
  */
-static void *array_iterator_prev(void *iterator) {
+static dsa_iterator_pt array_iterator_prev(dsa_iterator_pt iterator) {
     if (!iterator) {
         return NULL;
     }
@@ -63,7 +64,7 @@ static void *array_iterator_prev(void *iterator) {
  * @param iterator 当前迭代器
  * @return 当前元素的指针，如果迭代器无效则返回NULL
  */
-static dsa_element_pt array_iterator_get_value(void *iterator) {
+static dsa_element_pt array_iterator_get_value(dsa_iterator_pt iterator) {
     if (!iterator) {
         return NULL;
     }
@@ -88,11 +89,48 @@ static dsa_element_pt array_iterator_get_value(void *iterator) {
 }
 
 /**
+ * @brief 设置迭代器当前指向的元素值
+ * @param iterator 当前迭代器
+ * @param value 要设置的新值指针
+ * @return 操作结果，成功返回DSA_SUCCESS
+ */
+static dsa_result_t array_iterator_set_value(dsa_iterator_pt iterator, dsa_element_pt value) {
+    if (!iterator || !value) {
+        return DSA_ERROR_INVALID_PARAMETER;
+    }
+
+    array_iterator_t *iter = (array_iterator_t *)iterator;
+
+    // 检查迭代器是否指向有效位置
+    if (iter->current_index >= iter->container_size) {
+        return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
+    }
+
+    // 根据数组类型设置元素
+    if (iter->iterator_type == ARRAY_ITERATOR_TYPE_STATIC) {
+        const static_array_t *static_arr = (const static_array_t *)iter->container;
+        void *target = (char *)static_arr->data + (iter->current_index * static_arr->element_size);
+        memcpy(target, value, static_arr->element_size);
+        return DSA_SUCCESS;
+    } else if (iter->iterator_type == ARRAY_ITERATOR_TYPE_DYNAMIC) {
+        const dynamic_array_t *dynamic_arr = (const dynamic_array_t *)iter->container;
+        // 对于动态数组，需要释放旧元素并设置新元素
+        if (dynamic_arr->data[iter->current_index]) {
+            free(dynamic_arr->data[iter->current_index]);
+        }
+        dynamic_arr->data[iter->current_index] = value;
+        return DSA_SUCCESS;
+    }
+
+    return DSA_ERROR_INVALID_PARAMETER;
+}
+
+/**
  * @brief 检查迭代器是否有效
  * @param iterator 要检查的迭代器
  * @return 如果迭代器有效返回true，否则返回false
  */
-static bool array_iterator_is_valid(void *iterator) {
+static bool array_iterator_is_valid(dsa_iterator_pt iterator) {
     if (!iterator) {
         return false;
     }
@@ -111,6 +149,7 @@ static trait_iterator_t const array_iterator_trait = {
     .next = array_iterator_next,
     .prev = array_iterator_prev,
     .get_value = array_iterator_get_value,
+    .set_value = array_iterator_set_value,
     .is_valid = array_iterator_is_valid,
 };
 

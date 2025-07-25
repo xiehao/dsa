@@ -56,10 +56,24 @@ dsa_iterator_t *iterator_prev(dsa_iterator_t *iter);
  *
  * @param iter 迭代器指针
  * @return 当前元素的指针，如果迭代器无效或指向末尾则返回NULL
- * 
+ *
  * @pre iter != NULL
  */
 dsa_element_pt iterator_get_value(dsa_iterator_t *iter);
+
+/**
+ * @brief 设置迭代器当前指向的元素值
+ *
+ * @param iter 迭代器指针
+ * @param value 要设置的新值指针
+ * @return 操作结果，成功返回DSA_SUCCESS
+ *
+ * @pre iter != NULL
+ * @pre value != NULL
+ * @note 只有当迭代器指向有效元素时才能设置值
+ * @note 对于只读容器，此操作可能失败
+ */
+dsa_result_t iterator_set_value(dsa_iterator_t *iter, dsa_element_pt value);
 
 /**
  * @brief 检查迭代器是否有效

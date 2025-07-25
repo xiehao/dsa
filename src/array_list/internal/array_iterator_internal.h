@@ -36,6 +36,7 @@ typedef struct {
     size_t current_index;                      ///< 当前迭代器位置索引
     size_t container_size;                     ///< 容器大小（缓存以提高性能）
     dsa_array_iterator_type_t iterator_type;   ///< 迭代器类型
+    size_t version;                            ///< 迭代器版本号，用于失效检测
 } array_iterator_t;
 
 

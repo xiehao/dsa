@@ -8,8 +8,10 @@
 
 - **统一接口**：静态数组和动态数组使用相同的迭代器API
 - **双向遍历**：支持正向和反向遍历
+- **读写操作**：支持读取和修改元素值
 - **类型安全**：通过trait模式确保类型安全
 - **内存安全**：自动管理迭代器生命周期
+- **错误处理**：完整的边界检查和错误码返回
 - **高性能**：基于索引的O(1)访问和移动
 
 ## 基本用法
@@ -77,6 +79,41 @@ iterator_destroy(iter);
 iterator_destroy(end_iter);
 ```
 
+### 读写操作
+
+```c
+// 修改元素值
+dsa_iterator_t *iter = array_list_begin(arr);
+while (iterator_is_valid(iter)) {
+    int *value = (int *)iterator_get_value(iter);
+    if (*value < 0) {
+        int new_value = -*value;  // 将负数变为正数
+        dsa_result_t result = iterator_set_value(iter, &new_value);
+        if (result != DSA_SUCCESS) {
+            printf("设置值失败: %d\n", result);
+        }
+    }
+    iterator_next(iter);
+}
+iterator_destroy(iter);
+```
+
+### 条件修改
+
+```c
+// 对满足条件的元素进行修改
+dsa_iterator_t *iter = array_list_begin(arr);
+while (iterator_is_valid(iter)) {
+    int *value = (int *)iterator_get_value(iter);
+    if (*value % 2 == 0) {  // 偶数
+        int new_value = *value * 2;
+        iterator_set_value(iter, &new_value);
+    }
+    iterator_next(iter);
+}
+iterator_destroy(iter);
+```
+
 ## API 参考
 
 ### 创建迭代器
@@ -103,6 +140,12 @@ iterator_destroy(end_iter);
   - 获取迭代器当前指向的元素
   - 返回：元素指针，无效时返回NULL
 
+- `dsa_result_t iterator_set_value(dsa_iterator_t *iter, dsa_element_pt value)`
+  - 设置迭代器当前指向的元素值
+  - 参数：iter - 迭代器指针，value - 新值指针
+  - 返回：操作结果，成功返回DSA_SUCCESS
+  - 注意：只有当迭代器指向有效元素时才能设置值
+
 - `bool iterator_is_valid(dsa_iterator_t *iter)`
   - 检查迭代器是否指向有效元素
   - 返回：有效时返回true，否则返回false
@@ -118,10 +161,13 @@ iterator_destroy(end_iter);
 ## 注意事项
 
 1. **内存管理**：使用完迭代器后必须调用`iterator_destroy()`释放内存
-2. **容器修改**：在迭代过程中修改容器可能导致迭代器失效
-3. **边界检查**：使用`iterator_is_valid()`检查迭代器有效性
-4. **NULL安全**：所有API函数都能安全处理NULL指针
-5. **类型转换**：`iterator_get_value()`返回`void*`，需要转换为正确类型
+2. **容器修改**：在迭代过程中修改容器结构（添加/删除元素）可能导致迭代器失效
+3. **元素修改**：可以安全地修改元素值，不会影响迭代器有效性
+4. **边界检查**：使用`iterator_is_valid()`检查迭代器有效性
+5. **错误处理**：`iterator_set_value()`返回错误码，应检查操作是否成功
+6. **NULL安全**：所有API函数都能安全处理NULL指针
+7. **类型转换**：`iterator_get_value()`返回`void*`，需要转换为正确类型
+8. **动态数组特殊性**：对动态数组使用`iterator_set_value()`时，旧元素会被自动释放
 
 ## 性能特性
 

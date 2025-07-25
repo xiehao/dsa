@@ -196,15 +196,139 @@ static void test_iterator_boundary_conditions(void **state) {
 }
 
 /**
+ * @brief 测试迭代器的读写功能
+ */
+static void test_iterator_read_write(void **state) {
+    (void)state; // 未使用的参数
+
+    // 测试静态数组的读写
+    int buffer[5];
+    dsa_array_list_t *arr = array_list_create_static(buffer, 5, sizeof(int));
+    assert_non_null(arr);
+
+    // 添加测试数据
+    int test_values[] = {1, 2, 3, 4, 5};
+    for (int i = 0; i < 5; i++) {
+        assert_int_equal(array_list_push_back(arr, &test_values[i]), DSA_SUCCESS);
+    }
+
+    // 使用迭代器修改所有元素（乘以2）
+    dsa_iterator_t *iter = array_list_begin(arr);
+    assert_non_null(iter);
+
+    while (iterator_is_valid(iter)) {
+        int *value = (int *)iterator_get_value(iter);
+        assert_non_null(value);
+
+        int new_value = (*value) * 2;
+        assert_int_equal(iterator_set_value(iter, &new_value), DSA_SUCCESS);
+
+        // 验证修改是否成功
+        int *updated_value = (int *)iterator_get_value(iter);
+        assert_non_null(updated_value);
+        assert_int_equal(*updated_value, new_value);
+
+        iterator_next(iter);
+    }
+
+    iterator_destroy(iter);
+
+    // 验证所有元素都被正确修改
+    for (size_t i = 0; i < 5; i++) {
+        int *value = (int *)array_list_get(arr, i);
+        assert_non_null(value);
+        assert_int_equal(*value, test_values[i] * 2);
+    }
+
+    array_list_destroy(arr);
+}
+
+/**
+ * @brief 测试迭代器set_value的错误处理
+ */
+static void test_iterator_set_value_error_handling(void **state) {
+    (void)state; // 未使用的参数
+
+    int buffer[3];
+    dsa_array_list_t *arr = array_list_create_static(buffer, 3, sizeof(int));
+    assert_non_null(arr);
+
+    int value = 42;
+    assert_int_equal(array_list_push_back(arr, &value), DSA_SUCCESS);
+
+    dsa_iterator_t *iter = array_list_begin(arr);
+    assert_non_null(iter);
+
+    // 测试NULL迭代器
+    assert_int_equal(iterator_set_value(NULL, &value), DSA_ERROR_INVALID_PARAMETER);
+
+    // 测试NULL值
+    assert_int_equal(iterator_set_value(iter, NULL), DSA_ERROR_INVALID_PARAMETER);
+
+    // 移动到末尾位置（无效位置）
+    dsa_iterator_t *end_iter = array_list_end(arr);
+    assert_non_null(end_iter);
+
+    // 尝试在无效位置设置值
+    assert_int_equal(iterator_set_value(end_iter, &value), DSA_ERROR_INDEX_OUT_OF_BOUNDS);
+
+    iterator_destroy(iter);
+    iterator_destroy(end_iter);
+    array_list_destroy(arr);
+}
+
+/**
+ * @brief 测试动态数组迭代器的读写功能
+ */
+static void test_dynamic_array_iterator_read_write(void **state) {
+    (void)state; // 未使用的参数
+
+    dsa_array_list_t *arr = array_list_create_dynamic(3);
+    assert_non_null(arr);
+
+    // 添加测试数据
+    for (int i = 0; i < 3; i++) {
+        int *value = malloc(sizeof(int));
+        assert_non_null(value);
+        *value = i + 1;
+        assert_int_equal(array_list_push_back(arr, value), DSA_SUCCESS);
+    }
+
+    // 使用迭代器修改元素
+    dsa_iterator_t *iter = array_list_begin(arr);
+    assert_non_null(iter);
+
+    int index = 0;
+    while (iterator_is_valid(iter)) {
+        int *new_value = malloc(sizeof(int));
+        assert_non_null(new_value);
+        *new_value = (index + 1) * 10;  // 10, 20, 30
+
+        assert_int_equal(iterator_set_value(iter, new_value), DSA_SUCCESS);
+
+        // 验证修改
+        int *updated_value = (int *)iterator_get_value(iter);
+        assert_non_null(updated_value);
+        assert_int_equal(*updated_value, (index + 1) * 10);
+
+        index++;
+        iterator_next(iter);
+    }
+
+    iterator_destroy(iter);
+    array_list_destroy_with_free(arr);
+}
+
+/**
  * @brief 测试NULL指针的处理
  */
 static void test_iterator_null_handling(void **state) {
     (void)state; // 未使用的参数
-    
+
     // 测试NULL数组
     assert_null(array_list_begin(NULL));
     assert_null(array_list_end(NULL));
-    
+
     // 测试NULL迭代器
     assert_null(iterator_next(NULL));
     assert_null(iterator_prev(NULL));
@@ -212,7 +336,11 @@ static void test_iterator_null_handling(void **state) {
     assert_false(iterator_is_valid(NULL));
     assert_true(iterator_equals(NULL, NULL));
     assert_false(iterator_equals(NULL, (dsa_iterator_t *)0x1));
-    
+
+    // 测试set_value的NULL处理
+    int value = 42;
+    assert_int_equal(iterator_set_value(NULL, &value), DSA_ERROR_INVALID_PARAMETER);
+
     // iterator_destroy应该安全处理NULL
     iterator_destroy(NULL); // 不应该崩溃
 }
@@ -227,8 +355,11 @@ int main(void) {
         cmocka_unit_test(test_array_reverse_iteration),
         cmocka_unit_test(test_empty_array_iterator),
         cmocka_unit_test(test_iterator_boundary_conditions),
+        cmocka_unit_test(test_iterator_read_write),
+        cmocka_unit_test(test_iterator_set_value_error_handling),
+        cmocka_unit_test(test_dynamic_array_iterator_read_write),
         cmocka_unit_test(test_iterator_null_handling),
     };
-    
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

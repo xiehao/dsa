@@ -45,8 +45,19 @@ dsa_element_pt iterator_get_value(dsa_iterator_t *iter) {
     if (!iter || !iter->trait || !iter->trait->get_value) {
         return NULL;
     }
-    
+
     return iter->trait->get_value(iter);
+}
+
+/**
+ * @brief 设置迭代器当前指向的元素值
+ */
+dsa_result_t iterator_set_value(dsa_iterator_t *iter, dsa_element_pt value) {
+    if (!iter || !iter->trait || !iter->trait->set_value) {
+        return DSA_ERROR_INVALID_PARAMETER;
+    }
+
+    return iter->trait->set_value(iter, value);
 }
 
 /**

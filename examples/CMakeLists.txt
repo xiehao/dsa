@@ -9,10 +9,15 @@ add_executable(example_dynamic_array_list dynamic_array_list_example.c)
 target_link_libraries(example_dynamic_array_list PRIVATE ds_array_list)
 target_include_directories(example_dynamic_array_list PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-# Add unified array list example executable (original)
+# Add array list example executable
 add_executable(example_array_list array_list_example.c)
 target_link_libraries(example_array_list PRIVATE ds_array_list)
 target_include_directories(example_array_list PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Add array list iterator example executable
+add_executable(example_array_list_iterator array_list_iterator_example.c)
+target_link_libraries(example_array_list_iterator PRIVATE ds_array_list)
+target_include_directories(example_array_list_iterator PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 # Linked List Examples
 # Add singly linked list example executable
@@ -72,3 +77,9 @@ target_include_directories(example_circular_array_queue PRIVATE ${CMAKE_SOURCE_D
 add_executable(example_doubly_linked_queue doubly_linked_queue_example.c)
 target_link_libraries(example_doubly_linked_queue PRIVATE adt_queue)
 target_include_directories(example_doubly_linked_queue PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Sorting Examples
+# Add sorting algorithms example executable
+add_executable(example_sorting sorting_example.c)
+target_link_libraries(example_sorting PRIVATE dsa)
+target_include_directories(example_sorting PRIVATE ${CMAKE_SOURCE_DIR}/include)

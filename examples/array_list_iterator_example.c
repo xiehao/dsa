@@ -1,5 +1,5 @@
 /**
- * @file array_list_iterator_demo.c
+ * @file array_list_iterator_example.c
  * @brief 数组列表迭代器使用示例
  * @details 演示如何使用数组列表的迭代器进行遍历操作
  * @author DSA项目组

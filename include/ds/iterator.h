@@ -100,12 +100,93 @@ bool iterator_equals(dsa_iterator_t *iter1, dsa_iterator_t *iter2);
  * @brief 销毁迭代器并释放相关内存
  *
  * @param iter 要销毁的迭代器指针
- * 
+ *
  * @note 销毁后的迭代器指针不能再使用
  * @warning 调用此函数后，iter指针将失效，不能再使用
  */
 void iterator_destroy(dsa_iterator_t *iter);
 
 /** @} */ // IteratorOperations
+
+/**
+ * @defgroup IteratorAdvancedOperations 高级迭代器操作
+ * @brief 支持排序算法等复杂操作的高级迭代器接口
+ * @{
+ */
+
+/**
+ * @brief 克隆迭代器
+ * @details 创建一个指向相同位置的新迭代器，用于需要多个独立迭代器的场景
+ *
+ * @param iter 要克隆的迭代器指针
+ * @return 新的迭代器指针，失败时返回NULL
+ *
+ * @pre iter != NULL
+ * @note 返回的迭代器需要调用iterator_destroy()释放
+ * @note 克隆的迭代器与原迭代器相互独立，可以分别移动
+ */
+dsa_iterator_t *iterator_clone(const dsa_iterator_t *iter);
+
+/**
+ * @brief 计算两个迭代器之间的距离
+ * @details 计算从begin到end需要多少次iterator_next()操作
+ *
+ * @param begin 起始迭代器
+ * @param end 结束迭代器
+ * @return 距离（元素个数），如果end在begin之前则返回0
+ *
+ * @pre begin != NULL && end != NULL
+ * @pre begin和end来自同一个容器
+ * @note 时间复杂度：O(n)，其中n是距离
+ */
+size_t iterator_distance(dsa_iterator_t *begin, dsa_iterator_t *end);
+
+/**
+ * @brief 将迭代器向前移动指定步数
+ * @details 相当于连续调用n次iterator_next()
+ *
+ * @param iter 要移动的迭代器
+ * @param n 移动的步数
+ * @return 移动后的迭代器指针（与输入相同）
+ *
+ * @pre iter != NULL
+ * @note 如果移动超出容器范围，迭代器将指向end位置
+ * @note 时间复杂度：O(n)
+ */
+dsa_iterator_t *iterator_advance(dsa_iterator_t *iter, size_t n);
+
+/**
+ * @brief 将迭代器向后移动指定步数
+ * @details 相当于连续调用n次iterator_prev()
+ *
+ * @param iter 要移动的迭代器
+ * @param n 移动的步数
+ * @return 移动后的迭代器指针（与输入相同）
+ *
+ * @pre iter != NULL
+ * @note 如果移动超出容器范围，迭代器将指向begin位置
+ * @note 时间复杂度：O(n)
+ * @note 并非所有迭代器类型都支持反向移动
+ */
+dsa_iterator_t *iterator_retreat(dsa_iterator_t *iter, size_t n);
+
+/**
+ * @brief 在指定范围内查找第一个满足条件的元素
+ * @details 从begin开始向end方向查找，直到找到第一个使predicate返回true的元素
+ *
+ * @param begin 起始迭代器
+ * @param end 结束迭代器
+ * @param predicate 判断函数，接受元素指针，返回bool
+ * @param context 传递给predicate的上下文参数
+ * @return 指向找到元素的迭代器，未找到时返回end的克隆
+ *
+ * @pre begin != NULL && end != NULL && predicate != NULL
+ * @note 返回的迭代器需要调用iterator_destroy()释放
+ */
+typedef bool (*iterator_predicate_t)(dsa_const_element_pt element, void *context);
+dsa_iterator_t *iterator_find_if(dsa_iterator_t *begin, dsa_iterator_t *end,
+                                iterator_predicate_t predicate, void *context);
+
+/** @} */ // IteratorAdvancedOperations
 
 #endif // DSA_ITERATOR_H

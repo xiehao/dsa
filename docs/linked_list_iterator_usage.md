@@ -38,7 +38,7 @@
 ```c
 #include <ds/linked_list.h>
 #include <ds/linked_list_iterator.h>
-#include <ds/iterator.h>
+#include <a/iterator.h>
 ```
 
 ### 正向遍历

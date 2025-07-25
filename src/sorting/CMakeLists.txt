@@ -10,6 +10,7 @@ target_link_libraries(dsa_sorting
         PUBLIC
         dsa_common
         dsa_common_impl
+        dsa_iterator_utils
 )
 
 # 只需要设置私有的include目录

@@ -13,7 +13,7 @@
 #include <cmocka.h>
 #include <stdlib.h>
 #include <ds/array_list.h>
-#include <ds/iterator.h>
+#include <a/iterator.h>
 #include <ds/array_list_iterator.h>
 
 /**

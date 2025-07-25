@@ -10,7 +10,7 @@
 #ifndef DSA_ARRAY_LIST_ITERATOR_H
 #define DSA_ARRAY_LIST_ITERATOR_H
 
-#include <ds/iterator.h>
+#include <a/iterator.h>
 #include <ds/array_list.h>
 
 /**

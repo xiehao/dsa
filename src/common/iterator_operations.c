@@ -7,9 +7,9 @@
  * @version 1.0
  */
 
-#include <ds/iterator.h>
+#include <a/iterator.h>
 #include <traits.h>
-#include <iterator_internal.h>
+#include <../iterator/internal/iterator_internal.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>

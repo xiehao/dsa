@@ -7,14 +7,14 @@
  * @version 1.0
  */
 
-#include <ds/iterator.h>
+#include <a/iterator.h>
 #include <ds/array_list.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include <iterator_internal.h>
+#include <../iterator/internal/iterator_internal.h>
 #include <internal/array_iterator_internal.h>
 #include <internal/static_array_list.h>
 #include <internal/dynamic_array_list.h>

@@ -83,3 +83,9 @@ target_include_directories(example_doubly_linked_queue PRIVATE ${CMAKE_SOURCE_DI
 add_executable(example_sorting sorting_example.c)
 target_link_libraries(example_sorting PRIVATE dsa)
 target_include_directories(example_sorting PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+# Searching Examples
+# Add searching algorithms example executable
+add_executable(example_searching searching_example.c)
+target_link_libraries(example_searching PRIVATE dsa)
+target_include_directories(example_searching PRIVATE ${CMAKE_SOURCE_DIR}/include)

@@ -6,6 +6,8 @@ add_subdirectory(deque)
 add_subdirectory(stack)
 add_subdirectory(queue)
 add_subdirectory(sorting)
+add_subdirectory(searching)
+add_subdirectory(iterator)
 
 # Create an interface library to aggregate sub-libraries
 add_library(dsa_internal INTERFACE)
@@ -19,6 +21,8 @@ target_link_libraries(dsa_internal INTERFACE
         adt_stack
         adt_queue
         dsa_sorting
+        dsa_searching
+        dsa_iterator_utils
 )
 
 # Propagate include directories from the interface library

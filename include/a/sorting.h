@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <common.h>
-#include <ds/iterator.h>
+#include <a/iterator.h>
 
 /**
  * @defgroup SortingAlgorithms 排序算法
@@ -207,15 +207,6 @@ dsa_result_t dsa_selection_sort_bubble(dsa_iterator_t *begin, dsa_iterator_t *en
  * @note 时间复杂度：O(n)
  */
 bool dsa_is_sorted(dsa_iterator_t *begin, dsa_iterator_t *end, compare_func_t compare);
-
-/**
- * @brief 交换两个迭代器指向的元素
- * @param iter1 第一个迭代器
- * @param iter2 第二个迭代器
- * @return 操作结果
- * @note 内部使用临时缓冲区进行交换
- */
-dsa_result_t dsa_iterator_swap(dsa_iterator_t *iter1, dsa_iterator_t *iter2);
 
 /**
  * @brief 获取排序算法的名称

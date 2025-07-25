@@ -7,14 +7,14 @@
  * @version 1.0
  */
 
-#include <ds/iterator.h>
+#include <a/iterator.h>
 #include <ds/linked_list_iterator.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include <iterator_internal.h>
+#include <../iterator/internal/iterator_internal.h>
 #include <internal/linked_list_iterator_internal.h>
 #include <internal/singly_linked_list.h>
 #include <internal/doubly_linked_list.h>

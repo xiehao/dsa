@@ -24,3 +24,12 @@ target_link_libraries(test_array_iterator PRIVATE ds_array_list CMocka::CMocka)
 
 # Add the array iterator test to CTest
 add_test(NAME ArrayIteratorTest COMMAND test_array_iterator)
+
+# Define the iterator performance test executable
+add_executable(test_iterator_performance test_iterator_performance.c)
+
+# Link the dsa_array library and CMocka
+target_link_libraries(test_iterator_performance PRIVATE ds_array_list CMocka::CMocka)
+
+# Add the iterator performance test to CTest
+add_test(NAME IteratorPerformanceTest COMMAND test_iterator_performance)

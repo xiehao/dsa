@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <ds/sorting.h>
+#include <a/sorting.h>
 #include <ds/array_list.h>
 #include <ds/array_list_iterator.h>
 #include <ds/linked_list.h>

@@ -20,7 +20,7 @@
 
 ```c
 #include <ds/array_list.h>
-#include <ds/iterator.h>
+#include <a/iterator.h>
 ```
 
 ### 正向遍历

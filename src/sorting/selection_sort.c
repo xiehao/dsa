@@ -7,7 +7,7 @@
  * @version 1.0
  */
 
-#include <ds/sorting.h>
+#include <a/sorting.h>
 #include <stdlib.h>
 #include <string.h>
 

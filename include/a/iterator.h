@@ -194,6 +194,21 @@ typedef bool (*iterator_predicate_t)(dsa_const_element_pt element, void *context
 dsa_iterator_t *iterator_find_if(dsa_iterator_t *begin, dsa_iterator_t *end,
                                 iterator_predicate_t predicate, void *context);
 
+/**
+ * @brief 交换两个迭代器指向的元素
+ * @details 交换两个迭代器所指向位置的元素值，用于排序算法等需要元素交换的场景
+ *
+ * @param iter1 第一个迭代器
+ * @param iter2 第二个迭代器
+ * @return 操作结果，成功返回DSA_SUCCESS
+ *
+ * @pre iter1 != NULL && iter2 != NULL
+ * @pre iter1和iter2都指向有效元素
+ * @note 内部使用临时缓冲区进行交换
+ * @note 交换操作是原子的，要么完全成功，要么完全失败
+ */
+dsa_result_t dsa_iterator_swap(dsa_iterator_t *iter1, dsa_iterator_t *iter2);
+
 /** @} */ // IteratorAdvancedOperations
 
 #endif // DSA_ITERATOR_H

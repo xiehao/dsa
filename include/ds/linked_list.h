@@ -247,4 +247,26 @@ dsa_element_pt linked_list_pop_front(dsa_linked_list_t* list);
  */
 dsa_element_pt linked_list_pop_back(dsa_linked_list_t* list);
 
+/**
+ * @brief 获取链表类型
+ *
+ * @param linked_list 指向链表的指针
+ * @return 链表类型枚举值，如果链表为NULL则返回默认类型
+ *
+ * @pre linked_list != NULL
+ */
+dsa_linked_list_type_t linked_list_get_type(const dsa_linked_list_t *linked_list);
+
+/**
+ * @brief 获取链表类型名称
+ *
+ * @param linked_list 指向链表的指针
+ * @return 链表类型的字符串描述，如果链表为NULL则返回"Unknown"
+ *
+ * @pre linked_list != NULL
+ */
+const char *linked_list_get_type_name(const dsa_linked_list_t *linked_list);
+
+
+
 #endif // DSA_LINKED_LIST_H

@@ -11,26 +11,7 @@
 #include <internal/linked_list_traits.h>
 #include <internal/doubly_linked_list.h>
 
-/**
- * @brief 双向链表节点结构
- * @details 双向链表的基本节点，包含指向前一个和后一个节点的指针，以及数据指针
- */
-typedef struct node_t {
-    struct node_t *previous; /**< 指向前一个节点的指针 */
-    struct node_t *next; /**< 指向后一个节点的指针 */
-    dsa_element_pt data; /**< 节点存储的数据指针 */
-} node_t;
 
-/**
- * @brief 双向链表结构
- * @details 双向链表的主要结构，包含特征表、哨兵节点和大小信息
- */
-typedef struct {
-    trait_linked_list_t const *traits; /**< 链表特征函数表指针 */
-    node_t *head; /**< 头哨兵节点指针 */
-    node_t *tail; /**< 尾哨兵节点指针 */
-    size_t size; /**< 链表中元素的数量 */
-} doubly_linked_t;
 
 /**
  * @brief 获取双向链表的大小
@@ -72,9 +53,9 @@ static dsa_result_t doubly_linked_clear(dsa_container_pt list) {
     }
 
     // 从第一个数据节点开始遍历并释放
-    node_t *current = this->head->next;
+    doubly_node_t *current = this->head->next;
     while (current != this->tail) {
-        node_t *next = current->next;
+        doubly_node_t *next = current->next;
         free(current);
         current = next;
     }
@@ -136,7 +117,7 @@ static trait_basic_t const basic_trait = {
  * @retval node_t* 有效的节点指针
  * @details 从头哨兵节点开始，向前遍历index步，返回到达的节点
  */
-static node_t *find_node_before(doubly_linked_t const *this, size_t index) {
+static doubly_node_t *find_node_before(doubly_linked_t const *this, size_t index) {
     if (!this || !this->head || index > this->size) {
         return NULL;
     }
@@ -147,7 +128,7 @@ static node_t *find_node_before(doubly_linked_t const *this, size_t index) {
         return this->tail->previous->previous;
     }
 
-    node_t *node = this->head;
+    doubly_node_t *node = this->head;
     for (size_t i = 0; i < index; ++i) {
         node = node->next;
     }
@@ -164,7 +145,7 @@ static node_t *find_node_before(doubly_linked_t const *this, size_t index) {
  */
 static dsa_element_pt doubly_linked_get(dsa_const_container_pt list, size_t index) {
     doubly_linked_t const *this = list;
-    node_t const *node = find_node_before(this, index + 1);
+    doubly_node_t const *node = find_node_before(this, index + 1);
     return node ? node->data : NULL;
 }
 
@@ -184,7 +165,7 @@ static dsa_result_t doubly_linked_set(dsa_container_pt list, size_t index, dsa_e
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *node = find_node_before(this, index + 1);
+    doubly_node_t *node = find_node_before(this, index + 1);
     if (!node) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
@@ -203,12 +184,12 @@ static dsa_result_t doubly_linked_set(dsa_container_pt list, size_t index, dsa_e
  * @retval DSA_ERROR_MEMORY_ALLOCATION 内存分配失败
  * @details 创建的节点的前后指针都初始化为NULL
  */
-static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
+static dsa_result_t create_node(dsa_element_pt element, doubly_node_t **out_node) {
     if (!out_node) {
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *new_node = malloc(sizeof(node_t));
+    doubly_node_t *new_node = malloc(sizeof(doubly_node_t));
     if (!new_node) {
         return DSA_ERROR_MEMORY_ALLOCATION;
     }
@@ -227,7 +208,7 @@ static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
  * @retval DSA_ERROR_NULL_POINTER 节点指针为NULL
  * @details 只释放节点结构体的内存，不处理节点中存储的数据
  */
-static dsa_result_t destroy_node(node_t *node) {
+static dsa_result_t destroy_node(doubly_node_t *node) {
     if (!node) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -244,7 +225,7 @@ static dsa_result_t destroy_node(node_t *node) {
  * @retval DSA_ERROR_NULL_POINTER 节点指针为NULL或节点的next指针为NULL
  * @details 更新相关节点的前后指针以维护双向链表的完整性
  */
-static dsa_result_t attach_node_after(node_t *node, node_t *new_node) {
+static dsa_result_t attach_node_after(doubly_node_t *node, doubly_node_t *new_node) {
     if (!node || !node->next || !new_node) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -278,12 +259,12 @@ static dsa_result_t doubly_linked_insert_at(dsa_container_pt list, size_t index,
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *previous_node = find_node_before(this, index);
+    doubly_node_t *previous_node = find_node_before(this, index);
     if (!previous_node) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
 
-    node_t *new_node;
+    doubly_node_t *new_node;
     dsa_result_t result = create_node(element, &new_node);
     if (DSA_SUCCESS != result) {
         return result;
@@ -305,12 +286,12 @@ static dsa_result_t doubly_linked_insert_at(dsa_container_pt list, size_t index,
  * @retval node_t* 被分离的节点指针
  * @details 更新相关节点的前后指针，但不释放被分离节点的内存
  */
-static node_t *detach_node_after(node_t *node) {
+static doubly_node_t *detach_node_after(doubly_node_t *node) {
     if (!node) {
         return NULL;
     }
 
-    node_t *next_node = node->next;
+    doubly_node_t *next_node = node->next;
     if (!next_node || !next_node->next) {
         return NULL;
     }
@@ -334,12 +315,12 @@ static node_t *detach_node_after(node_t *node) {
 static dsa_element_pt doubly_linked_remove_at(dsa_container_pt list, size_t index) {
     doubly_linked_t *this = list;
 
-    node_t *previous_node = find_node_before(this, index);
+    doubly_node_t *previous_node = find_node_before(this, index);
     if (!previous_node) {
         return NULL;
     }
 
-    node_t *node_to_remove = detach_node_after(previous_node);
+    doubly_node_t *node_to_remove = detach_node_after(previous_node);
     if (!node_to_remove) {
         return NULL;
     }
@@ -443,7 +424,7 @@ dsa_linked_list_t *doubly_linked_create() {
     }
 
     // 创建头哨兵节点
-    node_t *head, *tail;
+    doubly_node_t *head, *tail;
     if (DSA_SUCCESS != create_node(NULL, &head)) {
         free(list);
         return NULL;

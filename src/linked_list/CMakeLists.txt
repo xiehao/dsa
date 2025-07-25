@@ -1,6 +1,7 @@
 # Add library target for linked_list
 add_library(ds_linked_list STATIC
         linked_list.c
+        linked_list_iterator.c
         singly_linked_list.c
         doubly_linked_list.c
         circular_linked_list.c

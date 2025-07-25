@@ -24,3 +24,12 @@ target_link_libraries(test_circular_linked_list PRIVATE ds_linked_list CMocka::C
 
 # Add the test to CTest
 add_test(NAME CircularLinkedListTest COMMAND test_circular_linked_list)
+
+# Define the test executable for linked list iterator
+add_executable(test_linked_list_iterator test_linked_list_iterator.c)
+
+# Link the linked_list library and common library
+target_link_libraries(test_linked_list_iterator PRIVATE ds_linked_list dsa_common_impl)
+
+# Add the test to CTest
+add_test(NAME LinkedListIteratorTest COMMAND test_linked_list_iterator)

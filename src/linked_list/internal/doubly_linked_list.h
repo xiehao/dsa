@@ -14,6 +14,28 @@
 #define DOUBLY_LINKED_LIST_H
 
 #include <ds/linked_list.h>
+#include <internal/linked_list_traits.h>
+
+/**
+ * @brief 双链表节点结构
+ * @details 双向链表的基本节点，包含指向前一个和后一个节点的指针，以及数据指针
+ */
+typedef struct doubly_node_t {
+    struct doubly_node_t *previous; /**< 指向前一个节点的指针 */
+    struct doubly_node_t *next; /**< 指向后一个节点的指针 */
+    dsa_element_pt data; /**< 节点存储的数据指针 */
+} doubly_node_t;
+
+/**
+ * @brief 双向链表结构
+ * @details 双向链表的主要结构，包含特征表、哨兵节点和大小信息
+ */
+typedef struct {
+    trait_linked_list_t const *traits; /**< 链表特征函数表指针 */
+    doubly_node_t *head; /**< 头哨兵节点指针 */
+    doubly_node_t *tail; /**< 尾哨兵节点指针 */
+    size_t size; /**< 链表中元素的数量 */
+} doubly_linked_t;
 
 /**
  * @brief 创建一个新的双向链表

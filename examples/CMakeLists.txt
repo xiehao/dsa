@@ -35,6 +35,11 @@ add_executable(example_linked_list linked_list_example.c)
 target_link_libraries(example_linked_list PRIVATE ds_linked_list)
 target_include_directories(example_linked_list PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
+# Add linked list iterator example executable
+add_executable(example_linked_list_iterator linked_list_iterator_example.c)
+target_link_libraries(example_linked_list_iterator PRIVATE ds_linked_list dsa_common_impl)
+target_include_directories(example_linked_list_iterator PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
 # Stack Examples
 # Add array stack example executable
 add_executable(example_array_stack array_stack_example.c)

@@ -10,24 +10,7 @@
 #include <internal/linked_list_traits.h>
 #include <stdlib.h>
 
-/**
- * @brief 循环链表节点结构
- * @details 定义了循环链表的基本节点结构，包含数据指针和下一个节点的指针
- */
-typedef struct node_t {
-    struct node_t *next; /**< 指向下一个节点的指针 */
-    dsa_element_pt data; /**< 存储的数据元素指针 */
-} node_t;
 
-/**
- * @brief 循环链表结构体
- * @details 定义了循环链表的主体结构，包含特性指针、头节点和大小信息
- */
-typedef struct {
-    trait_linked_list_t const *traits; /**< 链表特性接口指针 */
-    node_t *head; /**< 头节点指针（哨兵节点） */
-    size_t size; /**< 链表中元素的数量 */
-} circular_linked_t;
 
 /**
  * @brief 获取循环链表的大小
@@ -70,9 +53,9 @@ static dsa_result_t circular_linked_clear(dsa_container_pt list) {
     }
 
     // 从第一个数据节点开始清理
-    node_t *current = this->head->next;
+    circular_node_t *current = this->head->next;
     while (current != this->head) {
-        node_t *next = current->next;
+        circular_node_t *next = current->next;
         free(current);
         current = next;
     }
@@ -124,13 +107,13 @@ static trait_basic_t const basic_trait = {
  * @note 内部辅助函数：用于插入和删除操作
  * @details 从头节点开始查找，返回指定索引位置的前一个节点
  */
-static node_t *find_node_before(circular_linked_t const *this, size_t index) {
+static circular_node_t *find_node_before(circular_linked_t const *this, size_t index) {
     if (!this || !this->head || index > this->size) {
         return NULL;
     }
 
     // 从头节点开始查找前一个节点
-    node_t *previous = this->head;
+    circular_node_t *previous = this->head;
     for (size_t i = 0; i < index && previous->next != this->head; ++i) {
         previous = previous->next;
     }
@@ -151,7 +134,7 @@ static dsa_element_pt circular_linked_get(dsa_const_container_pt list, size_t in
     }
 
     // 找到index位置的前一个节点，然后取其next节点
-    node_t const *prev_node = find_node_before(this, index);
+    circular_node_t const *prev_node = find_node_before(this, index);
     if (!prev_node || !prev_node->next || prev_node->next == this->head) {
         return NULL;
     }
@@ -177,7 +160,7 @@ static dsa_result_t circular_linked_set(dsa_container_pt list, size_t index, dsa
     }
 
     // 找到index位置的前一个节点，然后设置其next节点的数据
-    node_t *prev_node = find_node_before(this, index);
+    circular_node_t *prev_node = find_node_before(this, index);
     if (!prev_node || !prev_node->next || prev_node->next == this->head) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
@@ -193,12 +176,12 @@ static dsa_result_t circular_linked_set(dsa_container_pt list, size_t index, dsa
  * @return DSA_SUCCESS表示成功，DSA_ERROR_NULL_POINTER表示空指针错误，DSA_ERROR_MEMORY_ALLOCATION表示内存分配失败
  * @note 内部辅助函数：创建新节点并初始化
  */
-static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
+static dsa_result_t create_node(dsa_element_pt element, circular_node_t **out_node) {
     if (!out_node) {
         return DSA_ERROR_NULL_POINTER;
     }
 
-    node_t *new_node = malloc(sizeof(node_t));
+    circular_node_t *new_node = malloc(sizeof(circular_node_t));
     if (!new_node) {
         return DSA_ERROR_MEMORY_ALLOCATION;
     }
@@ -217,7 +200,7 @@ static dsa_result_t create_node(dsa_element_pt element, node_t **out_node) {
  * @return DSA_SUCCESS表示成功，DSA_ERROR_NULL_POINTER表示空指针错误
  * @note 内部辅助函数：维护链表的链接关系
  */
-static dsa_result_t attach_node_after(node_t *node, node_t *new_node) {
+static dsa_result_t attach_node_after(circular_node_t *node, circular_node_t *new_node) {
     if (!node || !new_node) {
         return DSA_ERROR_NULL_POINTER;
     }
@@ -247,12 +230,12 @@ static dsa_result_t circular_linked_insert_at(dsa_container_pt list, size_t inde
     }
 
     // 使用统一的查找函数找到插入位置的前一个节点
-    node_t *previous_node = find_node_before(this, index);
+    circular_node_t *previous_node = find_node_before(this, index);
     if (!previous_node) {
         return DSA_ERROR_INDEX_OUT_OF_BOUNDS;
     }
 
-    node_t *new_node;
+    circular_node_t *new_node;
     dsa_result_t result = create_node(element, &new_node);
     if (DSA_SUCCESS != result) {
         return result;
@@ -275,11 +258,11 @@ static dsa_result_t circular_linked_insert_at(dsa_container_pt list, size_t inde
  * @note 内部辅助函数：用于删除操作
  * @details 断开链接关系但不释放节点内存
  */
-static node_t *detach_node_after(node_t *node) {
+static circular_node_t *detach_node_after(circular_node_t *node) {
     if (!node || !node->next) {
         return NULL;
     }
-    node_t *next = node->next;
+    circular_node_t *next = node->next;
     node->next = next->next;
     return next;
 }
@@ -299,12 +282,12 @@ static dsa_element_pt circular_linked_remove_at(dsa_container_pt list, size_t in
     }
 
     // 使用统一的查找函数找到要删除节点的前一个节点
-    node_t *prev = find_node_before(this, index);
+    circular_node_t *prev = find_node_before(this, index);
     if (!prev || !prev->next || prev->next == this->head) {
         return NULL; // 没有要删除的节点
     }
 
-    node_t *to_remove = detach_node_after(prev);
+    circular_node_t *to_remove = detach_node_after(prev);
     if (!to_remove) {
         return NULL;
     }
@@ -403,7 +386,7 @@ dsa_linked_list_t *circular_linked_list_create(void) {
         return NULL;
     }
 
-    node_t *head;
+    circular_node_t *head;
     dsa_result_t result = create_node(NULL, &head); // 传入NULL作为头节点数据
     if (result != DSA_SUCCESS) {
         free(list);

@@ -9,6 +9,26 @@
 #define SINGLY_LINKED_H
 
 #include <ds/linked_list.h>
+#include <internal/linked_list_traits.h>
+
+/**
+ * @brief 单链表节点结构
+ * @details 定义了单链表的基本节点结构，包含数据指针和下一个节点的指针
+ */
+typedef struct singly_node_t {
+    struct singly_node_t *next; /**< 指向下一个节点的指针 */
+    dsa_element_pt data; /**< 存储的数据元素指针 */
+} singly_node_t;
+
+/**
+ * @brief 单链表结构体
+ * @details 定义了单链表的主体结构，包含特性指针、头节点和大小信息
+ */
+typedef struct {
+    trait_linked_list_t const *traits; /**< 链表特性接口指针 */
+    singly_node_t *head; /**< 头节点指针（哨兵节点） */
+    size_t size; /**< 链表中元素的数量 */
+} singly_linked_t;
 
 /**
  * @brief 创建一个新的单向链表

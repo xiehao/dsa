@@ -242,220 +242,73 @@ ctest --output-on-failure
 - **⚡ 性能分析**: 展示不同数据结构的性能特点
 - **🆚 对比分析**: 不同数据结构之间的对比
 
-## 💻 API 使用指南
+## 📚 API 文档
 
-### 📊 数组列表 API
+本项目提供了完整的API文档，包含详细的使用示例和性能分析：
 
-#### 创建数组
+### 📖 详细文档
+- **[完整文档目录](docs/README.md)** - 所有文档的入口
+- **[数组列表 API](docs/array_list_api.md)** - 静态数组和动态数组的完整API文档
+- **[链表 API](docs/linked_list_api.md)** - 单链表、双链表和循环链表的API文档
+- **[栈 API](docs/stack_api.md)** - 数组栈和链表栈的API文档
+- **[双端队列 API](docs/deque_api.md)** - 循环数组和双向链表双端队列的API文档
+- **[队列 API](docs/queue_api.md)** - 循环数组和双向链表队列的API文档
+- **[性能分析](docs/performance.md)** - 各种数据结构的性能对比和选择指南
 
+### 🎯 快速示例
+
+#### 数组列表基本用法
 ```c
 #include <ds/array_list.h>
 
-// 创建静态数组（栈上分配）
-int buffer[10];
-dsa_array_list_t *static_arr = array_list_create_static(buffer, 10, sizeof(int));
+// 创建动态数组
+dsa_array_list_t *arr = array_list_create_dynamic(5);
 
-// 创建动态数组（堆上分配）
-dsa_array_list_t *dynamic_arr = array_list_create_dynamic(5);
-```
-
-#### 基本操作
-
-```c
 // 添加元素
 int value = 42;
 array_list_push_back(arr, &value);
 
-// 插入元素
-array_list_insert(arr, 1, &value);
-
 // 获取元素
 dsa_element_pt element = array_list_get(arr, 0);
-int retrieved_value = ELEMENT_VALUE(int, element);
-
-// 设置元素
-array_list_set(arr, 0, &new_value);
-
-// 删除元素
-dsa_element_pt removed = array_list_remove(arr, 0);
-dsa_element_pt popped = array_list_pop_back(arr);
-
-// 查询状态
-size_t size = array_list_size(arr);
-size_t capacity = array_list_capacity(arr);
-bool is_empty = array_list_is_empty(arr);
-bool is_full = array_list_is_full(arr);  // 仅静态数组
+int retrieved = ELEMENT_VALUE(int, element);
 
 // 清理
-array_list_clear(arr);              // 清空元素
-array_list_clear_with_free(arr);    // 清空并释放元素内存
-array_list_destroy(arr);            // 销毁数组
+array_list_destroy(arr);
 ```
 
-### 🔗 链表 API
-
-#### 创建链表
-
+#### 栈基本用法
 ```c
-#include <ds/linked_list.h>
+#include <adt/stack.h>
 
-// 创建不同类型的链表
-dsa_linked_list_t *singly = linked_list_create(LINKED_LIST_TYPE_SINGLY);
-dsa_linked_list_t *doubly = linked_list_create(LINKED_LIST_TYPE_DOUBLY);
-dsa_linked_list_t *circular = linked_list_create(LINKED_LIST_TYPE_CIRCULAR);
-```
+// 创建栈
+dsa_stack_t *stack = stack_create(STACK_TYPE_ARRAY_LIST);
 
-#### 基本操作
+// 压栈
+int value = 42;
+stack_push(stack, &value);
 
-```c
-// 插入元素
-int *data = malloc(sizeof(int));
-*data = 42;
-linked_list_insert_at(list, 0, data);
-
-// 获取元素
-dsa_element_pt element = linked_list_get(list, 0);
-int value = *(int*)element;
-
-// 设置元素
-int *new_data = malloc(sizeof(int));
-*new_data = 99;
-linked_list_set(list, 0, new_data);
-
-// 删除元素
-dsa_element_pt removed = linked_list_remove_at(list, 0);
-free(removed);
-
-// 查询状态
-size_t size = linked_list_size(list);
-bool is_empty = linked_list_is_empty(list);
+// 弹栈
+dsa_element_pt top = stack_pop(stack);
 
 // 清理
-linked_list_clear(list);
-linked_list_destroy(list);
+stack_destroy(stack);
 ```
 
-### 🔄 双端队列 API
-
-#### 创建双端队列
-
-```c
-#include <adt/deque.h>
-
-// 创建循环数组双端队列
-dsa_deque_t *circular_deque = deque_create(DEQUE_TYPE_CIRCULAR_ARRAY_LIST);
-
-// 创建双向链表双端队列
-dsa_deque_t *linked_deque = deque_create(DEQUE_TYPE_DOUBLY_LINKED_LIST);
-```
-
-#### 基本操作
-
-```c
-// 双端插入
-int *data1 = malloc(sizeof(int));
-*data1 = 42;
-deque_add_first(deque, data1);  // 前端插入
-
-int *data2 = malloc(sizeof(int));
-*data2 = 99;
-deque_add_last(deque, data2);   // 后端插入
-
-// 双端删除
-dsa_element_pt first = deque_remove_first(deque);   // 前端删除
-dsa_element_pt last = deque_remove_last(deque);     // 后端删除
-
-// 查看元素（不删除）
-dsa_element_pt peek_first = deque_peek_first(deque);
-dsa_element_pt peek_last = deque_peek_last(deque);
-
-// 查询状态
-size_t size = deque_size(deque);
-bool is_empty = deque_is_empty(deque);
-bool is_full = deque_is_full(deque);        // 仅循环数组实现
-size_t capacity = deque_capacity(deque);    // 仅循环数组实现
-
-// 获取类型信息
-dsa_deque_type_t type = deque_get_type(deque);
-const char *type_name = deque_get_type_name(deque);
-
-// 清理
-deque_clear(deque);                 // 清空元素
-deque_clear_with_free(deque);       // 清空并释放元素内存
-deque_destroy(deque);               // 销毁双端队列
-```
-
-### 🎫 队列 API
-
-#### 创建队列
-
+#### 队列基本用法
 ```c
 #include <adt/queue.h>
 
-// 创建循环数组队列
-dsa_queue_t *circular_queue = queue_create(QUEUE_TYPE_CIRCULAR_ARRAY_LIST);
-
-// 创建双向链表队列
-dsa_queue_t *linked_queue = queue_create(QUEUE_TYPE_DOUBLY_LINKED_LIST);
-```
-
-#### 基本操作
-
-```c
-// 入队操作（FIFO - 先进先出）
-int *data1 = malloc(sizeof(int));
-*data1 = 42;
-dsa_result_t result = queue_enqueue(queue, data1);  // 元素加入队尾
-
-int *data2 = malloc(sizeof(int));
-*data2 = 99;
-queue_enqueue(queue, data2);
-
-// 出队操作（FIFO - 先进先出）
-dsa_element_pt first_out = queue_dequeue(queue);   // 队首元素出队
-// first_out 指向 data1 (值为42)，因为它先入队
-
-dsa_element_pt second_out = queue_dequeue(queue);  // 下一个元素出队
-// second_out 指向 data2 (值为99)
-
-// 查询状态
-size_t size = queue_size(queue);
-bool is_empty = queue_is_empty(queue);
-
-// 获取类型信息
-dsa_queue_type_t type = queue_get_type(queue);
-const char *type_name = queue_get_type_name(queue);
-
-// 清理
-queue_clear(queue);                 // 清空队列
-queue_destroy(queue);               // 销毁队列
-```
-
-#### FIFO特性演示
-
-```c
-// 演示队列的先进先出特性
-printf("=== 队列FIFO特性演示 ===\n");
-
+// 创建队列
 dsa_queue_t *queue = queue_create(QUEUE_TYPE_CIRCULAR_ARRAY_LIST);
 
-// 依次入队
-for (int i = 1; i <= 5; i++) {
-    int *data = malloc(sizeof(int));
-    *data = i * 10;
-    queue_enqueue(queue, data);
-    printf("入队: %d\n", i * 10);
-}
+// 入队
+int value = 42;
+queue_enqueue(queue, &value);
 
-// 依次出队（按入队顺序）
-printf("出队顺序:\n");
-while (!queue_is_empty(queue)) {
-    dsa_element_pt element = queue_dequeue(queue);
-    printf("出队: %d\n", *(int*)element);
-    free(element);
-}
-// 输出: 10, 20, 30, 40, 50 (与入队顺序相同)
+// 出队
+dsa_element_pt element = queue_dequeue(queue);
 
+// 清理
 queue_destroy(queue);
 ```
 
@@ -469,80 +322,17 @@ queue_destroy(queue);
 
 ### 🔧 错误处理
 
+所有修改操作都返回 `dsa_result_t` 类型的错误码，支持完善的错误处理：
+
 ```c
-// 所有修改操作都返回错误码
 dsa_result_t result = array_list_push_back(arr, &value);
 if (result != DSA_SUCCESS) {
-    switch (result) {
-        case DSA_ERROR_NULL_POINTER:
-            printf("空指针错误\n");
-            break;
-        case DSA_ERROR_MEMORY_ALLOCATION:
-            printf("内存分配失败\n");
-            break;
-        case DSA_ERROR_INDEX_OUT_OF_BOUNDS:
-            printf("索引越界\n");
-            break;
-        case DSA_ERROR_CONTAINER_FULL:
-            printf("容器已满\n");
-            break;
-        default:
-            printf("未知错误\n");
-    }
+    // 处理错误情况
+    printf("操作失败: %d\n", result);
 }
 ```
 
-## 📈 性能特点
-
-### 数组列表性能对比
-
-| 操作     | 静态数组  | 动态数组  | 说明                 |
-| -------- | --------- | --------- | -------------------- |
-| 随机访问 | O(1) ✅   | O(1) ✅   | 都支持常数时间访问   |
-| 尾部插入 | O(1) ✅   | O(1)* ✅  | 动态数组偶尔需要扩容 |
-| 中间插入 | O(n) ⚠️ | O(n) ⚠️ | 需要移动后续元素     |
-| 删除操作 | O(n) ⚠️ | O(n) ⚠️ | 需要移动后续元素     |
-| 内存开销 | 低 ✅     | 中等 ⚠️ | 静态数组无额外开销   |
-| 扩容能力 | 无 ❌     | 自动 ✅   | 动态数组可自动扩容   |
-
-### 链表性能对比
-
-| 操作         | 单链表    | 双链表    | 循环链表  | 说明                 |
-| ------------ | --------- | --------- | --------- | -------------------- |
-| 头部插入     | O(1) ✅   | O(1) ✅   | O(1) ✅   | 都支持高效头部操作   |
-| 尾部插入     | O(n) ⚠️ | O(1) ✅   | O(1) ✅   | 双链表和循环链表更优 |
-| 随机访问     | O(n) ⚠️ | O(n) ⚠️ | O(n) ⚠️ | 都需要遍历查找       |
-| 删除已知节点 | O(n) ⚠️ | O(1) ✅   | O(1) ✅   | 双链表优势明显       |
-| 反向遍历     | 不支持 ❌ | 支持 ✅   | 支持 ✅   | 双向链接的优势       |
-| 内存开销     | 低 ✅     | 高 ⚠️   | 中等 ⚠️ | 指针数量影响开销     |
-
-### 双端队列性能对比
-
-| 操作       | 循环数组双端队列 | 双向链表双端队列 | 说明                       |
-| ---------- | ---------------- | ---------------- | -------------------------- |
-| 前端插入   | O(1) ✅          | O(1) ✅          | 都支持高效前端操作         |
-| 后端插入   | O(1) ✅          | O(1) ✅          | 都支持高效后端操作         |
-| 前端删除   | O(1) ✅          | O(1) ✅          | 都支持高效前端删除         |
-| 后端删除   | O(1) ✅          | O(1) ✅          | 都支持高效后端删除         |
-| 随机访问   | 不支持 ❌        | 不支持 ❌        | 双端队列不提供随机访问     |
-| 内存局部性 | 好 ✅            | 差 ⚠️          | 数组连续存储优势明显       |
-| 内存开销   | 低 ✅            | 高 ⚠️          | 链表需要额外指针开销       |
-| 扩容能力   | 自动 ✅          | 无限 ✅          | 数组自动扩容，链表理论无限 |
-| 扩容成本   | O(n) ⚠️        | 无 ✅            | 数组扩容需要复制元素       |
-
-### 队列性能对比
-
-| 操作       | 循环数组队列  | 双向链表队列 | 说明                                   |
-| ---------- | ------------- | ------------ | -------------------------------------- |
-| 入队操作   | O(1)* ✅      | O(1) ✅      | 循环数组平摊常数时间，链表严格常数时间 |
-| 出队操作   | O(1) ✅       | O(1) ✅      | 都支持高效的FIFO出队                   |
-| 查看队首   | 不支持 ❌     | 不支持 ❌    | 队列ADT不提供peek操作                  |
-| 随机访问   | 不支持 ❌     | 不支持 ❌    | 队列只支持FIFO访问模式                 |
-| 内存局部性 | 好 ✅         | 差 ⚠️      | 数组连续存储，缓存友好                 |
-| 内存开销   | 低 ✅         | 高 ⚠️      | 链表需要额外指针开销                   |
-| 扩容能力   | 自动 ✅       | 无限 ✅      | 数组自动扩容，链表理论无限             |
-| 扩容成本   | O(n) ⚠️     | 无 ✅        | 数组扩容需要复制元素                   |
-| 适用场景   | 高性能应用 ✅ | 动态场景 ✅  | 数组适合性能敏感，链表适合大小变化     |
+详细的错误处理示例请参考各个API文档。
 
 ## 🎓 学习资源
 

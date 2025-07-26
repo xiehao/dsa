@@ -1,3 +1,12 @@
+/**
+ * @file stack_traits.h
+ * @brief 栈特性接口定义
+ * @details 定义了栈数据结构的特性接口，用于实现不同栈实现的统一访问
+ * @author DSA项目组
+ * @date 2025-07-22
+ * @version 1.0
+ */
+
 #ifndef DSA_STACK_TRAITS_H
 #define DSA_STACK_TRAITS_H
 

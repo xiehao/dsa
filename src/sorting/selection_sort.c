@@ -1,10 +1,10 @@
 /**
  * @file selection_sort.c
  * @brief 选择类排序算法实现
- * @details 实现直接选择排序和冒泡排序算法
+ * @details 实现统一的选择排序框架，支持多种选择策略：线性选择和冒泡选择
  * @author DSA项目组
- * @date 2025-07-25
- * @version 1.0
+ * @date 2025-07-27
+ * @version 1.1
  */
 
 #include <a/sorting.h>
@@ -116,76 +116,7 @@ static dsa_iterator_t *find_min_bubble(dsa_iterator_t *begin, dsa_iterator_t *en
     return iterator_clone(begin); // 返回begin位置
 }
 
-/**
- * @brief 完整的冒泡排序实现
- * @details 标准的冒泡排序算法
- */
-static dsa_result_t bubble_sort_complete(dsa_iterator_t *begin, dsa_iterator_t *end,
-                                        compare_func_t compare, dsa_sort_stats_t *stats) {
-    if (!begin || !end || !compare) {
-        return DSA_ERROR_NULL_POINTER;
-    }
 
-    size_t n = iterator_distance(begin, end);
-    if (n <= 1) {
-        return DSA_SUCCESS;
-    }
-
-    // 外层循环：控制排序轮数
-    for (size_t i = 0; i < n - 1; i++) {
-        bool swapped = false; // 优化：如果一轮中没有交换，说明已经排序完成
-
-        // 内层循环：进行相邻元素比较和交换
-        dsa_iterator_t *current = iterator_clone(begin);
-        if (!current) {
-            return DSA_ERROR_MEMORY_ALLOCATION;
-        }
-
-        for (size_t j = 0; j < n - 1 - i; j++) {
-            dsa_iterator_t *next = iterator_clone(current);
-            iterator_next(next);
-
-            if (!iterator_is_valid(next) || iterator_equals(next, end)) {
-                iterator_destroy(next);
-                break;
-            }
-
-            dsa_element_pt current_value = iterator_get_value(current);
-            dsa_element_pt next_value = iterator_get_value(next);
-
-            if (stats) {
-                stats->comparisons++;
-            }
-
-            // 如果当前元素大于下一个元素，则交换
-            if (compare(current_value, next_value) > 0) {
-                dsa_result_t swap_result = dsa_iterator_swap(current, next);
-                if (swap_result != DSA_SUCCESS) {
-                    iterator_destroy(current);
-                    iterator_destroy(next);
-                    return swap_result;
-                }
-
-                if (stats) {
-                    stats->swaps++;
-                }
-                swapped = true;
-            }
-
-            iterator_destroy(next);
-            iterator_next(current);
-        }
-
-        iterator_destroy(current);
-
-        // 如果这一轮没有发生交换，说明数组已经有序
-        if (!swapped) {
-            break;
-        }
-    }
-
-    return DSA_SUCCESS;
-}
 
 /**
  * @brief 选择策略映射表
@@ -222,12 +153,7 @@ dsa_result_t dsa_selection_sort(dsa_iterator_t *begin, dsa_iterator_t *end,
         return DSA_SUCCESS;
     }
 
-    // 冒泡排序需要特殊处理，因为它是完整的排序算法，不是选择策略
-    if (strategy == SELECTION_STRATEGY_BUBBLE) {
-        return bubble_sort_complete(begin, end, compare, stats);
-    }
-
-    // 其他选择策略的标准流程
+    // 统一的选择策略流程
     selection_func_t select_func = selection_strategies[strategy];
     dsa_iterator_t *current = iterator_clone(begin);
     if (!current) {
@@ -275,7 +201,8 @@ dsa_result_t dsa_selection_sort_direct(dsa_iterator_t *begin, dsa_iterator_t *en
 
 /**
  * @brief 冒泡排序实现
- * @details 调用统一选择排序框架，使用冒泡策略
+ * @details 调用统一选择排序框架，使用冒泡策略选择最值
+ * @note 通过冒泡方式逐个选择最小元素，体现了选择排序的本质
  */
 dsa_result_t dsa_selection_sort_bubble(dsa_iterator_t *begin, dsa_iterator_t *end,
                                       compare_func_t compare, dsa_sort_stats_t *stats) {
